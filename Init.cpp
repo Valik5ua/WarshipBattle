@@ -1,40 +1,16 @@
-/*
- * Example of a Windows OpenGL program.
- * The OpenGL code is the same as that used in
- * the X Window System sample
- */
 #include "GL/glew.h"
 #include "GL/freeglut.h" 
 #include "Settings.h"
 
- /* Windows globals, defines, and prototypes */
 CHAR szAppName[] = "Win OpenGL";
-HWND  ghWnd;
-HDC   ghDC;
-HGLRC ghRC;
-
-#define SWAPBUFFERS SwapBuffers(ghDC) 
-
-
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL bSetupPixelFormat(HDC);
+void timerFunc(LPVOID);
+extern HWND  ghWnd;
+extern HDC   ghDC;
+extern HGLRC ghRC;
+extern HANDLE HTimerFunc;
 
-/* OpenGL globals, defines, and prototypes */
-bool drawtime;
-HANDLE HTimerFunc;
-float refreshRate = (float)1000 / 60;
-GLvoid resize(GLsizei, GLsizei);
-GLvoid initializeGL(GLsizei, GLsizei);
-GLvoid drawScene(GLvoid);
-
-void timerFunc(LPVOID)
-{
-    while (true)
-    {
-        Sleep(refreshRate);
-        drawtime = true;
-    }
-}
 int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -108,73 +84,6 @@ int WINAPI WinMain(
     }
 }
 
-/* main window procedure */
-LONG WINAPI MainWndProc(
-    HWND    hWnd,
-    UINT    uMsg,
-    WPARAM  wParam,
-    LPARAM  lParam)
-{
-    LONG    lRet = 1;
-    PAINTSTRUCT    ps;
-    RECT rect;
-
-    switch (uMsg) {
-    case WM_COMMAND:
-        switch (LOWORD(wParam))
-        {
-        default:
-            return DefWindowProc(hWnd, uMsg, wParam, lParam);
-        }
-        break;
-    case WM_CREATE:
-        ghDC = GetDC(hWnd);
-        if (!bSetupPixelFormat(ghDC))
-            PostQuitMessage(0);
-
-        ghRC = wglCreateContext(ghDC);
-        wglMakeCurrent(ghDC, ghRC);
-        GetClientRect(hWnd, &rect);
-        initializeGL(rect.right, rect.bottom);
-        break;
-    case WM_PAINT:
-        BeginPaint(hWnd, &ps);
-        EndPaint(hWnd, &ps);
-        break;
-
-    case WM_SIZE:
-        GetClientRect(hWnd, &rect);
-        resize(rect.right, rect.bottom);
-        break;
-
-    case WM_CLOSE:
-        if (ghRC)
-            wglDeleteContext(ghRC);
-        if (ghDC)
-            ReleaseDC(hWnd, ghDC);
-        ghRC = 0;
-        ghDC = 0;
-
-        TerminateThread(HTimerFunc, 0x0);
-        DestroyWindow(hWnd);
-        break;
-
-    case WM_DESTROY:
-        if (ghRC)
-            wglDeleteContext(ghRC);
-        if (ghDC)
-            ReleaseDC(hWnd, ghDC);
-        TerminateThread(HTimerFunc, 0x0);
-        PostQuitMessage(0);
-        break;
-    default:
-        lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
-        break;
-    }
-
-    return lRet;
-}
-
 BOOL bSetupPixelFormat(HDC hdc)
 {
     PIXELFORMATDESCRIPTOR pfd, * ppfd;
@@ -212,33 +121,15 @@ BOOL bSetupPixelFormat(HDC hdc)
 
 /* OpenGL code */
 
-GLvoid resize(GLsizei width, GLsizei height)
-{
-    GLfloat aspect;
 
-    glViewport(0, 0, width, height);
-
-    aspect = (GLfloat)width / height;
-
-     glViewport(0, 0, width, height);
-    glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, 25, 0, 14); //Setting Up 2D ORTHOGRAPHIC projection
-    glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
-}
 GLvoid initializeGL(GLsizei width, GLsizei height)
 {
     GLfloat     maxObjectSize, aspect;
     GLdouble    near_plane, far_plane;
     glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-    
+
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
     gluOrtho2D(0, 25, 0, 14); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
-}
-
-GLvoid drawScene(GLvoid)
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-    SWAPBUFFERS;
 }
