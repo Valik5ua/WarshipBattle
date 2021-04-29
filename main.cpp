@@ -1,46 +1,27 @@
-/*
- * Example of a Windows OpenGL program.
- * The OpenGL code is the same as that used in
- * the X Window System sample
- */
 #include "GL/glew.h"
 #include "GL/freeglut.h" 
-#include "Settings.h"
+#include "recource.h"
 
- /* Windows globals, defines, and prototypes */
-CHAR szAppName[] = "Win OpenGL";
-HWND  ghWnd;
-HDC   ghDC;
-HGLRC ghRC;
-
-#define SWAPBUFFERS SwapBuffers(ghDC) 
-
-
+//Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL bSetupPixelFormat(HDC);
+BOOL B_SetupPixelFormat(HDC);
 
-/* OpenGL globals, defines, and prototypes */
-bool drawtime;
-HANDLE HTimerFunc;
-float refreshRate = (float)1000 / 60;
-GLvoid resize(GLsizei, GLsizei);
-GLvoid initializeGL(GLsizei, GLsizei);
-GLvoid drawScene(GLvoid);
+//OpenGL defines 
+#define SWAPBUFFERS SwapBuffers(hDC) 
 
-void timerFunc(LPVOID)
-{
-    while (true)
-    {
-        Sleep(refreshRate);
-        drawtime = true;
-    }
-}
+// OpenGL prototypes 
+GLvoid Resize(GLsizei, GLsizei);
+GLvoid InitGL(GLsizei, GLsizei);
+GLvoid DrawScene(GLvoid);
+
+//Custom prototypes
+void TimerFunc(LPVOID);
+
 int WINAPI WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPSTR lpCmdLine,
-    _In_ int nShowCmd
-)
+    _In_ int nShowCmd)
 {
     MSG        msg;
     WNDCLASS   wndclass;
@@ -51,43 +32,44 @@ int WINAPI WinMain(
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = hInstance;
-    wndclass.hIcon = LoadIconA(hInstance, szAppName);
+    wndclass.hIcon = LoadIconA(hInstance, WindowClassName);
     wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
     wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wndclass.lpszMenuName = (LPCWSTR)szAppName;
-    wndclass.lpszClassName = (LPCWSTR)szAppName;
+    wndclass.lpszMenuName = (LPCWSTR)WindowClassName;
+    wndclass.lpszClassName = (LPCWSTR)WindowClassName;
 
     if (!RegisterClass(&wndclass))
         return FALSE;
 
     /* Create the frame */
-    ghWnd = CreateWindow((LPCWSTR)szAppName,
-        L"Windows OpenGL",
+    hwnd = CreateWindow((LPCWSTR)WindowClassName,
+        L"Warships Battle",
         WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        WIDTH,
-        HEIGHT,
+        MINIMAL_WIDTH,
+        MINIMAL_HEIGHT,
         NULL,
         NULL,
         hInstance,
         NULL);
 
     /* make sure window was created */
-    if (!ghWnd)
+    if (!hwnd)
         return FALSE;
 
     /* show and update main window */
-    ShowWindow(ghWnd, nShowCmd);
+    ShowWindow(hwnd, SW_SHOWMAXIMIZED);
 
-    UpdateWindow(ghWnd);
+    UpdateWindow(hwnd);
 
+    //Create thread to Implement TimerFunc, which tells the program when to redraw the window 
+    TimerFuncHandler = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)TimerFunc, NULL, NULL, NULL);
+    
     /* animation loop */
-    HTimerFunc = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)timerFunc, NULL, NULL, NULL);
-    while (1) {
-        /*
-         *  Process all pending messages
-         */
+    while (true) {
+
+        // Process all pending messages 
 
         while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) == TRUE)
         {
@@ -100,15 +82,15 @@ int WINAPI WinMain(
                 return TRUE;
             }
         }
-        if (drawtime)
+        if (TimeToRedraw)
         {
-            drawScene();
-            drawtime = false;
+            DrawScene();
+            TimeToRedraw = false;
         }
     }
 }
 
-/* main window procedure */
+// main window procedure 
 LONG WINAPI MainWndProc(
     HWND    hWnd,
     UINT    uMsg,
@@ -123,19 +105,17 @@ LONG WINAPI MainWndProc(
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
-        default:
-            return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
         break;
     case WM_CREATE:
-        ghDC = GetDC(hWnd);
-        if (!bSetupPixelFormat(ghDC))
+        hDC = GetDC(hWnd);
+        if (!B_SetupPixelFormat(hDC))
             PostQuitMessage(0);
 
-        ghRC = wglCreateContext(ghDC);
-        wglMakeCurrent(ghDC, ghRC);
+        hRC = wglCreateContext(hDC);
+        wglMakeCurrent(hDC, hRC);
         GetClientRect(hWnd, &rect);
-        initializeGL(rect.right, rect.bottom);
+        InitGL(rect.right, rect.bottom);
         break;
     case WM_PAINT:
         BeginPaint(hWnd, &ps);
@@ -144,28 +124,35 @@ LONG WINAPI MainWndProc(
 
     case WM_SIZE:
         GetClientRect(hWnd, &rect);
-        resize(rect.right, rect.bottom);
+        Resize(rect.right, rect.bottom);
         break;
 
     case WM_CLOSE:
-        if (ghRC)
-            wglDeleteContext(ghRC);
-        if (ghDC)
-            ReleaseDC(hWnd, ghDC);
-        ghRC = 0;
-        ghDC = 0;
+        if (hRC)
+            wglDeleteContext(hRC);
+        if (hDC)
+            ReleaseDC(hWnd, hDC);
+        hRC = 0;
+        hDC = 0;
 
-        TerminateThread(HTimerFunc, 0x0);
         DestroyWindow(hWnd);
         break;
 
     case WM_DESTROY:
-        if (ghRC)
-            wglDeleteContext(ghRC);
-        if (ghDC)
-            ReleaseDC(hWnd, ghDC);
-        TerminateThread(HTimerFunc, 0x0);
+        if (hRC)
+            wglDeleteContext(hRC);
+        if (hDC)
+            ReleaseDC(hWnd, hDC);
+
+        CloseHandle(TimerFuncHandler);
         PostQuitMessage(0);
+        break;
+    case WM_GETMINMAXINFO:
+    {
+        PMINMAXINFO pMinMaxInfo{ (PMINMAXINFO)lParam };
+        pMinMaxInfo->ptMinTrackSize.x = MINIMAL_WIDTH;
+        pMinMaxInfo->ptMinTrackSize.y = MINIMAL_HEIGHT;
+    }
         break;
     default:
         lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -175,7 +162,7 @@ LONG WINAPI MainWndProc(
     return lRet;
 }
 
-BOOL bSetupPixelFormat(HDC hdc)
+BOOL B_SetupPixelFormat(HDC hdc)
 {
     PIXELFORMATDESCRIPTOR pfd, * ppfd;
     int pixelformat;
@@ -184,8 +171,7 @@ BOOL bSetupPixelFormat(HDC hdc)
 
     ppfd->nSize = sizeof(PIXELFORMATDESCRIPTOR);
     ppfd->nVersion = 1;
-    ppfd->dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL |
-        PFD_DOUBLEBUFFER;
+    ppfd->dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
     ppfd->dwLayerMask = PFD_MAIN_PLANE;
     ppfd->iPixelType = PFD_TYPE_COLORINDEX;
     ppfd->cColorBits = 8;
@@ -209,26 +195,20 @@ BOOL bSetupPixelFormat(HDC hdc)
 
     return TRUE;
 }
+// OpenGL code
 
-/* OpenGL code */
-
-GLvoid resize(GLsizei width, GLsizei height)
+GLvoid Resize(GLsizei width, GLsizei height)
 {
-    GLfloat aspect;
-
     glViewport(0, 0, width, height);
 
-    aspect = (GLfloat)width / height;
-
-     glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
     gluOrtho2D(0, 25, 0, 14); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
-GLvoid initializeGL(GLsizei width, GLsizei height)
+
+GLvoid InitGL(GLsizei width, GLsizei height)
 {
-    GLfloat     maxObjectSize, aspect;
-    GLdouble    near_plane, far_plane;
     glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
     
     glViewport(0, 0, width, height);
@@ -237,8 +217,30 @@ GLvoid initializeGL(GLsizei width, GLsizei height)
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
-GLvoid drawScene(GLvoid)
+GLvoid DrawScene(GLvoid)
 {
     glClear(GL_COLOR_BUFFER_BIT);
+    glBegin(GL_QUADS);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex2f(1.0f, 2.0f);
+    glVertex2f(1.0f, 1.0f);
+    glVertex2f(2.0f, 1.0f);
+    glVertex2f(2.0f, 2.0f);
+    glEnd();
     SWAPBUFFERS;
+}
+
+//Custom Functions
+
+/// <summary>
+/// Function that tells the program when to redraw the window
+/// </summary>
+/// <param name="">No paraneters required</param>
+void TimerFunc(LPVOID)
+{
+    while (true)
+    {
+        Sleep(FrameRate);
+        TimeToRedraw = true;
+    }
 }
