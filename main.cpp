@@ -117,6 +117,10 @@ LONG WINAPI MainWndProc(
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
+        case MENU_NEW_EXIT:
+            SendMessage(hWnd, WM_CLOSE, NULL, NULL); 
+        default:
+            return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
         break;
     case WM_CREATE:
@@ -233,11 +237,14 @@ GLvoid DrawScene(GLvoid)
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
     glLoadIdentity();
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex2f(1.0f, OPENGLHEIGHT - 1.0f);
-    glVertex2f(1.0f, 1.0f);
-    glVertex2f(OPENGLWIDTH  - 1.0f, 1.0f);
-    glVertex2f(OPENGLWIDTH - 1.0f, OPENGLHEIGHT - 1.0f);
+    for (int i{ 1 }; i < 13; i++)
+    {
+        glColor3f((float)(i % 2) / 10, (float)(i % 3) / 10, (float)(i % 4) / 10);
+        glVertex2f(i, OPENGLHEIGHT - i);
+        glVertex2f(i, i);
+        glVertex2f(OPENGLWIDTH - i, i);
+        glVertex2f(OPENGLWIDTH - i, OPENGLHEIGHT - i);
+    }
     glEnd();
     SWAPBUFFERS;
 }

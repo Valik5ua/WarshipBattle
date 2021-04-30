@@ -23,6 +23,8 @@ void CreateMenus(HWND hwnd)
     AppendMenu(HMenuNewPVE, MF_STRING, (UINT_PTR)MENU_PVE_MEDIUM, L"Medium Mode");
     AppendMenu(HMenuNewPVE, MF_STRING, (UINT_PTR)MENU_PVE_HARD, L"Hard Mode");
 
+    AppendMenu(HMenuNewGame, MF_STRING, (UINT_PTR)MENU_NEW_EXIT, L"Exit");
+
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR)HMenuHelp, L"Help");
 
     AppendMenu(HMenuHelp, MF_STRING, (UINT_PTR)MENU_HELP_ABOUT, L"About");
