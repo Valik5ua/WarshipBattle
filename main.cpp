@@ -1,6 +1,18 @@
+#include "Menu.h"
 #include "GL/glew.h"
 #include "GL/freeglut.h" 
 #include "recource.h"
+
+// Windows globals
+CHAR   WindowClassName[] = { "Windows OpenGL" };
+HWND   hwnd{};
+HDC    hDC{};
+HGLRC  hRC{};
+
+// Custom globals
+bool   TimeToRedraw{};
+HANDLE TimerFuncHandler{};
+float  FrameRate = (float)1000 / 60;
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -105,6 +117,10 @@ LONG WINAPI MainWndProc(
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
+        case MENU_NEW_EXIT:
+            SendMessage(hWnd, WM_CLOSE, NULL, NULL); 
+        default:
+            return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
         break;
     case WM_CREATE:
@@ -116,6 +132,7 @@ LONG WINAPI MainWndProc(
         wglMakeCurrent(hDC, hRC);
         GetClientRect(hWnd, &rect);
         InitGL(rect.right, rect.bottom);
+        CreateMenus(hWnd);
         break;
     case WM_PAINT:
         BeginPaint(hWnd, &ps);
@@ -134,7 +151,6 @@ LONG WINAPI MainWndProc(
             ReleaseDC(hWnd, hDC);
         hRC = 0;
         hDC = 0;
-
         DestroyWindow(hWnd);
         break;
 
@@ -143,7 +159,6 @@ LONG WINAPI MainWndProc(
             wglDeleteContext(hRC);
         if (hDC)
             ReleaseDC(hWnd, hDC);
-
         CloseHandle(TimerFuncHandler);
         PostQuitMessage(0);
         break;
@@ -203,7 +218,7 @@ GLvoid Resize(GLsizei width, GLsizei height)
 
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, 25, 0, 14); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(0, OPENGLWIDTH, 0, OPENGLHEIGHT); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
@@ -213,7 +228,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
     
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, 25, 0, 14); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(0, OPENGLWIDTH, 0, OPENGLHEIGHT); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
@@ -221,11 +236,15 @@ GLvoid DrawScene(GLvoid)
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex2f(1.0f, 2.0f);
-    glVertex2f(1.0f, 1.0f);
-    glVertex2f(2.0f, 1.0f);
-    glVertex2f(2.0f, 2.0f);
+    glLoadIdentity();
+    for (int i{ 1 }; i < 13; i++)
+    {
+        glColor3f((float)(i % 2) / 10, (float)(i % 3) / 10, (float)(i % 4) / 10);
+        glVertex2f(i, OPENGLHEIGHT - i);
+        glVertex2f(i, i);
+        glVertex2f(OPENGLWIDTH - i, i);
+        glVertex2f(OPENGLWIDTH - i, OPENGLHEIGHT - i);
+    }
     glEnd();
     SWAPBUFFERS;
 }
