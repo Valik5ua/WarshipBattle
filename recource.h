@@ -8,13 +8,13 @@
 #define OPENGLHEIGHT			14
 
 // Bottom level Menus For New Game
-#define MENU_NEW_PVP			1
+#define MENU_GAME_PVP			1
 
-#define MENU_PVE_EASY			11
-#define MENU_PVE_MEDIUM			12
-#define MENU_PVE_HARD			13
+#define MENU_GAME_EASY			11
+#define MENU_GAME_MEDIUM			12
+#define MENU_GAME_HARD			13
 
-#define MENU_NEW_EXIT			101
+#define MENU_GAME_EXIT			101
 
 //Bottom level Menu For Help
 #define MENU_HELP_ABOUT			201
