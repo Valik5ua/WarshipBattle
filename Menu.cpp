@@ -1,5 +1,7 @@
-#include "recource.h"
+#include "resource.h"
 #include "Menu.h"
+
+extern Engine _Engine;
 
 /// <summary>
 /// This function creates the menus

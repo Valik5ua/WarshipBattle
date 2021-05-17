@@ -1,7 +1,7 @@
 #include "Menu.h"
 #include "GL/glew.h"
 #include "GL/freeglut.h" 
-#include "recource.h"
+#include "resource.h"
 
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
@@ -13,6 +13,7 @@ HGLRC  hRC{};
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
+Engine _Engine;
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -59,8 +60,8 @@ int WINAPI WinMain(
         WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        MINIMAL_WIDTH,
-        MINIMAL_HEIGHT,
+        MinimalWidth,
+        MinimalHeight,
         NULL,
         NULL,
         hInstance,
@@ -165,8 +166,8 @@ LONG WINAPI MainWndProc(
     case WM_GETMINMAXINFO:
     {
         PMINMAXINFO pMinMaxInfo{ (PMINMAXINFO)lParam };
-        pMinMaxInfo->ptMinTrackSize.x = MINIMAL_WIDTH;
-        pMinMaxInfo->ptMinTrackSize.y = MINIMAL_HEIGHT;
+        pMinMaxInfo->ptMinTrackSize.x = MinimalWidth;
+        pMinMaxInfo->ptMinTrackSize.y = MinimalHeight;
     }
         break;
     default:
@@ -214,21 +215,50 @@ BOOL B_SetupPixelFormat(HDC hdc)
 
 GLvoid Resize(GLsizei width, GLsizei height)
 {
-    glViewport(0, 0, width, height);
-
+    _Engine.m_iCurrentHeight = height;
+    _Engine.m_iCurrentWidth = width;
+    if ((float)width / height < AspectRatio)
+    {
+        _Engine.m_iPixelCellSize = _Engine.m_iCurrentHeight / OpenGLHeight;
+        _Engine.m_fOffestH = (float)height - (width / AspectRatio);
+        _Engine.m_fOffestH /= (width / OpenGLWidth);
+        _Engine.m_fOffestH /= 2;
+    }
+    if ((float)width / height > AspectRatio)
+    {
+        _Engine.m_iPixelCellSize = _Engine.m_iCurrentWidth / OpenGLWidth;
+        _Engine.m_fOffestW = (float)width - (height * AspectRatio);
+        _Engine.m_fOffestW /= (height / OpenGLHeight);
+        _Engine.m_fOffestW /= 2;
+    }
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, OPENGLWIDTH, 0, OPENGLHEIGHT); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(-_Engine.m_fOffestW, OpenGLWidth + _Engine.m_fOffestW, -_Engine.m_fOffestH, OpenGLHeight + _Engine.m_fOffestH); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
+    DrawScene();
 }
 
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
     glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
     
+    float fOffsetHeight{};
+    float fOffsetWidth{};
+    if ((float)width / height < AspectRatio)
+    {
+        fOffsetHeight = (float)height - (width / AspectRatio);
+        fOffsetHeight /= (width / OpenGLWidth);
+        fOffsetHeight /= 2;
+    }
+    if ((float)width / height > AspectRatio)
+    {
+        fOffsetWidth = (float)width - (height * AspectRatio);
+        fOffsetWidth /= (height / OpenGLHeight);
+        fOffsetWidth /= 2;
+    }
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, OPENGLWIDTH, 0, OPENGLHEIGHT); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(-fOffsetWidth, OpenGLWidth + fOffsetWidth, -fOffsetHeight, OpenGLHeight + fOffsetHeight); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
@@ -237,14 +267,22 @@ GLvoid DrawScene(GLvoid)
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
     glLoadIdentity();
-    for (float i{ 1 }; i < 12.8; i+=0.1)
+
+    glColor3f(0, 1, 0);
+    glVertex2f(0, 0);
+    glVertex2f(OpenGLWidth, 0);
+    glVertex2f(OpenGLWidth, OpenGLHeight);
+    glVertex2f(0, OpenGLHeight);
+    /*
+    for (float i{}; i < 16; i += 0.01)
     {
-        glColor3f(i, i / 10, i / 2);
-        glVertex2f(i, OPENGLHEIGHT - i);
+        glColor3f(i / 20, i / 100, i / 9);
+        glVertex2f(i, OpenGLHeight - i);
         glVertex2f(i, i);
-        glVertex2f(OPENGLWIDTH - i, i);
-        glVertex2f(OPENGLWIDTH - i, OPENGLHEIGHT - i);
+        glVertex2f(OpenGLWidth - i, i);
+        glVertex2f(OpenGLWidth - i, OpenGLHeight - i);
     }
+    */
     glEnd();
     SWAPBUFFERS;
 }
