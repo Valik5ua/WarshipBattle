@@ -264,14 +264,14 @@ GLvoid DrawScene(GLvoid)
     glVertex2f(OpenGLWidth, OpenGLHeight);
     glVertex2f(0, OpenGLHeight);
     glEnd();
-    for (int i{}; i < OpenGLHeight * 2; i++)
+    for (int i{}; i < OpenGLWidth; i++)
     {
         glBegin(GL_LINES);
         glColor3f(0.0f, 0.0f, 0.0f);
         glVertex2f(i, 0);
         glVertex2f(i, OpenGLHeight);
     }
-    for (int i{}; i < OpenGLWidth * 2; i++)
+    for (int i{}; i < OpenGLHeight; i++)
     {
         glBegin(GL_LINES);
         glColor3f(0.0f, 0.0f, 0.0f);
