@@ -6,11 +6,9 @@ class Engine
 public:
 	Engine();
 	void ConvertPixelsToGL(POINT* Pixels);
-	void SetMetrics(int Width, int Height);
-	void SetOffset();
+	void SetWindowGLParam(int Width, int Height);
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
-	void MouseFunc(int X, int Y);
 private:
 	enum MODE { Connecting, Deploying, MainGame };
 	MODE Mode;

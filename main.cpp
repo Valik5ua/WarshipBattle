@@ -3,6 +3,8 @@
 #include "WindowsX.h"
 #include "Menu.h"
 
+#define DEBUG
+
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
@@ -145,8 +147,11 @@ LONG WINAPI MainWndProc(
         Resize(rect.right, rect.bottom);
         break;
     case WM_LBUTTONDOWN:
-    {
-        _Engine.MouseFunc(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+    {              
+        POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam)};
+        _Engine.ConvertPixelsToGL(&ClickCoordinate);
+        
+
     }
     break;
     case WM_CLOSE:
@@ -219,8 +224,7 @@ BOOL B_SetupPixelFormat(HDC hdc)
 
 GLvoid Resize(GLsizei width, GLsizei height)
 {
-    _Engine.SetMetrics(width, height);
-    _Engine.SetOffset();
+    _Engine.SetWindowGLParam(width, height);
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
     gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
@@ -232,23 +236,10 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 {
     glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
     
-    float fOffsetHeight{};
-    float fOffsetWidth{};
-    if ((float)width / height < AspectRatio)
-    {
-        fOffsetHeight = (float)height - (width / AspectRatio);
-        fOffsetHeight /= (width / OpenGLWidth);
-        fOffsetHeight /= 2;
-    }
-    if ((float)width / height > AspectRatio)
-    {
-        fOffsetWidth = (float)width - (height * AspectRatio);
-        fOffsetWidth /= (height / OpenGLHeight);
-        fOffsetWidth /= 2;
-    }
+    _Engine.SetWindowGLParam(width, height);
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(-fOffsetWidth, OpenGLWidth + fOffsetWidth, -fOffsetHeight, OpenGLHeight + fOffsetHeight); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
@@ -264,14 +255,14 @@ GLvoid DrawScene(GLvoid)
     glVertex2f(OpenGLWidth, OpenGLHeight);
     glVertex2f(0, OpenGLHeight);
     glEnd();
-    for (int i{}; i < OpenGLHeight * 2; i++)
+    for (int i{}; i < OpenGLWidth; i++)
     {
         glBegin(GL_LINES);
         glColor3f(0.0f, 0.0f, 0.0f);
         glVertex2f(i, 0);
         glVertex2f(i, OpenGLHeight);
     }
-    for (int i{}; i < OpenGLWidth * 2; i++)
+    for (int i{}; i < OpenGLHeight; i++)
     {
         glBegin(GL_LINES);
         glColor3f(0.0f, 0.0f, 0.0f);

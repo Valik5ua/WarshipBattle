@@ -17,17 +17,14 @@ void Engine::ConvertPixelsToGL(POINT* Pixels)
     Pixels->x -= fOffsetW;
 }
 
-void Engine::SetMetrics(int Width, int Height)
+void Engine::SetWindowGLParam(int Width, int Height)
 {
-	iCurrentHeight = Height;
-	iCurrentWidth = Width;
-}
-
-void Engine::SetOffset()
-{
+    iCurrentHeight = Height;
+    iCurrentWidth = Width;
+        _Engine.fOffsetW = 0;
+        _Engine.fOffsetH = 0;
     if ((float)iCurrentWidth / iCurrentHeight < AspectRatio)
     {
-        _Engine.fOffsetW = 0;
 
         _Engine.iPixelCellSize = _Engine.iCurrentWidth / OpenGLWidth;
 
@@ -36,27 +33,10 @@ void Engine::SetOffset()
     }
     else if ((float)iCurrentWidth / iCurrentHeight > AspectRatio)
     {
-        _Engine.fOffsetH = 0;
 
         _Engine.iPixelCellSize = _Engine.iCurrentHeight / OpenGLHeight;
 
         _Engine.fOffsetW = (float)iCurrentWidth - (iCurrentHeight * AspectRatio);
         _Engine.fOffsetW /= (iCurrentHeight / OpenGLHeight * 2);
     }
-}
-
-void Engine::MouseFunc(int X, int Y)
-{
-    POINT Coordinate{ X,Y };
-    ConvertPixelsToGL(&Coordinate);
-
-    static std::ofstream FileMousePos;
-
-    FileMousePos.open("MousePos.test");
-
-    static std::streambuf* sbuf = std::cout.rdbuf();
-
-    std::cout.rdbuf(FileMousePos.rdbuf());
-    std::cout << "(" << std::to_string(Coordinate.x) << ",";
-    std::cout << std::to_string(Coordinate.y) << ")" << std::endl;
 }
