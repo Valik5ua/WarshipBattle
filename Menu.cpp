@@ -1,4 +1,3 @@
-#include "resource.h"
 #include "Menu.h"
 
 extern Engine _Engine;
