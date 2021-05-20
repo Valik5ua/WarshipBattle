@@ -16,5 +16,5 @@ private:
 	float fOffsetW;
 	int iCurrentHeight;
 	int iCurrentWidth;
-	int iPixelCellSize;
+	float fPixelCellSize;
 };

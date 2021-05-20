@@ -1,6 +1,7 @@
 #include "GL/glew.h"
 #include "GL/freeglut.h" 
 #include "WindowsX.h"
+#include <string>
 #include "Menu.h"
 
 #define DEBUG
@@ -151,7 +152,9 @@ LONG WINAPI MainWndProc(
         POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam)};
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
         
-
+        std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","
+            + std::to_string(ClickCoordinate.y) + ")";
+        MessageBoxA(hWnd, Msg.c_str(), "Click coordinates:", MB_OK);
     }
     break;
     case WM_CLOSE:

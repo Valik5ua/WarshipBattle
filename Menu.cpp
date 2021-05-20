@@ -16,7 +16,6 @@ void CreateMenus(HWND hwnd)
 
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR)HMenuGame, L"Game");
 
-
     AppendMenu(HMenuGame, MF_POPUP, (UINT_PTR)HMenuNewPVE, L"Player Vs Computer");
 
     AppendMenu(HMenuNewPVE, MF_STRING, (UINT_PTR)MENU_GAME_EASY, L"Easy Mode");
