@@ -13,8 +13,8 @@ Engine::Engine() :Mode(Connecting), fOffsetH(0), fOffsetW(0), fCurrentHeight(0),
 void Engine::ConvertPixelsToGL(POINT* Pixels)
 {
     Pixels->y = OpenGLHeight * fPixelCellSize - Pixels->y;
-    Pixels->y = floor((Pixels->y / fPixelCellSize) + fOffsetH);
-    Pixels->x = floor((Pixels->x / fPixelCellSize) - fOffsetW);
+    Pixels->y = Pixels->y / fPixelCellSize + fOffsetH;
+    Pixels->x = Pixels->x / fPixelCellSize - fOffsetW;
 }
 
 /// <summary>
