@@ -1,7 +1,10 @@
-#include "Menu.h"
 #include "GL/glew.h"
 #include "GL/freeglut.h" 
-#include "recource.h"
+#include "WindowsX.h"
+#include <string>
+#include "Menu.h"
+
+#define DEBUG
 
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
@@ -13,6 +16,7 @@ HGLRC  hRC{};
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
+Engine _Engine;
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -59,8 +63,8 @@ int WINAPI WinMain(
         WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        MINIMAL_WIDTH,
-        MINIMAL_HEIGHT,
+        MinimalWidth,
+        MinimalHeight,
         NULL,
         NULL,
         hInstance,
@@ -117,7 +121,7 @@ LONG WINAPI MainWndProc(
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
-        case MENU_NEW_EXIT:
+        case MENU_GAME_EXIT:
             SendMessage(hWnd, WM_CLOSE, NULL, NULL); 
         default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -143,7 +147,16 @@ LONG WINAPI MainWndProc(
         GetClientRect(hWnd, &rect);
         Resize(rect.right, rect.bottom);
         break;
-
+    case WM_LBUTTONDOWN:
+    {              
+        POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
+        _Engine.ConvertPixelsToGL(&ClickCoordinate);
+        
+        std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","
+            + std::to_string(ClickCoordinate.y) + ")";
+        MessageBoxA(hWnd, Msg.c_str(), "Click coordinates:", MB_OK);
+    }
+    break;
     case WM_CLOSE:
         if (hRC)
             wglDeleteContext(hRC);
@@ -165,8 +178,8 @@ LONG WINAPI MainWndProc(
     case WM_GETMINMAXINFO:
     {
         PMINMAXINFO pMinMaxInfo{ (PMINMAXINFO)lParam };
-        pMinMaxInfo->ptMinTrackSize.x = MINIMAL_WIDTH;
-        pMinMaxInfo->ptMinTrackSize.y = MINIMAL_HEIGHT;
+        pMinMaxInfo->ptMinTrackSize.x = MinimalWidth;
+        pMinMaxInfo->ptMinTrackSize.y = MinimalHeight;
     }
         break;
     default:
@@ -214,21 +227,22 @@ BOOL B_SetupPixelFormat(HDC hdc)
 
 GLvoid Resize(GLsizei width, GLsizei height)
 {
-    glViewport(0, 0, width, height);
-
+    _Engine.SetWindowGLParam(width, height);
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, OPENGLWIDTH, 0, OPENGLHEIGHT); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
+    DrawScene();
 }
 
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
     glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
     
+    _Engine.SetWindowGLParam(width, height);
     glViewport(0, 0, width, height);
     glLoadIdentity(); //Reset Coordinate System
-    gluOrtho2D(0, OPENGLWIDTH, 0, OPENGLHEIGHT); //Setting Up 2D ORTHOGRAPHIC projection
+    gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
     glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
@@ -237,13 +251,26 @@ GLvoid DrawScene(GLvoid)
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
     glLoadIdentity();
-    for (int i{ 1 }; i < 13; i++)
+
+    glColor3f(0, 1, 0);
+    glVertex2f(0, 0);
+    glVertex2f(OpenGLWidth, 0);
+    glVertex2f(OpenGLWidth, OpenGLHeight);
+    glVertex2f(0, OpenGLHeight);
+    glEnd();
+    for (int i{}; i < OpenGLWidth; i++)
     {
-        glColor3f((float)(i % 2) / 10, (float)(i % 3) / 10, (float)(i % 4) / 10);
-        glVertex2f(i, OPENGLHEIGHT - i);
-        glVertex2f(i, i);
-        glVertex2f(OPENGLWIDTH - i, i);
-        glVertex2f(OPENGLWIDTH - i, OPENGLHEIGHT - i);
+        glBegin(GL_LINES);
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glVertex2f(i, 0);
+        glVertex2f(i, OpenGLHeight);
+    }
+    for (int i{}; i < OpenGLHeight; i++)
+    {
+        glBegin(GL_LINES);
+        glColor3f(0.0f, 0.0f, 0.0f);
+        glVertex2f(0, i);
+        glVertex2f(OpenGLWidth, i);
     }
     glEnd();
     SWAPBUFFERS;
