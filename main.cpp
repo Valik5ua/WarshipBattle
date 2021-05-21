@@ -149,7 +149,7 @@ LONG WINAPI MainWndProc(
         break;
     case WM_LBUTTONDOWN:
     {              
-        POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam)};
+        POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
         
         std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","

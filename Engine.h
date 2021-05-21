@@ -14,7 +14,7 @@ private:
 	MODE Mode;
 	float fOffsetH;
 	float fOffsetW;
-	int iCurrentHeight;
-	int iCurrentWidth;
+	float fCurrentHeight;
+	float fCurrentWidth;
 	float fPixelCellSize;
 };
