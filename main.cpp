@@ -252,26 +252,6 @@ GLvoid DrawScene(GLvoid)
     glBegin(GL_QUADS);
     glLoadIdentity();
 
-    glColor3f(0, 1, 0);
-    glVertex2f(0, 0);
-    glVertex2f(OpenGLWidth, 0);
-    glVertex2f(OpenGLWidth, OpenGLHeight);
-    glVertex2f(0, OpenGLHeight);
-    glEnd();
-    for (int i{}; i < OpenGLWidth; i++)
-    {
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glVertex2f(i, 0);
-        glVertex2f(i, OpenGLHeight);
-    }
-    for (int i{}; i < OpenGLHeight; i++)
-    {
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glVertex2f(0, i);
-        glVertex2f(OpenGLWidth, i);
-    }
     glEnd();
     SWAPBUFFERS;
 }

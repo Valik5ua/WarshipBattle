@@ -20,7 +20,7 @@ const float OpenGLWidth = 32.0;
 const float OpenGLHeight = 16.0;
 const float AspectRatio = OpenGLWidth / OpenGLHeight;
 const float MinimalWidth = OpenGLWidth * MinSizeFactor;
-const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3);
+const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3f);
 
 // Windows globals
 extern CHAR   WindowClassName[];
