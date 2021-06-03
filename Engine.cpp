@@ -1,5 +1,10 @@
-#include "resource.h"
+#include "Engine.h"
 #include <math.h>
+#include "resource.h"
+
+extern const float OpenGLHeight;
+extern const float OpenGLWidth;
+extern const float AspectRatio;
 
 Engine::Engine() :Mode(Connecting), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {

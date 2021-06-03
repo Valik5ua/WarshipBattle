@@ -4,8 +4,6 @@
 #include <string>
 #include "Menu.h"
 
-#define DEBUG
-
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
@@ -17,6 +15,8 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
 Engine _Engine;
+UserField _UserField(3,3);
+EnemyField _EnemyField(19, 3);
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -155,6 +155,8 @@ LONG WINAPI MainWndProc(
         std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","
             + std::to_string(ClickCoordinate.y) + ")";
         MessageBoxA(hWnd, Msg.c_str(), "Click coordinates:", MB_OK);
+        _UserField.Click(ClickCoordinate.x, ClickCoordinate.y);
+        _EnemyField.Click(ClickCoordinate.x, ClickCoordinate.y);
     }
     break;
     case WM_CLOSE:
@@ -237,7 +239,7 @@ GLvoid Resize(GLsizei width, GLsizei height)
 
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
-    glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+    glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
     
     _Engine.SetWindowGLParam(width, height);
     glViewport(0, 0, width, height);
@@ -251,7 +253,8 @@ GLvoid DrawScene(GLvoid)
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
     glLoadIdentity();
-
+    _UserField.Draw();
+    _EnemyField.Draw();
     glEnd();
     SWAPBUFFERS;
 }

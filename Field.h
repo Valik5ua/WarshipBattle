@@ -1,13 +1,15 @@
 #pragma once
 #include "Cell.h"
+#include <map>
 
-class Field : public Cell
+extern HWND hwnd;
+
+class Field
 {
 public:
-	Field(bool DV,bool DH);
-	bool Click(float x, float y);
-	void Draw();
-private:
-	bool Draw_Vertical;
-	bool Draw_Horizontal;
+	Field();
+	virtual bool Click(float GLmouseX, float GLmouseY) { MessageBox(hwnd, L"Click in base class field (from field.h) .", L"Clicked on Field", NULL); return false; }
+	virtual void Draw() {}
+	int StartX;
+	int StartY;
 };

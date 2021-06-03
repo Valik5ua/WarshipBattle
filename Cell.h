@@ -1,14 +1,12 @@
 #pragma once
+#include "GL/glew.h"
+#include "GL/freeglut.h"
 
 class Cell
 {
 public:
 	Cell();
-	Cell(float x, float y, float w, float h);
-	virtual bool Click(float x, float y) = 0;
-protected:
-	float X;
-	float Y;
-	float Width;
-	float Height;
+public:
+	enum Status { opened, closed };
+	Status Stat;
 };
