@@ -1,5 +1,10 @@
-#include "resource.h"
+#include "Engine.h"
 #include <math.h>
+#include <string>
+
+extern const float OpenGLHeight;
+extern const float OpenGLWidth;
+extern const float AspectRatio;
 
 Engine::Engine() :Mode(Connecting), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
@@ -38,4 +43,15 @@ void Engine::SetWindowGLParam(int Width, int Height)
         fGLUnitSize = fCurrentHeight / OpenGLHeight;
         fOffsetW = (fCurrentWidth / fGLUnitSize - OpenGLWidth) / 2;
     }
+}
+
+bool Engine::ClickEvent(Field* ClickedField, POINT ClickCoordinates)
+{
+    std::string msg = "The primary user field was clicked! Cell: (";
+    msg += std::to_string(ClickCoordinates.x);
+    msg += ",";
+    msg += std::to_string(ClickCoordinates.y);
+    msg += ")";
+    MessageBoxA(hwnd, msg.c_str(), "user field was clicked", NULL);
+    return true;
 }

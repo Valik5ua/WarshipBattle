@@ -1,5 +1,4 @@
 #pragma once
-#include "Engine.h"
 
 // Bottom level Menus For New Game
 #define MENU_GAME_PVP			1
@@ -22,14 +21,7 @@ const float AspectRatio = OpenGLWidth / OpenGLHeight;
 const float MinimalWidth = OpenGLWidth * MinSizeFactor;
 const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3f);
 
-// Windows globals
-extern CHAR   WindowClassName[];
-extern HWND   hwnd;
-extern HDC    hDC;
-extern HGLRC  hRC;
-
-// Custom globals
-extern bool   TimeToRedraw;
-extern HANDLE TimerFuncHandler;
-extern float  FrameRate;
-extern Engine _Engine;
+const int MyGameFieldW = 10;
+const int MyGameFieldH = 10;
+const int OpponentGameFieldW = 10;
+const int OpponentGameFieldH = 10;

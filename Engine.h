@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include "Field.h"
 
 class Engine
 {
@@ -9,6 +10,7 @@ public:
 	void SetWindowGLParam(int Width, int Height);
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
+	bool ClickEvent(Field* ClickedField, POINT ClickCoordinates);
 private:
 	enum MODE { Connecting, Deploying, MainGame };
 	MODE Mode;

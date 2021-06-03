@@ -1,13 +1,15 @@
 #pragma once
 #include "Cell.h"
+#include "resource.h"
 
-class Field : public Cell
+extern HWND hwnd;
+
+class Field
 {
 public:
-	Field(bool DV,bool DH);
-	bool Click(float x, float y);
-	void Draw();
-private:
-	bool Draw_Vertical;
-	bool Draw_Horizontal;
+	Field();
+	virtual bool Click(POINT coordinates) = 0;
+	virtual void Draw() = 0;
+	int StartX;
+	int StartY;
 };

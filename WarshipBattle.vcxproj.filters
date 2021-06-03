@@ -27,6 +27,15 @@
     <ClCompile Include="Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Field.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -42,6 +51,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Field.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserField.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
