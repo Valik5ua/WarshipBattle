@@ -1,6 +1,9 @@
 #pragma once
 #include "Field.h"
 
+const int OpponentGameFieldW = 10;
+const int OpponentGameFieldH = 10;
+
 class EnemyField : public Field
 {
 public:
