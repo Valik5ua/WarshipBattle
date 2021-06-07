@@ -8,7 +8,7 @@ class Field
 {
 public:
 	Field();
-	virtual bool Click(POINT coordinates) = 0;
+	virtual bool Click(POINT& coordinates) = 0;
 	virtual void Draw() = 0;
 	int StartX;
 	int StartY;

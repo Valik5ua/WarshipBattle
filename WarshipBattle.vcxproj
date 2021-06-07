@@ -89,6 +89,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SoulutionDir)OpenGl\FreeGLUT\include;$(SoulutionDir)OpenGl\Glew\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,6 +165,7 @@
     <ClCompile Include="Field.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MessageParam.cpp" />
     <ClCompile Include="UserField.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +174,7 @@
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="MessageParam.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="UserField.h" />

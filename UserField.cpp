@@ -1,18 +1,22 @@
 #include "UserField.h"
-#include "Engine.h"
 #include <string>
 
-extern Engine _Engine;
-
-bool UserField::Click(POINT coordinates)
+/// <summary>
+/// Changes 
+/// </summary>
+/// <param name="coordinates"></param>
+/// <returns></returns>
+bool UserField::Click(POINT& coordinates)
 {
+	if (coordinates.x < this->StartX || coordinates.y < this->StartY || coordinates.x >= MyGameFieldW + this->StartX || coordinates.y >= MyGameFieldH + this->StartY) return false;
 	coordinates.x -= this->StartX;
 	coordinates.y -= this->StartY;
-	if (coordinates.x < 0 || coordinates.y < 0 || coordinates.x >= MyGameFieldW || coordinates.y >= MyGameFieldH) return false;
 	Cells[coordinates.x][coordinates.y].Stat = Cell::Status::opened;
-	_Engine.ClickEvent(this, coordinates);
 }
 
+/// <summary>
+/// Draws the Field
+/// </summary>
 void UserField::Draw()
 {
 	for (int i{-1}; i <= MyGameFieldW; i++)
@@ -40,10 +44,10 @@ void UserField::Draw()
 			if(Cells[i][j].Stat==Cell::Status::opened) glColor3f(1.0f, 1.0f, 1.0f);
 			else glColor3f(0.0f, 0.0f, 0.0f);
 			glBegin(GL_QUADS);
-			glVertex2f(i + StartX, j + StartY + 0.98f);
-			glVertex2f(i + StartX, j + StartY);
-			glVertex2f(i + StartX + 0.98f, j + StartY);
-			glVertex2f(i + StartX + 0.98f, j + StartY + 0.98f);
+			glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
+			glVertex2f(i + this->StartX, j + this->StartY);
+			glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
+			glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 0.98f);
 			glEnd();
 		}
 	}

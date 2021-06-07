@@ -12,6 +12,15 @@
 //Bottom level Menu For Help
 #define MENU_HELP_ABOUT			201
 
+//Messages for MessageParam struct
+#define MSG_LBTTNDOWN			1001
+#define MSG_RBTTNDOWN			1002
+
+#define MSG_KEYPRESS			2001
+
+//Size of the field array
+#define FIELDARRSIZE			2
+
 // Program Metrics
 const float MinSizeFactor = 30;
 

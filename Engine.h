@@ -1,4 +1,5 @@
 #pragma once
+#include "MessageParam.h"
 #include <Windows.h>
 #include "Field.h"
 
@@ -10,13 +11,37 @@ public:
 	void SetWindowGLParam(int Width, int Height);
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
-	bool ClickEvent(Field* ClickedField, POINT ClickCoordinates);
+	bool Event(MessageParam, int MSG, unsigned int key = 0);
 private:
-	enum MODE { Connecting, Deploying, MainGame };
+	enum MODE { WaitingForAction, Connecting, Deploying, MainGame, ComputerTurn };
 	MODE Mode;
 	float fOffsetH;
 	float fOffsetW;
 	float fCurrentHeight;
 	float fCurrentWidth;
 	float fGLUnitSize;
+
+#ifdef TRANSLATE
+
+private: 
+	bool translateMSG(int& MSG, unsigned int Key);
+private:
+	//Fully translated messages for Engine::Event
+	 
+	//Messages when MODE::Connecting is the current mode
+#define TRANSLATEDMSG_CONNECT		10001
+#define TRANSLATEDMSG_DISCONNECT    10002
+
+	//Messages when MODE::Deploying is the current mode
+#define TRANSLATEDMSG_SELECTSHIP    11001
+#define TRANSLATEDMSG_MOVESHIPL	    11002
+#define TRANSLATEDMSG_MOVESHIPR	    11003
+#define TRANSLATEDMSG_MOVESHIPUP    11004
+#define TRANSLATEDMSG_MOVESHIPDOWN  11005
+
+	//Messages when MODE::MainGame is the current mode
+#define TRANSLATEDMSG_AIM		    12001
+#define TRANSLATEDMSG_FIRE		    12002
+
+#endif //TRANSLATE
 };

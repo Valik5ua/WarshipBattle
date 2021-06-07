@@ -5,10 +5,10 @@
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
+extern Field* FieldArr[2];
 
-Engine::Engine() :Mode(Connecting), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
+Engine::Engine() :Mode(WaitingForAction), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
-
 }
 
 /// <summary>
@@ -45,13 +45,90 @@ void Engine::SetWindowGLParam(int Width, int Height)
     }
 }
 
-bool Engine::ClickEvent(Field* ClickedField, POINT ClickCoordinates)
+bool Engine::Event(MessageParam Messageparam, int MSG, unsigned int key)
 {
-    std::string msg = "The primary user field was clicked! Cell: (";
-    msg += std::to_string(ClickCoordinates.x);
+
+#ifdef TRANSLATE
+
+    translateMSG(MSG, key);
+    switch (Mode)
+    {
+    case MODE::Connecting:
+    {
+        switch (MSG)
+        {
+        case TRANSLATEDMSG_CONNECT:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_DISCONNECT:
+        {
+        }
+        break;
+        default: 
+            break;
+        }
+    }
+    break;
+    case MODE::Deploying:
+    {
+        switch (MSG)
+        {
+        case TRANSLATEDMSG_SELECTSHIP:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPL:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPR:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPUP:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPDOWN:
+        {
+        }
+        break;
+        default:
+            break;
+        }
+    }
+    break;
+    case MODE::MainGame:
+    {
+        switch (MSG)
+        {
+        case TRANSLATEDMSG_AIM:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_FIRE:
+        {
+        }
+        break;
+        default:
+            break;
+        }
+}
+    break;
+    default:
+        return false;
+    }
+
+#endif //TRANSLATE
+
+    std::string msg = "Field ";
+    msg += std::to_string(Messageparam.SelectedFieldArrNum + 1);
+    msg += " was clicked! Cell: (";
+    msg += std::to_string(Messageparam.GLCoordinates.x);
     msg += ",";
-    msg += std::to_string(ClickCoordinates.y);
+    msg += std::to_string(Messageparam.GLCoordinates.y);
     msg += ")";
-    MessageBoxA(hwnd, msg.c_str(), "user field was clicked", NULL);
+    MessageBoxA(hwnd, msg.c_str(), "A field was clicked", NULL);
     return true;
 }

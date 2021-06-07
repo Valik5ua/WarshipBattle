@@ -9,10 +9,10 @@ class UserField : public Field
 public:
 	UserField(int x, int y)
 	{
-		StartX = x;
-		StartY = y;
+		this->StartX = x;
+		this->StartY = y;
 	}
-	bool Click(POINT coordinates) override;
+	bool Click(POINT& coordinates) override;
 	void Draw() override;
 	Cell Cells[MyGameFieldW][MyGameFieldH];
 };
