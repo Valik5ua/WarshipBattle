@@ -45,14 +45,43 @@ void Engine::SetWindowGLParam(int Width, int Height)
     }
 }
 
-bool Engine::Event(MessageParam Messageparam, int MSG, unsigned int key)
+bool Engine::Event(POINT Coordinates, int MSG, unsigned int key)
 {
-
-#ifdef TRANSLATE
-
-    translateMSG(MSG, key);
+    TranslateMSG(Coordinates, MSG, key);
     switch (Mode)
     {
+#ifdef TRANSLATE
+
+    case MODE::WaitingForAction:
+    {
+        switch (MSG)
+        {
+        case TRANSLATEDMSG_USERFIELDCLICK:
+        {
+            std::string msg = "User Field was clicked! Cell: (";
+            msg += std::to_string(MSGParam.GLCoordinates.x);
+            msg += ",";
+            msg += std::to_string(MSGParam.GLCoordinates.y);
+            msg += ")";
+            MessageBoxA(hwnd, msg.c_str(), "User field was clicked", NULL);
+        }
+        break;
+        case TRANSLATEDMSG_ENEMYFIELDCLICK:
+        {
+            std::string msg = "Enemy Field was clicked! Cell: (";
+            msg += std::to_string(MSGParam.GLCoordinates.x);
+            msg += ",";
+            msg += std::to_string(MSGParam.GLCoordinates.y);
+            msg += ")";
+            MessageBoxA(hwnd, msg.c_str(), "Enemy field was clicked", NULL);
+        }
+        break;
+        default: break;
+        }
+    }
+
+#endif //TRANSLATE
+
     case MODE::Connecting:
     {
         switch (MSG)
@@ -119,16 +148,18 @@ bool Engine::Event(MessageParam Messageparam, int MSG, unsigned int key)
     default:
         return false;
     }
-
-#endif //TRANSLATE
-
-    std::string msg = "Field ";
-    msg += std::to_string(Messageparam.SelectedFieldArrNum + 1);
-    msg += " was clicked! Cell: (";
-    msg += std::to_string(Messageparam.GLCoordinates.x);
-    msg += ",";
-    msg += std::to_string(Messageparam.GLCoordinates.y);
-    msg += ")";
-    MessageBoxA(hwnd, msg.c_str(), "A field was clicked", NULL);
+    return true;
+}
+bool Engine::TranslateMSG(POINT GLCoordinates, int& MSG, unsigned int Key)
+{
+    size_t ActiveArray = 0;
+    for (; ActiveArray < FIELDARRSIZE; ActiveArray++)
+    {
+        if (FieldArr[ActiveArray]->Click(GLCoordinates)) break;
+        if (ActiveArray == FIELDARRSIZE - 1) return false;
+    }
+    MSGParam.GLCoordinates = GLCoordinates;
+    if (ActiveArray == 0) MSG = TRANSLATEDMSG_USERFIELDCLICK;
+    if (ActiveArray == 1) MSG = TRANSLATEDMSG_ENEMYFIELDCLICK;
     return true;
 }

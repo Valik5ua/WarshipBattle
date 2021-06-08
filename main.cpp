@@ -18,7 +18,6 @@ float  FrameRate = (float)1000 / 60;
 Engine _Engine;
 UserField _UserField(3,3);
 EnemyField _EnemyField(19, 3);
-MessageParam MSGParam{};
 Field* FieldArr[FIELDARRSIZE]{ &_UserField, &_EnemyField };
 
 //Windows prototypes
@@ -154,19 +153,13 @@ LONG WINAPI MainWndProc(
     case WM_LBUTTONDOWN:
     {              
         POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
-        MSGParam.WinCoordinates = ClickCoordinate;
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
         
         std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","
             + std::to_string(ClickCoordinate.y) + ")";
         MessageBoxA(hWnd, Msg.c_str(), "Click coordinates:", MB_OK);
         
-        MSGParam.GLCoordinates = ClickCoordinate;
-        MSGParam.SelectActiveField(FieldArr);
-        if(MSGParam.SelectedFieldArrNum>=0)
-        _Engine.Event(MSGParam, MSG_LBTTNDOWN);
-        else
-            MessageBoxA(hWnd, "No field was clicked", "No field was clicked", MB_OK);
+        _Engine.Event(ClickCoordinate, MSG_LBTTNDOWN);
     }
     break;
     case WM_CLOSE:

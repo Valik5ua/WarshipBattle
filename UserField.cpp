@@ -8,10 +8,13 @@
 /// <returns></returns>
 bool UserField::Click(POINT& coordinates)
 {
-	if (coordinates.x < this->StartX || coordinates.y < this->StartY || coordinates.x >= MyGameFieldW + this->StartX || coordinates.y >= MyGameFieldH + this->StartY) return false;
-	coordinates.x -= this->StartX;
-	coordinates.y -= this->StartY;
-	Cells[coordinates.x][coordinates.y].Stat = Cell::Status::opened;
+	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < MyGameFieldW + this->StartX && coordinates.y < MyGameFieldH + this->StartY)
+	{
+		coordinates.x -= this->StartX;
+		coordinates.y -= this->StartY;
+		return true;
+	}
+	return false;
 }
 
 /// <summary>
