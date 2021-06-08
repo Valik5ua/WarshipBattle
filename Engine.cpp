@@ -1,11 +1,14 @@
 #include "Engine.h"
 #include <math.h>
 #include <string>
+#include "UserField.h"
+#include "EnemyField.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
-extern Field* FieldArr[2];
+extern UserField _UserField;
+extern EnemyField _EnemyField;
 
 Engine::Engine() :Mode(WaitingForAction), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
@@ -45,35 +48,25 @@ void Engine::SetWindowGLParam(int Width, int Height)
     }
 }
 
-bool Engine::Event(POINT Coordinates, int MSG, unsigned int key)
+bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 {
-    TranslateMSG(Coordinates, MSG, key);
+    int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
     switch (Mode)
     {
 #ifdef TRANSLATE
 
     case MODE::WaitingForAction:
     {
-        switch (MSG)
+        switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_USERFIELDCLICK:
         {
-            std::string msg = "User Field was clicked! Cell: (";
-            msg += std::to_string(MSGParam.GLCoordinates.x);
-            msg += ",";
-            msg += std::to_string(MSGParam.GLCoordinates.y);
-            msg += ")";
-            MessageBoxA(hwnd, msg.c_str(), "User field was clicked", NULL);
+            _UserField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
         }
         break;
         case TRANSLATEDMSG_ENEMYFIELDCLICK:
         {
-            std::string msg = "Enemy Field was clicked! Cell: (";
-            msg += std::to_string(MSGParam.GLCoordinates.x);
-            msg += ",";
-            msg += std::to_string(MSGParam.GLCoordinates.y);
-            msg += ")";
-            MessageBoxA(hwnd, msg.c_str(), "Enemy field was clicked", NULL);
+            _EnemyField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
         }
         break;
         default: break;
@@ -84,7 +77,7 @@ bool Engine::Event(POINT Coordinates, int MSG, unsigned int key)
 
     case MODE::Connecting:
     {
-        switch (MSG)
+        switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_CONNECT:
         {
@@ -101,7 +94,7 @@ bool Engine::Event(POINT Coordinates, int MSG, unsigned int key)
     break;
     case MODE::Deploying:
     {
-        switch (MSG)
+        switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_SELECTSHIP:
         {
@@ -130,7 +123,7 @@ bool Engine::Event(POINT Coordinates, int MSG, unsigned int key)
     break;
     case MODE::MainGame:
     {
-        switch (MSG)
+        switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_AIM:
         {
@@ -150,16 +143,20 @@ bool Engine::Event(POINT Coordinates, int MSG, unsigned int key)
     }
     return true;
 }
-bool Engine::TranslateMSG(POINT GLCoordinates, int& MSG, unsigned int Key)
+
+int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
-    size_t ActiveArray = 0;
-    for (; ActiveArray < FIELDARRSIZE; ActiveArray++)
+    if (MSG == MSG_LBTTNDOWN)
     {
-        if (FieldArr[ActiveArray]->Click(GLCoordinates)) break;
-        if (ActiveArray == FIELDARRSIZE - 1) return false;
+        if (_UserField.Click(Coordinates))
+        {
+            MSGParam.FieldCoordinates = Coordinates;
+            return TRANSLATEDMSG_USERFIELDCLICK;
+        }
+        if (_EnemyField.Click(Coordinates))
+        {
+            MSGParam.FieldCoordinates = Coordinates;
+            return TRANSLATEDMSG_ENEMYFIELDCLICK;
+        }
     }
-    MSGParam.GLCoordinates = GLCoordinates;
-    if (ActiveArray == 0) MSG = TRANSLATEDMSG_USERFIELDCLICK;
-    if (ActiveArray == 1) MSG = TRANSLATEDMSG_ENEMYFIELDCLICK;
-    return true;
 }

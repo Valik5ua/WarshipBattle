@@ -18,9 +18,6 @@
 
 #define MSG_KEYPRESS			2001
 
-//Size of the field array
-#define FIELDARRSIZE			2
-
 // Program Metrics
 const float MinSizeFactor = 30;
 

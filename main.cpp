@@ -18,7 +18,6 @@ float  FrameRate = (float)1000 / 60;
 Engine _Engine;
 UserField _UserField(3,3);
 EnemyField _EnemyField(19, 3);
-Field* FieldArr[FIELDARRSIZE]{ &_UserField, &_EnemyField };
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -154,11 +153,6 @@ LONG WINAPI MainWndProc(
     {              
         POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
-        
-        std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","
-            + std::to_string(ClickCoordinate.y) + ")";
-        MessageBoxA(hWnd, Msg.c_str(), "Click coordinates:", MB_OK);
-        
         _Engine.Event(ClickCoordinate, MSG_LBTTNDOWN);
     }
     break;

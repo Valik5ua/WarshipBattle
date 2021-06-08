@@ -12,7 +12,7 @@ public:
 	void SetWindowGLParam(int Width, int Height);
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
-	bool Event(POINT Coordinates, int MSG, unsigned int key = 0);
+	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
 private:
 	enum MODE { WaitingForAction, Connecting, Deploying, MainGame, ComputerTurn };
 	MODE Mode;
@@ -29,12 +29,12 @@ private:
 
 	struct MessageParam
 	{
-		POINT WinCoordinates;
-		POINT GLCoordinates;
+		//POINT InputCoordinates;
+		POINT FieldCoordinates;
 	} MSGParam;
 
 private: 
-	bool TranslateMSG(POINT GLCoordinates, int& MSG, unsigned int Key);
+	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 private:
 	//Fully translated messages for Engine::Event
 	
