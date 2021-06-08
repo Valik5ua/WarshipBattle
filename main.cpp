@@ -1,10 +1,9 @@
-#include "GL/glew.h"
-#include "GL/freeglut.h" 
 #include "WindowsX.h"
-#include <string>
 #include "Menu.h"
-
-#define DEBUG
+#include "Engine.h"
+#include "UserField.h"
+#include "EnemyField.h"
+#include <string>
 
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
@@ -17,6 +16,8 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
 Engine _Engine;
+UserField _UserField(3,3);
+EnemyField _EnemyField(19, 3);
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -122,7 +123,8 @@ LONG WINAPI MainWndProc(
         switch (LOWORD(wParam))
         {
         case MENU_GAME_EXIT:
-            SendMessage(hWnd, WM_CLOSE, NULL, NULL); 
+            SendMessage(hWnd, WM_CLOSE, NULL, NULL);
+            break;
         default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
@@ -151,10 +153,7 @@ LONG WINAPI MainWndProc(
     {              
         POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
-        
-        std::string Msg = "(" + std::to_string(ClickCoordinate.x)+","
-            + std::to_string(ClickCoordinate.y) + ")";
-        MessageBoxA(hWnd, Msg.c_str(), "Click coordinates:", MB_OK);
+        _Engine.Event(ClickCoordinate, MSG_LBTTNDOWN);
     }
     break;
     case WM_CLOSE:
@@ -237,7 +236,7 @@ GLvoid Resize(GLsizei width, GLsizei height)
 
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
-    glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
+    glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
     
     _Engine.SetWindowGLParam(width, height);
     glViewport(0, 0, width, height);
@@ -251,27 +250,8 @@ GLvoid DrawScene(GLvoid)
     glClear(GL_COLOR_BUFFER_BIT);
     glBegin(GL_QUADS);
     glLoadIdentity();
-
-    glColor3f(0, 1, 0);
-    glVertex2f(0, 0);
-    glVertex2f(OpenGLWidth, 0);
-    glVertex2f(OpenGLWidth, OpenGLHeight);
-    glVertex2f(0, OpenGLHeight);
-    glEnd();
-    for (int i{}; i < OpenGLWidth; i++)
-    {
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glVertex2f(i, 0);
-        glVertex2f(i, OpenGLHeight);
-    }
-    for (int i{}; i < OpenGLHeight; i++)
-    {
-        glBegin(GL_LINES);
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glVertex2f(0, i);
-        glVertex2f(OpenGLWidth, i);
-    }
+    _UserField.Draw();
+    _EnemyField.Draw();
     glEnd();
     SWAPBUFFERS;
 }

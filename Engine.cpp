@@ -1,9 +1,17 @@
-#include "resource.h"
+#include "Engine.h"
 #include <math.h>
+#include <string>
+#include "UserField.h"
+#include "EnemyField.h"
 
-Engine::Engine() :Mode(Connecting), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
+extern const float OpenGLHeight;
+extern const float OpenGLWidth;
+extern const float AspectRatio;
+extern UserField _UserField;
+extern EnemyField _EnemyField;
+
+Engine::Engine() :Mode(WaitingForAction), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
-
 }
 
 /// <summary>
@@ -37,5 +45,118 @@ void Engine::SetWindowGLParam(int Width, int Height)
     {
         fGLUnitSize = fCurrentHeight / OpenGLHeight;
         fOffsetW = (fCurrentWidth / fGLUnitSize - OpenGLWidth) / 2;
+    }
+}
+
+bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
+{
+    int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
+    switch (Mode)
+    {
+#ifdef TRANSLATE
+
+    case MODE::WaitingForAction:
+    {
+        switch (TranslatedMSG)
+        {
+        case TRANSLATEDMSG_USERFIELDCLICK:
+        {
+            _UserField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
+        }
+        break;
+        case TRANSLATEDMSG_ENEMYFIELDCLICK:
+        {
+            _EnemyField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
+        }
+        break;
+        default: break;
+        }
+    }
+
+#endif //TRANSLATE
+
+    case MODE::Connecting:
+    {
+        switch (TranslatedMSG)
+        {
+        case TRANSLATEDMSG_CONNECT:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_DISCONNECT:
+        {
+        }
+        break;
+        default: 
+            break;
+        }
+    }
+    break;
+    case MODE::Deploying:
+    {
+        switch (TranslatedMSG)
+        {
+        case TRANSLATEDMSG_SELECTSHIP:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPL:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPR:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPUP:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_MOVESHIPDOWN:
+        {
+        }
+        break;
+        default:
+            break;
+        }
+    }
+    break;
+    case MODE::MainGame:
+    {
+        switch (TranslatedMSG)
+        {
+        case TRANSLATEDMSG_AIM:
+        {
+        }
+        break;
+        case TRANSLATEDMSG_FIRE:
+        {
+        }
+        break;
+        default:
+            break;
+        }
+}
+    break;
+    default:
+        return false;
+    }
+    return true;
+}
+
+int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
+{
+    if (MSG == MSG_LBTTNDOWN)
+    {
+        if (_UserField.Click(Coordinates))
+        {
+            MSGParam.FieldCoordinates = Coordinates;
+            return TRANSLATEDMSG_USERFIELDCLICK;
+        }
+        if (_EnemyField.Click(Coordinates))
+        {
+            MSGParam.FieldCoordinates = Coordinates;
+            return TRANSLATEDMSG_ENEMYFIELDCLICK;
+        }
     }
 }

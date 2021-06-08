@@ -1,6 +1,5 @@
 #include "Menu.h"
-
-extern Engine _Engine;
+#include <Windows.h>
 
 /// <summary>
 /// This function creates the menus
