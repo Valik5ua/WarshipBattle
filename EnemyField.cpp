@@ -36,7 +36,8 @@ void EnemyField::Draw()
 	{
 		for (int j{}; j < OpponentGameFieldH; j++)
 		{
-			if (Cells[i][j].Stat == Cell::Status::opened) glColor3f(1.0f, 1.0f, 1.0f);
+			if(Cells[i][j].Selected) glColor3f(1.0f, 1.0f, 1.0f);
+			else if (Cells[i][j].Stat == Cell::Status::opened) glColor3f(0.67f, 0.67f, 0.67f);
 			else glColor3f(0.0f, 0.0f, 0.0f);
 			glBegin(GL_QUADS);
 			glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
@@ -44,6 +45,23 @@ void EnemyField::Draw()
 			glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
 			glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 0.98f);
 			glEnd();
+		}
+	}
+}
+
+void EnemyField::Select(const size_t CellX, const size_t CellY)
+{
+	Deselect();
+	this->Cells[CellX][CellY].Selected = true;
+}
+
+void EnemyField::Deselect()
+{
+	for (int i{}; i < MyGameFieldW; i++)
+	{
+		for (int j{}; j < MyGameFieldH; j++)
+		{
+			if (this->Cells[i][j].Selected) { this->Cells[i][j].Selected = false; return; }
 		}
 	}
 }

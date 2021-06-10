@@ -14,5 +14,7 @@ public:
 	}
 	bool Click(POINT& coordinates) override;
 	void Draw() override;
+	void Select(const size_t, const size_t) override;
+	void Deselect() override;
 	Cell Cells[MyGameFieldW][MyGameFieldH];
 };

@@ -153,7 +153,7 @@ LONG WINAPI MainWndProc(
     {              
         POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
-        _Engine.Event(ClickCoordinate, MSG_LBTTNDOWN);
+        _Engine.Event(MSG_LBTTNDOWN, ClickCoordinate);
     }
     break;
     case WM_CLOSE:

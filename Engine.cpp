@@ -53,7 +53,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
     switch (Mode)
     {
-#ifdef TRANSLATE
+#ifdef DEBUG1
 
     case MODE::WaitingForAction:
     {
@@ -62,10 +62,12 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         case TRANSLATEDMSG_USERFIELDCLICK:
         {
             _UserField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
+            _UserField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
         }
         break;
         case TRANSLATEDMSG_ENEMYFIELDCLICK:
         {
+            _EnemyField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
             _EnemyField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
         }
         break;
@@ -73,7 +75,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         }
     }
 
-#endif //TRANSLATE
+#endif //DEBUG1
 
     case MODE::Connecting:
     {
