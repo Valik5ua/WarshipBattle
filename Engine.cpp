@@ -73,22 +73,22 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
             _EnemyField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
         }
         break;
-        case BF_MOVE_LEFT:
+        case TRANSLATEDMSG_MOVE_LEFT:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
         break;
-        case BF_MOVE_RIGHT:
+        case TRANSLATEDMSG_MOVE_RIGHT:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
-        case BF_MOVE_DOWN:
+        case TRANSLATEDMSG_MOVE_DOWN:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
-        case BF_MOVE_UP:
+        case TRANSLATEDMSG_MOVE_UP:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
-        case BF_READY:
+        case TRANSLATEDMSG_READY:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
-        case BF_ROTATE:
+        case TRANSLATEDMSG_ROTATE:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
         default: break;
@@ -183,12 +183,12 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         if (_ButtonField.Click(Coordinates))
         {
             MSGParam.FieldCoordinates = Coordinates;
-            if (Coordinates.x == 0 && Coordinates.y == 0 || Coordinates.x == 0 && Coordinates.y == 1) return BF_MOVE_RIGHT;
-            if (Coordinates.x == 1 && Coordinates.y == 0 || Coordinates.x == 2 && Coordinates.y == 0) return BF_MOVE_DOWN;
-            if (Coordinates.x == 2 && Coordinates.y == 1 || Coordinates.x == 2 && Coordinates.y == 2) return BF_MOVE_LEFT;
-            if (Coordinates.x == 0 && Coordinates.y == 2 || Coordinates.x == 1 && Coordinates.y == 2) return BF_MOVE_UP;
-            if (Coordinates.x == 1 && Coordinates.y == 1) return BF_READY;
-            if (Coordinates.x == 3 && (Coordinates.y == 0 || Coordinates.y == 1 || Coordinates.y == 2)) return BF_ROTATE;
+            if (Coordinates.x == 0 && Coordinates.y == 0 || Coordinates.x == 0 && Coordinates.y == 1) return TRANSLATEDMSG_MOVE_RIGHT;
+            if (Coordinates.x == 1 && Coordinates.y == 0 || Coordinates.x == 2 && Coordinates.y == 0) return TRANSLATEDMSG_MOVE_DOWN;
+            if (Coordinates.x == 2 && Coordinates.y == 1 || Coordinates.x == 2 && Coordinates.y == 2) return TRANSLATEDMSG_MOVE_LEFT;
+            if (Coordinates.x == 0 && Coordinates.y == 2 || Coordinates.x == 1 && Coordinates.y == 2) return TRANSLATEDMSG_MOVE_UP;
+            if (Coordinates.x == 1 && Coordinates.y == 1) return TRANSLATEDMSG_READY;
+            if (Coordinates.x == 3 && (Coordinates.y == 0 || Coordinates.y == 1 || Coordinates.y == 2)) return TRANSLATEDMSG_ROTATE;
         }
     }
 }
