@@ -3,7 +3,7 @@
 #include "Engine.h"
 #include "UserField.h"
 #include "EnemyField.h"
-#include <string>
+#include "ButtonField.h"
 
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
@@ -16,8 +16,9 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
 Engine _Engine;
-UserField _UserField(3,3);
-EnemyField _EnemyField(19, 3);
+ButtonField _ButtonField(3, 1);
+UserField _UserField(3,5);
+EnemyField _EnemyField(19, 5);
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -252,6 +253,7 @@ GLvoid DrawScene(GLvoid)
     glLoadIdentity();
     _UserField.Draw();
     _EnemyField.Draw();
+    _ButtonField.Draw();
     glEnd();
     SWAPBUFFERS;
 }

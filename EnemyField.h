@@ -1,5 +1,6 @@
 #pragma once
 #include "Field.h"
+#include "Cell.h"
 
 extern const int OpponentGameFieldW;
 extern const int OpponentGameFieldH;

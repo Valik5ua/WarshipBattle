@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ButtonField.cpp" />
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="EnemyField.cpp" />
     <ClCompile Include="Engine.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="UserField.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonField.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="EnemyField.h" />
     <ClInclude Include="Engine.h" />
