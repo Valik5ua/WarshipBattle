@@ -3,7 +3,7 @@
 
 bool EnemyField::Click(POINT& coordinates)
 {
-	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < MyGameFieldW + this->StartX && coordinates.y < MyGameFieldH + this->StartY)
+	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < OpponentGameFieldW + this->StartX && coordinates.y < OpponentGameFieldH + this->StartY)
 	{
 		coordinates.x -= this->StartX;
 		coordinates.y -= this->StartY;
@@ -57,9 +57,9 @@ void EnemyField::Select(const size_t CellX, const size_t CellY)
 
 void EnemyField::Deselect()
 {
-	for (int i{}; i < MyGameFieldW; i++)
+	for (int i{}; i < OpponentGameFieldW; i++)
 	{
-		for (int j{}; j < MyGameFieldH; j++)
+		for (int j{}; j < OpponentGameFieldH; j++)
 		{
 			if (this->Cells[i][j].Selected) { this->Cells[i][j].Selected = false; return; }
 		}

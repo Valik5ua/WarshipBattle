@@ -4,6 +4,25 @@ ButtonField::ButtonField(int StartX, int StartY)
 {
 	this->StartX = StartX;
 	this->StartY = StartY;
+	this->Cells[0][0].ButtonID = BF_MOVE_LEFT;
+	this->Cells[0][1].ButtonID = BF_MOVE_LEFT;
+
+	this->Cells[0][2].ButtonID = BF_MOVE_UP;
+
+	this->Cells[1][0].ButtonID = BF_MOVE_DOWN;
+
+	this->Cells[1][1].ButtonID = BF_ROTATE;
+
+	this->Cells[1][2].ButtonID = BF_MOVE_UP;
+
+	this->Cells[2][0].ButtonID = BF_MOVE_DOWN;
+
+	this->Cells[2][1].ButtonID = BF_MOVE_RIGHT;
+	this->Cells[2][2].ButtonID = BF_MOVE_RIGHT;
+
+	this->Cells[3][0].ButtonID = BF_DEPLOY;
+	this->Cells[3][1].ButtonID = BF_DEPLOY;
+	this->Cells[3][2].ButtonID = BF_DEPLOY;
 }
 
 bool ButtonField::Click(POINT& coordinates)
@@ -50,32 +69,4 @@ void ButtonField::Draw()
 			glVertex2f(i + this->StartX, j + this->StartY + 1);
 			glEnd();
 		}
-}
-
-void ButtonField::Select(const size_t CellX, const size_t CellY)
-{
-	Deselect();
-	Cells[CellX][CellY].Selected = true;
-	if (CellX == 0 && CellY == 0) Cells[CellX][CellY + 1].Selected = true;
-	if (CellX == 0 && CellY == 1) Cells[CellX][CellY - 1].Selected = true;
-	if (CellX == 1 && CellY == 0) Cells[CellX + 1][CellY].Selected = true;
-	if (CellX == 2 && CellY == 0) Cells[CellX - 1][CellY].Selected = true;
-	if (CellX == 2 && CellY == 1) Cells[CellX][CellY + 1].Selected = true;
-	if (CellX == 2 && CellY == 2) Cells[CellX][CellY - 1].Selected = true;
-	if (CellX == 0 && CellY == 2) Cells[CellX + 1][CellY].Selected = true;
-	if (CellX == 1 && CellY == 2) Cells[CellX - 1][CellY].Selected = true;
-	if (CellX == 3 && CellY == 0) { Cells[CellX][CellY + 1].Selected = true; Cells[CellX][CellY + 2].Selected = true; }
-	if (CellX == 3 && CellY == 1) { Cells[CellX][CellY - 1].Selected = true; Cells[CellX][CellY + 1].Selected = true; }
-	if (CellX == 3 && CellY == 2) { Cells[CellX][CellY - 2].Selected = true; Cells[CellX][CellY - 1].Selected = true; }
-}
-
-void ButtonField::Deselect()
-{
-	for (int i{}; i < ButtonFieldW; i++)
-	{
-		for (int j{}; j < ButtonFieldH; j++)
-		{
-			if (this->Cells[i][j].Selected) this->Cells[i][j].Selected = false;
-		}
-	}
 }

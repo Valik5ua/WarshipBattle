@@ -85,7 +85,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         case TRANSLATEDMSG_MOVE_UP:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
-        case TRANSLATEDMSG_READY:
+        case TRANSLATEDMSG_DEPLOY:
             _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
         case TRANSLATEDMSG_ROTATE:
@@ -183,12 +183,23 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         if (_ButtonField.Click(Coordinates))
         {
             MSGParam.FieldCoordinates = Coordinates;
-            if (Coordinates.x == 0 && Coordinates.y == 0 || Coordinates.x == 0 && Coordinates.y == 1) return TRANSLATEDMSG_MOVE_RIGHT;
-            if (Coordinates.x == 1 && Coordinates.y == 0 || Coordinates.x == 2 && Coordinates.y == 0) return TRANSLATEDMSG_MOVE_DOWN;
-            if (Coordinates.x == 2 && Coordinates.y == 1 || Coordinates.x == 2 && Coordinates.y == 2) return TRANSLATEDMSG_MOVE_LEFT;
-            if (Coordinates.x == 0 && Coordinates.y == 2 || Coordinates.x == 1 && Coordinates.y == 2) return TRANSLATEDMSG_MOVE_UP;
-            if (Coordinates.x == 1 && Coordinates.y == 1) return TRANSLATEDMSG_READY;
-            if (Coordinates.x == 3 && (Coordinates.y == 0 || Coordinates.y == 1 || Coordinates.y == 2)) return TRANSLATEDMSG_ROTATE;
+            switch (_ButtonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+            {
+            case BF_MOVE_DOWN:
+                return TRANSLATEDMSG_MOVE_DOWN;
+            case BF_MOVE_LEFT:
+                return TRANSLATEDMSG_MOVE_LEFT;
+            case BF_MOVE_UP:
+                return TRANSLATEDMSG_MOVE_UP;
+            case BF_MOVE_RIGHT:
+                return TRANSLATEDMSG_MOVE_RIGHT;
+            case BF_DEPLOY:
+                return TRANSLATEDMSG_DEPLOY;
+            case BF_ROTATE:
+                return TRANSLATEDMSG_ROTATE;
+            default: return MSG_VOID;
+            }
         }
     }
+    return MSG_VOID;
 }

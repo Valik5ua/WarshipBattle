@@ -18,6 +18,15 @@
 
 #define MSG_KEYPRESS			2001
 
+//ButtonField Buttons
+#define BF_MOVE_LEFT			14001
+#define BF_MOVE_RIGHT			14002
+#define BF_MOVE_UP				14003
+#define BF_MOVE_DOWN			14004
+
+#define BF_DEPLOY				14101
+#define BF_ROTATE				14102
+
 // Program Metrics
 const float MinSizeFactor = 30;
 
