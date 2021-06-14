@@ -151,10 +151,31 @@ LONG WINAPI MainWndProc(
         Resize(rect.right, rect.bottom);
         break;
     case WM_LBUTTONDOWN:
-    {              
+    {
         POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
         _Engine.ConvertPixelsToGL(&ClickCoordinate);
         _Engine.Event(MSG_LBTTNDOWN, ClickCoordinate);
+    }
+    break;
+    case WM_KEYDOWN:
+    {
+        switch (wParam) {
+        case VK_LEFT:
+            _Engine.Event(MSG_KEYPRESS, { NULL, NULL}, BF_MOVE_LEFT);
+            break;
+        case VK_RIGHT:
+            _Engine.Event(MSG_KEYPRESS, { NULL, NULL}, BF_MOVE_RIGHT);
+            break;
+        case VK_UP:
+            _Engine.Event(MSG_KEYPRESS, { NULL, NULL}, BF_MOVE_UP);
+            break;
+        case VK_DOWN:
+            _Engine.Event(MSG_KEYPRESS, { NULL, NULL}, BF_MOVE_DOWN);
+            break;
+        case 13:
+            _Engine.Event(MSG_KEYPRESS, { NULL, NULL}, BF_DEPLOY);
+            break;
+        }
     }
     break;
     case WM_CLOSE:
@@ -181,49 +202,49 @@ LONG WINAPI MainWndProc(
         pMinMaxInfo->ptMinTrackSize.x = MinimalWidth;
         pMinMaxInfo->ptMinTrackSize.y = MinimalHeight;
     }
-        break;
+    break;
     default:
         lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
         break;
     }
 
     return lRet;
-}
-
-BOOL B_SetupPixelFormat(HDC hdc)
-{
-    PIXELFORMATDESCRIPTOR pfd, * ppfd;
-    int pixelformat;
-
-    ppfd = &pfd;
-
-    ppfd->nSize = sizeof(PIXELFORMATDESCRIPTOR);
-    ppfd->nVersion = 1;
-    ppfd->dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-    ppfd->dwLayerMask = PFD_MAIN_PLANE;
-    ppfd->iPixelType = PFD_TYPE_COLORINDEX;
-    ppfd->cColorBits = 8;
-    ppfd->cDepthBits = 16;
-    ppfd->cAccumBits = 0;
-    ppfd->cStencilBits = 0;
-
-    pixelformat = ChoosePixelFormat(hdc, ppfd);
-
-    if ((pixelformat = ChoosePixelFormat(hdc, ppfd)) == 0)
-    {
-        MessageBoxA(NULL, "ChoosePixelFormat failed", "Error", MB_OK);
-        return FALSE;
     }
 
-    if (SetPixelFormat(hdc, pixelformat, ppfd) == FALSE)
+    BOOL B_SetupPixelFormat(HDC hdc)
     {
-        MessageBoxA(NULL, "SetPixelFormat failed", "Error", MB_OK);
-        return FALSE;
-    }
+        PIXELFORMATDESCRIPTOR pfd, * ppfd;
+        int pixelformat;
 
-    return TRUE;
-}
-// OpenGL code
+        ppfd = &pfd;
+
+        ppfd->nSize = sizeof(PIXELFORMATDESCRIPTOR);
+        ppfd->nVersion = 1;
+        ppfd->dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+        ppfd->dwLayerMask = PFD_MAIN_PLANE;
+        ppfd->iPixelType = PFD_TYPE_COLORINDEX;
+        ppfd->cColorBits = 8;
+        ppfd->cDepthBits = 16;
+        ppfd->cAccumBits = 0;
+        ppfd->cStencilBits = 0;
+
+        pixelformat = ChoosePixelFormat(hdc, ppfd);
+
+        if ((pixelformat = ChoosePixelFormat(hdc, ppfd)) == 0)
+        {
+            MessageBoxA(NULL, "ChoosePixelFormat failed", "Error", MB_OK);
+            return FALSE;
+        }
+
+        if (SetPixelFormat(hdc, pixelformat, ppfd) == FALSE)
+        {
+            MessageBoxA(NULL, "SetPixelFormat failed", "Error", MB_OK);
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+    // OpenGL code
 
 GLvoid Resize(GLsizei width, GLsizei height)
 {

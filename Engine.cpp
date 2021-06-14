@@ -198,5 +198,24 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
             }
         }
     }
+    if (MSG == MSG_KEYPRESS)
+    {
+        switch (Key)
+        {
+        case BF_MOVE_DOWN:
+            return TRANSLATEDMSG_MOVE_DOWN;
+        case BF_MOVE_LEFT:
+            return TRANSLATEDMSG_MOVE_LEFT;
+        case BF_MOVE_UP:
+            return TRANSLATEDMSG_MOVE_UP;
+        case BF_MOVE_RIGHT:
+            return TRANSLATEDMSG_MOVE_RIGHT;
+        case BF_DEPLOY:
+            return TRANSLATEDMSG_DEPLOY;
+        case BF_ROTATE:
+            return TRANSLATEDMSG_ROTATE;
+        default: return MSG_VOID;
+        }
+    }
     return MSG_VOID;
 }
