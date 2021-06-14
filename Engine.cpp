@@ -73,7 +73,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         break;
         case TRANSLATEDMSG_MOVE_LEFT:
             _EnemyField.MoveSelection(BF_MOVE_LEFT);
-        break;
+            break;
         case TRANSLATEDMSG_MOVE_RIGHT:
             _EnemyField.MoveSelection(BF_MOVE_RIGHT);
             break;
@@ -144,13 +144,20 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
-        case TRANSLATEDMSG_AIM:
-        {
-        }
-        break;
+        case TRANSLATEDMSG_MOVE_LEFT:
+            _EnemyField.MoveSelection(BF_MOVE_LEFT);
+            break;
+        case TRANSLATEDMSG_MOVE_RIGHT:
+            _EnemyField.MoveSelection(BF_MOVE_RIGHT);
+            break;
+        case TRANSLATEDMSG_MOVE_DOWN:
+            _EnemyField.MoveSelection(BF_MOVE_DOWN);
+            break;
+        case TRANSLATEDMSG_MOVE_UP:
+            _EnemyField.MoveSelection(BF_MOVE_UP);
+            break;
         case TRANSLATEDMSG_FIRE:
-        {
-        }
+
         break;
         default:
             break;
@@ -190,8 +197,8 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 return TRANSLATEDMSG_MOVE_UP;
             case BF_MOVE_RIGHT:
                 return TRANSLATEDMSG_MOVE_RIGHT;
-            case BF_DEPLOY:
-                return TRANSLATEDMSG_DEPLOY;
+            case BF_FIRE:
+                return TRANSLATEDMSG_FIRE;
             case BF_ROTATE:
                 return TRANSLATEDMSG_ROTATE;
             default: return MSG_VOID;
@@ -210,7 +217,7 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
             return TRANSLATEDMSG_MOVE_UP;
         case BF_MOVE_RIGHT:
             return TRANSLATEDMSG_MOVE_RIGHT;
-        case BF_DEPLOY:
+        case BF_FIRE:
             return TRANSLATEDMSG_DEPLOY;
         case BF_ROTATE:
             return TRANSLATEDMSG_ROTATE;

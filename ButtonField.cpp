@@ -20,9 +20,9 @@ ButtonField::ButtonField(int StartX, int StartY)
 	this->Cells[2][1].ButtonID = BF_MOVE_RIGHT;
 	this->Cells[2][2].ButtonID = BF_MOVE_RIGHT;
 
-	this->Cells[3][0].ButtonID = BF_DEPLOY;
-	this->Cells[3][1].ButtonID = BF_DEPLOY;
-	this->Cells[3][2].ButtonID = BF_DEPLOY;
+	this->Cells[3][0].ButtonID = BF_FIRE;
+	this->Cells[3][1].ButtonID = BF_FIRE;
+	this->Cells[3][2].ButtonID = BF_FIRE;
 }
 
 bool ButtonField::Click(POINT& coordinates)
