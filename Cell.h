@@ -10,5 +10,5 @@ public:
 	enum Status { opened, closed };
 	Status Stat;
 	bool Selected;
-	int ButtonID = 0;
+	int ButtonID;
 };

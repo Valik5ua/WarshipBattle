@@ -37,7 +37,6 @@ void EnemyField::Draw()
 		for (int j{}; j < OpponentGameFieldH; j++)
 		{
 			if(Cells[i][j].Selected) glColor3f(1.0f, 1.0f, 1.0f);
-			else if (Cells[i][j].Stat == Cell::Status::opened) glColor3f(0.67f, 0.67f, 0.67f);
 			else glColor3f(0.0f, 0.0f, 0.0f);
 			glBegin(GL_QUADS);
 			glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
@@ -47,6 +46,57 @@ void EnemyField::Draw()
 			glEnd();
 		}
 	}
+}
+
+bool EnemyField::MoveSelection(int Direction)
+{
+	for (int x{}; x < OpponentGameFieldW; x++)
+	{
+		for (int y{}; y < OpponentGameFieldH; y++)
+		{
+			if (Cells[x][y].Selected)
+			{
+				switch (Direction)
+				{
+				case BF_MOVE_LEFT:
+				{
+					if (x>0)
+					{
+						this->Select(x - 1, y);
+					}
+				}
+				break;
+				case BF_MOVE_RIGHT:
+				{
+					if (x < OpponentGameFieldW - 1)
+					{
+						this->Select(x + 1, y);
+					}
+				}
+				break;
+				case BF_MOVE_UP:
+				{
+					if (y < OpponentGameFieldH - 1)
+					{
+						this->Select(x, y + 1);
+					}
+				}
+				break;
+				case BF_MOVE_DOWN:
+				{
+					if (y > 0)
+					{
+						this->Select(x, y - 1);
+					}
+				}
+				break;
+				default: return false;
+				}
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void EnemyField::Select(const size_t CellX, const size_t CellY)

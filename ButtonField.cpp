@@ -42,6 +42,7 @@ void ButtonField::Draw()
 	{
 		for (int j = StartY; j < ButtonFieldH + StartY; j++)
 		{
+			glColor3f(0.0f, 0.0f, 0.0f);
 			glBegin(GL_LINES);
 			glVertex2f(i, j);
 			glVertex2f(i + 0.98f, j);
@@ -64,9 +65,9 @@ void ButtonField::Draw()
 			else glColor3f(0.0f, 0.0f, 0.0f);
 			glBegin(GL_QUADS);
 			glVertex2f(i + this->StartX, j + this->StartY);
-			glVertex2f(i + this->StartX + 1, j + this->StartY);
-			glVertex2f(i + this->StartX + 1, j + this->StartY + 1);
-			glVertex2f(i + this->StartX, j + this->StartY + 1);
+			glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
+			glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 0.98f);
+			glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
 			glEnd();
 		}
 }

@@ -63,37 +63,34 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         {
         case TRANSLATEDMSG_USERFIELDCLICK:
         {
-            _UserField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
             _UserField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
         }
         break;
         case TRANSLATEDMSG_ENEMYFIELDCLICK:
         {
             _EnemyField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
-            _EnemyField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
         }
         break;
         case TRANSLATEDMSG_MOVE_LEFT:
-            _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            _EnemyField.MoveSelection(BF_MOVE_LEFT);
         break;
         case TRANSLATEDMSG_MOVE_RIGHT:
-            _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            _EnemyField.MoveSelection(BF_MOVE_RIGHT);
             break;
         case TRANSLATEDMSG_MOVE_DOWN:
-            _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            _EnemyField.MoveSelection(BF_MOVE_DOWN);
             break;
         case TRANSLATEDMSG_MOVE_UP:
-            _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            _EnemyField.MoveSelection(BF_MOVE_UP);
             break;
         case TRANSLATEDMSG_DEPLOY:
-            _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
         case TRANSLATEDMSG_ROTATE:
-            _ButtonField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
             break;
         default: break;
         }
     }
+    break;
 
 #endif //DEBUG1
 
