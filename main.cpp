@@ -159,26 +159,7 @@ LONG WINAPI MainWndProc(
 	break;
 	case WM_KEYDOWN:
 	{
-		switch (wParam) {
-		case VK_LEFT:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_LEFT);
-			break;
-		case VK_RIGHT:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_RIGHT);
-			break;
-		case VK_UP:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_UP);
-			break;
-		case VK_DOWN:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_DOWN);
-			break;
-		case 13:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_FIRE);
-			break;
-		case 32:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_ROTATE);
-			break;
-		}
+		_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, wParam);
 	}
 	break;
 	case WM_CLOSE:

@@ -209,17 +209,17 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     {
         switch (Key)
         {
-        case BF_MOVE_DOWN:
+        case VK_DOWN:
             return TRANSLATEDMSG_MOVE_DOWN;
-        case BF_MOVE_LEFT:
+        case VK_LEFT:
             return TRANSLATEDMSG_MOVE_LEFT;
-        case BF_MOVE_UP:
+        case VK_UP:
             return TRANSLATEDMSG_MOVE_UP;
-        case BF_MOVE_RIGHT:
+        case VK_RIGHT:
             return TRANSLATEDMSG_MOVE_RIGHT;
-        case BF_FIRE:
+        case 13:
             return TRANSLATEDMSG_DEPLOY;
-        case BF_ROTATE:
+        case 32:
             return TRANSLATEDMSG_ROTATE;
         default: return MSG_VOID;
         }
