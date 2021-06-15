@@ -3,12 +3,14 @@
 #include <string>
 #include "UserField.h"
 #include "EnemyField.h"
+#include "ButtonField.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
 extern UserField _UserField;
 extern EnemyField _EnemyField;
+extern ButtonField _ButtonField;
 
 Engine::Engine() :Mode(WaitingForAction), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
@@ -53,7 +55,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
     switch (Mode)
     {
-#ifdef TRANSLATE
+#ifdef DEBUG1
 
     case MODE::WaitingForAction:
     {
@@ -61,19 +63,36 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         {
         case TRANSLATEDMSG_USERFIELDCLICK:
         {
-            _UserField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
+            _UserField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
         }
         break;
         case TRANSLATEDMSG_ENEMYFIELDCLICK:
         {
-            _EnemyField.Cells[MSGParam.FieldCoordinates.x][MSGParam.FieldCoordinates.y].Stat = Cell::Status::opened;
+            _EnemyField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
         }
         break;
+        case TRANSLATEDMSG_MOVE_LEFT:
+            _EnemyField.MoveSelection(BF_MOVE_LEFT);
+            break;
+        case TRANSLATEDMSG_MOVE_RIGHT:
+            _EnemyField.MoveSelection(BF_MOVE_RIGHT);
+            break;
+        case TRANSLATEDMSG_MOVE_DOWN:
+            _EnemyField.MoveSelection(BF_MOVE_DOWN);
+            break;
+        case TRANSLATEDMSG_MOVE_UP:
+            _EnemyField.MoveSelection(BF_MOVE_UP);
+            break;
+        case TRANSLATEDMSG_DEPLOY:
+            break;
+        case TRANSLATEDMSG_ROTATE:
+            break;
         default: break;
         }
     }
+    break;
 
-#endif //TRANSLATE
+#endif //DEBUG1
 
     case MODE::Connecting:
     {
@@ -125,13 +144,20 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
-        case TRANSLATEDMSG_AIM:
-        {
-        }
-        break;
+        case TRANSLATEDMSG_MOVE_LEFT:
+            _EnemyField.MoveSelection(BF_MOVE_LEFT);
+            break;
+        case TRANSLATEDMSG_MOVE_RIGHT:
+            _EnemyField.MoveSelection(BF_MOVE_RIGHT);
+            break;
+        case TRANSLATEDMSG_MOVE_DOWN:
+            _EnemyField.MoveSelection(BF_MOVE_DOWN);
+            break;
+        case TRANSLATEDMSG_MOVE_UP:
+            _EnemyField.MoveSelection(BF_MOVE_UP);
+            break;
         case TRANSLATEDMSG_FIRE:
-        {
-        }
+
         break;
         default:
             break;
@@ -158,5 +184,45 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
             MSGParam.FieldCoordinates = Coordinates;
             return TRANSLATEDMSG_ENEMYFIELDCLICK;
         }
+        if (_ButtonField.Click(Coordinates))
+        {
+            MSGParam.FieldCoordinates = Coordinates;
+            switch (_ButtonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+            {
+            case BF_MOVE_DOWN:
+                return TRANSLATEDMSG_MOVE_DOWN;
+            case BF_MOVE_LEFT:
+                return TRANSLATEDMSG_MOVE_LEFT;
+            case BF_MOVE_UP:
+                return TRANSLATEDMSG_MOVE_UP;
+            case BF_MOVE_RIGHT:
+                return TRANSLATEDMSG_MOVE_RIGHT;
+            case BF_FIRE:
+                return TRANSLATEDMSG_FIRE;
+            case BF_ROTATE:
+                return TRANSLATEDMSG_ROTATE;
+            default: return MSG_VOID;
+            }
+        }
     }
+    if (MSG == MSG_KEYPRESS)
+    {
+        switch (Key)
+        {
+        case BF_MOVE_DOWN:
+            return TRANSLATEDMSG_MOVE_DOWN;
+        case BF_MOVE_LEFT:
+            return TRANSLATEDMSG_MOVE_LEFT;
+        case BF_MOVE_UP:
+            return TRANSLATEDMSG_MOVE_UP;
+        case BF_MOVE_RIGHT:
+            return TRANSLATEDMSG_MOVE_RIGHT;
+        case BF_FIRE:
+            return TRANSLATEDMSG_DEPLOY;
+        case BF_ROTATE:
+            return TRANSLATEDMSG_ROTATE;
+        default: return MSG_VOID;
+        }
+    }
+    return MSG_VOID;
 }

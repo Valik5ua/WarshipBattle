@@ -9,4 +9,6 @@ public:
 public:
 	enum Status { opened, closed };
 	Status Stat;
+	bool Selected;
+	int ButtonID;
 };
