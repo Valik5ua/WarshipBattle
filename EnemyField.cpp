@@ -1,6 +1,9 @@
 #include "EnemyField.h"
 #include <string>
 
+extern GLuint WaterTextureID;
+extern GLuint WaterAimTextureID;
+
 bool EnemyField::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < OpponentGameFieldW + this->StartX && coordinates.y < OpponentGameFieldH + this->StartY)
@@ -14,36 +17,31 @@ bool EnemyField::Click(POINT& coordinates)
 
 void EnemyField::Draw()
 {
-	for (int i{}; i <= OpponentGameFieldW; i++)
-	{
-		glLineWidth(1.0f);
-		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex2f(this->StartX + i, this->StartY);
-		glVertex2f(i + this->StartX, this->StartY + OpponentGameFieldH);
-		glEnd();
-	}
-	for (int i{}; i <= OpponentGameFieldH; i++)
-	{
-		glLineWidth(1.0f);
-		glBegin(GL_LINES);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex2f(this->StartX, this->StartY + i);
-		glVertex2f(OpponentGameFieldW + this->StartX, this->StartY + i);
-		glEnd();
-	}
 	for (int i{}; i < OpponentGameFieldW; i++)
 	{
 		for (int j{}; j < OpponentGameFieldH; j++)
 		{
-			if(Cells[i][j].Selected) glColor3f(1.0f, 1.0f, 1.0f);
-			else glColor3f(0.0f, 0.0f, 0.0f);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, WaterTextureID);
 			glBegin(GL_QUADS);
-			glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-			glVertex2f(i + this->StartX, j + this->StartY);
-			glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
-			glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 0.98f);
+			glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
+			glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + this->StartY + 1.0f);
+			glTexCoord2d(1.f, 1.f); glVertex2f(i + this->StartX + 1.0f, j + this->StartY + 1.0f);
+			glTexCoord2d(1.f, 0); glVertex2f(i + this->StartX + 1.0f, j + this->StartY);
 			glEnd();
+			glDisable(GL_TEXTURE_2D);
+			if (Cells[i][j].Selected)
+			{
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, WaterAimTextureID);
+				glBegin(GL_QUADS);
+				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
+				glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + this->StartY + 1.0f);
+				glTexCoord2d(1.f, 1.f); glVertex2f(i + this->StartX + 1.0f, j + this->StartY + 1.0f);
+				glTexCoord2d(1.f, 0); glVertex2f(i + this->StartX + 1.0f, j + this->StartY);
+				glEnd();
+				glDisable(GL_TEXTURE_2D);
+			}
 		}
 	}
 }
@@ -60,7 +58,7 @@ bool EnemyField::MoveSelection(int Direction)
 				{
 				case BF_MOVE_LEFT:
 				{
-					if (x>0)
+					if (x > 0)
 					{
 						this->Select(x - 1, y);
 					}

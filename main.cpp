@@ -4,6 +4,7 @@
 #include "UserField.h"
 #include "EnemyField.h"
 #include "ButtonField.h"
+#include "Texture.h"
 
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
@@ -16,9 +17,9 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
 Engine _Engine;
-ButtonField _ButtonField(3, 1);
-UserField _UserField(3,5);
-EnemyField _EnemyField(19, 5);
+ButtonField buttonField(3, 1);
+UserField userField(3,5);
+EnemyField enemyField(19, 5);
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -34,6 +35,11 @@ GLvoid DrawScene(GLvoid);
 
 //Custom prototypes
 void TimerFunc(LPVOID);
+
+//Texture IDs
+extern GLuint	ShipFrontTextureID;
+extern GLuint	ShipMiddleTextureID;
+extern GLuint	ShipBackTextureID;
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance,
@@ -80,10 +86,13 @@ int WINAPI WinMain(
 	ShowWindow(hwnd, SW_SHOWMAXIMIZED);
 
 	UpdateWindow(hwnd);
-
+	
+	//Loading Textures into memory
+	
 	//Create thread to Implement TimerFunc, which tells the program when to redraw the window 
 	TimerFuncHandler = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)TimerFunc, NULL, NULL, NULL);
 	
+
 	/* animation loop */
 	while (true) {
 
@@ -242,8 +251,13 @@ GLvoid Resize(GLsizei width, GLsizei height)
 
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
+	//sets backround color
 	glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
-	
+
+	//load textures into memory
+	_Engine.LoadAllTextures();
+
+	//Setting screen offset + size info
 	_Engine.SetWindowGLParam(width, height);
 	glViewport(0, 0, width, height);
 	glLoadIdentity(); //Reset Coordinate System
@@ -254,21 +268,19 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_QUADS);
-	glLoadIdentity();
-	_UserField.Draw();
-	_EnemyField.Draw();
-	_ButtonField.Draw();
-	glEnd();
+	userField.Draw();
+	buttonField.Draw();
+	enemyField.Draw();
+
 	SWAPBUFFERS;
 }
 
 //Custom Functions
 
 /// <summary>
-/// Function that tells the program when to redraw the window
+/// Function that tells the program when to redraw the window.
 /// </summary>
-/// <param name="">No paraneters required</param>
+/// <param name="">No parameters required</param>
 void TimerFunc(LPVOID)
 {
 	while (true)

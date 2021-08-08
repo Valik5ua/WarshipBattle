@@ -4,15 +4,59 @@
 #include "UserField.h"
 #include "EnemyField.h"
 #include "ButtonField.h"
+#include "Texture.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
-extern UserField _UserField;
-extern EnemyField _EnemyField;
-extern ButtonField _ButtonField;
 
-Engine::Engine() :Mode(WaitingForAction), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
+extern UserField userField;
+extern EnemyField enemyField;
+extern ButtonField buttonField;
+
+//Texture IDs
+extern GLuint	ShipFrontTextureID;
+extern GLuint	ShipMiddleTextureID;
+extern GLuint	ShipBackTextureID;
+
+extern GLuint	ShipFrontAimTextureID;
+extern GLuint	ShipMiddleAimTextureID;
+extern GLuint	ShipBackAimTextureID;
+
+extern GLuint	ShipFrontAfireTextureID;
+extern GLuint	ShipMiddleAfireTextureID;
+extern GLuint	ShipBackAfireTextureID;
+
+extern GLuint	ShipFrontAfireAimTextureID;
+extern GLuint	ShipMiddleAfireAimTextureID;
+extern GLuint	ShipBackAfireAimTextureID;
+
+extern GLuint	ShipFrontCrackedTextureID;
+extern GLuint	ShipMiddleCrackedTextureID;
+extern GLuint	ShipBackCrackedTextureID;
+
+extern GLuint	ShipFrontCrackedAimTextureID;
+extern GLuint	ShipMiddleCrackedAimTextureID;
+extern GLuint	ShipBackCrackedAimTextureID;
+
+extern GLuint   SingleShipTextureID;
+extern GLuint   SingleShipAimTextureID;
+extern GLuint   SingleShipCrackedTextureID;
+extern GLuint   SingleShipCrackedAimTextureID;
+
+extern GLuint   Btn_RotateTextureID;
+extern GLuint	Btn_RandomAimTextureID;
+extern GLuint	WaterAimTextureID;
+
+extern GLuint	Btn_DownTextureID;
+extern GLuint	Btn_UpTextureID;
+extern GLuint	Btn_LeftTextureID;
+extern GLuint	Btn_RightTextureID;
+extern GLuint	Btn_FireTextureID;
+extern GLuint	Btn_DeployTextureID;
+extern GLuint	WaterTextureID;
+
+Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
 }
 
@@ -55,45 +99,6 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
     switch (Mode)
     {
-#ifdef DEBUG1
-
-    case MODE::WaitingForAction:
-    {
-        switch (TranslatedMSG)
-        {
-        case TRANSLATEDMSG_USERFIELDCLICK:
-        {
-            _UserField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
-        }
-        break;
-        case TRANSLATEDMSG_ENEMYFIELDCLICK:
-        {
-            _EnemyField.Select(MSGParam.FieldCoordinates.x,MSGParam.FieldCoordinates.y);
-        }
-        break;
-        case TRANSLATEDMSG_MOVE_LEFT:
-            _EnemyField.MoveSelection(BF_MOVE_LEFT);
-            break;
-        case TRANSLATEDMSG_MOVE_RIGHT:
-            _EnemyField.MoveSelection(BF_MOVE_RIGHT);
-            break;
-        case TRANSLATEDMSG_MOVE_DOWN:
-            _EnemyField.MoveSelection(BF_MOVE_DOWN);
-            break;
-        case TRANSLATEDMSG_MOVE_UP:
-            _EnemyField.MoveSelection(BF_MOVE_UP);
-            break;
-        case TRANSLATEDMSG_DEPLOY:
-            break;
-        case TRANSLATEDMSG_ROTATE:
-            break;
-        default: break;
-        }
-    }
-    break;
-
-#endif //DEBUG1
-
     case MODE::Connecting:
     {
         switch (TranslatedMSG)
@@ -106,7 +111,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         {
         }
         break;
-        default: 
+        default:
             break;
         }
     }
@@ -135,6 +140,10 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         {
         }
         break;
+        case TRANSLATEDMSG_DEPLOY:
+            break;
+        case TRANSLATEDMSG_ROTATE:
+            break;
         default:
             break;
         }
@@ -144,25 +153,28 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
+        case TRANSLATEDMSG_AIM:
+            enemyField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            break;
         case TRANSLATEDMSG_MOVE_LEFT:
-            _EnemyField.MoveSelection(BF_MOVE_LEFT);
+            enemyField.MoveSelection(BF_MOVE_LEFT);
             break;
         case TRANSLATEDMSG_MOVE_RIGHT:
-            _EnemyField.MoveSelection(BF_MOVE_RIGHT);
+            enemyField.MoveSelection(BF_MOVE_RIGHT);
             break;
         case TRANSLATEDMSG_MOVE_DOWN:
-            _EnemyField.MoveSelection(BF_MOVE_DOWN);
+            enemyField.MoveSelection(BF_MOVE_DOWN);
             break;
         case TRANSLATEDMSG_MOVE_UP:
-            _EnemyField.MoveSelection(BF_MOVE_UP);
+            enemyField.MoveSelection(BF_MOVE_UP);
             break;
         case TRANSLATEDMSG_FIRE:
 
-        break;
+            break;
         default:
             break;
         }
-}
+    }
     break;
     default:
         return false;
@@ -170,59 +182,124 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     return true;
 }
 
+void Engine::LoadAllTextures()
+{
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  // (Actually, this one is the default)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", Btn_RandomAimTextureID);
+    LoadTexture((char*)"Textures\\BTN_ROTATE.bmp", Btn_RotateTextureID);
+    LoadTexture((char*)"Textures\\WaterAim.bmp", WaterAimTextureID);
+    LoadTexture((char*)"Textures\\BTN_UP.bmp", Btn_UpTextureID);
+    LoadTexture((char*)"Textures\\BTN_DOWN.bmp", Btn_DownTextureID);
+    LoadTexture((char*)"Textures\\BTN_LEFT.bmp", Btn_LeftTextureID);
+    LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", Btn_RightTextureID);
+    LoadTexture((char*)"Textures\\BTN_FIRE.bmp", Btn_FireTextureID);
+    LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", Btn_DeployTextureID);
+    LoadTexture((char*)"Textures\\sea.bmp", WaterTextureID);
+    LoadTexture((char*)"Textures\\Ship front Afire.bmp", ShipFrontTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Afire.bmp", ShipMiddleTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Afire.bmp", ShipBackTextureID);
+    LoadTexture((char*)"Textures\\Rocket Missed.bmp", SingleShipTextureID);
+}
+
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
-    if (MSG == MSG_LBTTNDOWN)
+    switch (Mode)
     {
-        if (_UserField.Click(Coordinates))
+    case MODE::Deploying:
+    {
+        if (MSG == MSG_LBTTNDOWN)
         {
-            MSGParam.FieldCoordinates = Coordinates;
-            return TRANSLATEDMSG_USERFIELDCLICK;
-        }
-        if (_EnemyField.Click(Coordinates))
-        {
-            MSGParam.FieldCoordinates = Coordinates;
-            return TRANSLATEDMSG_ENEMYFIELDCLICK;
-        }
-        if (_ButtonField.Click(Coordinates))
-        {
-            MSGParam.FieldCoordinates = Coordinates;
-            switch (_ButtonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+            if (buttonField.Click(Coordinates))
             {
-            case BF_MOVE_DOWN:
-                return TRANSLATEDMSG_MOVE_DOWN;
-            case BF_MOVE_LEFT:
-                return TRANSLATEDMSG_MOVE_LEFT;
-            case BF_MOVE_UP:
-                return TRANSLATEDMSG_MOVE_UP;
-            case BF_MOVE_RIGHT:
-                return TRANSLATEDMSG_MOVE_RIGHT;
-            case BF_FIRE:
-                return TRANSLATEDMSG_FIRE;
-            case BF_ROTATE:
-                return TRANSLATEDMSG_ROTATE;
-            default: return MSG_VOID;
+                MSGParam.FieldCoordinates = Coordinates;
+                switch (buttonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+                {
+                case BF_MOVE_DOWN:
+                    return TRANSLATEDMSG_MOVESHIPDOWN;
+                case BF_MOVE_LEFT:
+                    return TRANSLATEDMSG_MOVESHIPL;
+                case BF_MOVE_UP:
+                    return TRANSLATEDMSG_MOVESHIPUP;
+                case BF_MOVE_RIGHT:
+                    return TRANSLATEDMSG_MOVESHIPR;
+                default: return MSG_VOID;
+                }
+            }
+            if (MSG == MSG_KEYPRESS)
+            {
+                switch (Key)
+                {
+                case VK_DOWN:
+                    return TRANSLATEDMSG_MOVE_DOWN;
+                case VK_LEFT:
+                    return TRANSLATEDMSG_MOVE_LEFT;
+                case VK_UP:
+                    return TRANSLATEDMSG_MOVE_UP;
+                case VK_RIGHT:
+                    return TRANSLATEDMSG_MOVE_RIGHT;
+                case 13:
+                    return TRANSLATEDMSG_DEPLOY;
+                case 32:
+                    return TRANSLATEDMSG_ROTATE;
+                default: return MSG_VOID;
+                }
             }
         }
     }
-    if (MSG == MSG_KEYPRESS)
+    case MODE::MainGame:
     {
-        switch (Key)
+        if (MSG == MSG_LBTTNDOWN)
         {
-        case VK_DOWN:
-            return TRANSLATEDMSG_MOVE_DOWN;
-        case VK_LEFT:
-            return TRANSLATEDMSG_MOVE_LEFT;
-        case VK_UP:
-            return TRANSLATEDMSG_MOVE_UP;
-        case VK_RIGHT:
-            return TRANSLATEDMSG_MOVE_RIGHT;
-        case 13:
-            return TRANSLATEDMSG_DEPLOY;
-        case 32:
-            return TRANSLATEDMSG_ROTATE;
-        default: return MSG_VOID;
+            if (enemyField.Click(Coordinates))
+            {
+                MSGParam.FieldCoordinates = Coordinates;
+                return TRANSLATEDMSG_AIM;
+            }
+            if (buttonField.Click(Coordinates))
+            {
+                MSGParam.FieldCoordinates = Coordinates;
+                switch (buttonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+                {
+                case BF_MOVE_DOWN:
+                    return TRANSLATEDMSG_MOVE_DOWN;
+                case BF_MOVE_LEFT:
+                    return TRANSLATEDMSG_MOVE_LEFT;
+                case BF_MOVE_UP:
+                    return TRANSLATEDMSG_MOVE_UP;
+                case BF_MOVE_RIGHT:
+                    return TRANSLATEDMSG_MOVE_RIGHT;
+                case BF_FIRE:
+                    return TRANSLATEDMSG_FIRE;
+                case BF_RANDOMAIM:
+                    return TRANSLATEDMSG_RANDOMAIM;
+                default: return MSG_VOID;
+                }
+            }
         }
+        if (MSG == MSG_KEYPRESS)
+        {
+            switch (Key)
+            {
+            case VK_DOWN:
+                return TRANSLATEDMSG_MOVE_DOWN;
+            case VK_LEFT:
+                return TRANSLATEDMSG_MOVE_LEFT;
+            case VK_UP:
+                return TRANSLATEDMSG_MOVE_UP;
+            case VK_RIGHT:
+                return TRANSLATEDMSG_MOVE_RIGHT;
+            case 13:
+                return TRANSLATEDMSG_FIRE;
+            case 32:
+                return TRANSLATEDMSG_RANDOMAIM;
+            default: return MSG_VOID;
+            }
+        }
+        return MSG_VOID;
     }
-    return MSG_VOID;
+    }
 }

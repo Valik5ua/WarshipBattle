@@ -1,8 +1,6 @@
 #pragma once
 #include <Windows.h>
 
-#define DEBUG1
-
 class Engine
 {
 public:
@@ -12,7 +10,7 @@ public:
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
-
+	void LoadAllTextures();
 private:
 	enum MODE { WaitingForAction, Connecting, Deploying, MainGame, ComputerTurn };
 	MODE Mode;
@@ -48,25 +46,18 @@ private:
 #define TRANSLATEDMSG_MOVESHIPUP		11004
 #define TRANSLATEDMSG_MOVESHIPDOWN		11005
 
+#define TRANSLATEDMSG_DEPLOY			11101
+#define TRANSLATEDMSG_ROTATE			11102
+
 	//Messages when MODE::MainGame is the current mode
 #define TRANSLATEDMSG_AIM				12001
 #define TRANSLATEDMSG_FIRE				12002
+#define	TRANSLATEDMSG_RANDOMAIM			12003
 
-#ifdef DEBUG1
-
-#define TRANSLATEDMSG_USERFIELDCLICK	13001
-#define TRANSLATEDMSG_ENEMYFIELDCLICK	13002
-
-#endif //DEBUG1
-
-//ButtonField Buttons
-#define TRANSLATEDMSG_MOVE_LEFT			14001
-#define TRANSLATEDMSG_MOVE_RIGHT		14002
-#define TRANSLATEDMSG_MOVE_UP			14003
-#define TRANSLATEDMSG_MOVE_DOWN			14004
-
-#define TRANSLATEDMSG_DEPLOY			14101
-#define TRANSLATEDMSG_ROTATE			14102
+#define TRANSLATEDMSG_MOVE_LEFT			12101
+#define TRANSLATEDMSG_MOVE_RIGHT		12102
+#define TRANSLATEDMSG_MOVE_UP			12103
+#define TRANSLATEDMSG_MOVE_DOWN			12104
 
 #define MSG_VOID						-1
 };

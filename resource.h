@@ -24,8 +24,10 @@
 #define BF_MOVE_UP				14003
 #define BF_MOVE_DOWN			14004
 
-#define BF_FIRE				14101
-#define BF_ROTATE				14102
+#define BF_DEPLOY				14101
+#define BF_FIRE					14102
+#define BF_ROTATE				14103
+#define BF_RANDOMAIM			14104
 
 // Program Metrics
 const float MinSizeFactor = 30;
