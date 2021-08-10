@@ -1,4 +1,4 @@
-#include "ButtonField.h"
+#include "ButtonFieldDeploy.h"
 
 extern GLuint	Btn_RotateTextureID;
 extern GLuint	Btn_DownTextureID;
@@ -8,7 +8,7 @@ extern GLuint	Btn_RightTextureID;
 extern GLuint	Btn_DeployTextureID;
 extern GLuint	WaterTextureID;
 
-ButtonField::ButtonField(int StartX, int StartY)
+ButtonFieldDeploy::ButtonFieldDeploy(int StartX, int StartY)
 {
 	this->StartX = StartX;
 	this->StartY = StartY;
@@ -33,7 +33,7 @@ ButtonField::ButtonField(int StartX, int StartY)
 	this->Cells[3][2].ButtonID = BF_DEPLOY;
 }
 
-bool ButtonField::Click(POINT& coordinates)
+bool ButtonFieldDeploy::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < ButtonFieldW + this->StartX && coordinates.y < ButtonFieldH + this->StartY)
 	{
@@ -44,7 +44,7 @@ bool ButtonField::Click(POINT& coordinates)
 	return false;
 }
 
-void ButtonField::Draw()
+void ButtonFieldDeploy::Draw()
 {
 	for (int i = 0; i < ButtonFieldW; i++)
 		for (int j = 0; j < ButtonFieldH; j++)

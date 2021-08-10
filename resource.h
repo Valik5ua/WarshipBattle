@@ -29,6 +29,10 @@
 #define BF_ROTATE				14103
 #define BF_RANDOMAIM			14104
 
+#define BF_CONNECT				14111
+#define BF_DISCONNECT			14112
+#define BF_CANCEL				14113
+
 // Program Metrics
 const float MinSizeFactor = 30;
 

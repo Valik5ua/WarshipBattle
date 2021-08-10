@@ -11,8 +11,9 @@ public:
 	float GetOffsetH() { return fOffsetH; }
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
 	void LoadAllTextures();
-private:
+public:
 	enum MODE { WaitingForAction, Connecting, Deploying, MainGame, ComputerTurn };
+private:
 	MODE Mode;
 
 	float fOffsetH;

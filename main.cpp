@@ -3,9 +3,10 @@
 #include "Engine.h"
 #include "UserField.h"
 #include "EnemyField.h"
-#include "ButtonField.h"
+#include "ButtonFieldDeploy.h"
+#include "ButtonFieldFire.h"
+#include "ButtonFieldConnect.h"
 #include "Texture.h"
-
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
@@ -17,7 +18,10 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
 Engine _Engine;
-ButtonField buttonField(3, 1);
+Engine::MODE ButtonFieldMode;
+ButtonFieldDeploy buttonFieldDeploy(3, 1);
+ButtonFieldFire buttonFieldFire(3, 1);
+ButtonFieldConnect buttonFieldConnect(3, 1);
 UserField userField(3,5);
 EnemyField enemyField(19, 5);
 
@@ -269,7 +273,17 @@ GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	userField.Draw();
-	buttonField.Draw();
+	switch (ButtonFieldMode)
+	{
+	case Engine::MODE::Deploying:
+	buttonFieldDeploy.Draw();
+	case Engine::MODE::MainGame:
+		buttonFieldFire.Draw();
+	case Engine::MODE::Connecting:
+		buttonFieldConnect.Draw();
+	default:
+		buttonFieldDeploy.Draw();
+	}
 	enemyField.Draw();
 
 	SWAPBUFFERS;

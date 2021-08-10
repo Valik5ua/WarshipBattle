@@ -42,6 +42,9 @@ GLuint	Btn_LeftTextureID;
 GLuint	Btn_RightTextureID;
 GLuint	Btn_FireTextureID;
 GLuint	Btn_DeployTextureID;
+GLuint	Btn_ConnectTextureID;
+GLuint	Btn_CancelTextureID;
+GLuint	Btn_DisconnectTextureID;
 GLuint	WaterTextureID;
 
 bool LoadTexture(char* FileName, GLuint& Texture_ID)

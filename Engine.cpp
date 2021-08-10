@@ -3,16 +3,21 @@
 #include <string>
 #include "UserField.h"
 #include "EnemyField.h"
-#include "ButtonField.h"
+#include "ButtonFieldDeploy.h"
+#include "ButtonFieldFire.h"
+#include "ButtonFieldConnect.h"
 #include "Texture.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
 
+extern Engine::MODE ButtonFieldMode;
 extern UserField userField;
 extern EnemyField enemyField;
-extern ButtonField buttonField;
+extern ButtonFieldDeploy buttonFieldDeploy;
+extern ButtonFieldFire buttonFieldFire;
+extern ButtonFieldConnect buttonFieldConnect;
 
 //Texture IDs
 extern GLuint	ShipFrontTextureID;
@@ -54,6 +59,9 @@ extern GLuint	Btn_LeftTextureID;
 extern GLuint	Btn_RightTextureID;
 extern GLuint	Btn_FireTextureID;
 extern GLuint	Btn_DeployTextureID;
+extern GLuint	Btn_CancelTextureID;
+extern GLuint	Btn_ConnectTextureID;
+extern GLuint	Btn_DisconnectTextureID;
 extern GLuint	WaterTextureID;
 
 Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
@@ -198,6 +206,9 @@ void Engine::LoadAllTextures()
     LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", Btn_RightTextureID);
     LoadTexture((char*)"Textures\\BTN_FIRE.bmp", Btn_FireTextureID);
     LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", Btn_DeployTextureID);
+    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", Btn_ConnectTextureID);
+    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", Btn_CancelTextureID);
+    LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", Btn_DisconnectTextureID);
     LoadTexture((char*)"Textures\\sea.bmp", WaterTextureID);
     LoadTexture((char*)"Textures\\Ship front Afire.bmp", ShipFrontTextureID);
     LoadTexture((char*)"Textures\\Ship middle Afire.bmp", ShipMiddleTextureID);
@@ -211,12 +222,13 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     {
     case MODE::Deploying:
     {
+        ButtonFieldMode = MODE::Deploying;
         if (MSG == MSG_LBTTNDOWN)
         {
-            if (buttonField.Click(Coordinates))
+            if (buttonFieldDeploy.Click(Coordinates))
             {
                 MSGParam.FieldCoordinates = Coordinates;
-                switch (buttonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+                switch (buttonFieldDeploy.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:
                     return TRANSLATEDMSG_MOVESHIPDOWN;
@@ -252,6 +264,7 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     }
     case MODE::MainGame:
     {
+        ButtonFieldMode = MODE::MainGame;
         if (MSG == MSG_LBTTNDOWN)
         {
             if (enemyField.Click(Coordinates))
@@ -259,10 +272,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 MSGParam.FieldCoordinates = Coordinates;
                 return TRANSLATEDMSG_AIM;
             }
-            if (buttonField.Click(Coordinates))
+            if (buttonFieldDeploy.Click(Coordinates))
             {
                 MSGParam.FieldCoordinates = Coordinates;
-                switch (buttonField.Cells[Coordinates.x][Coordinates.y].ButtonID)
+                switch (buttonFieldDeploy.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:
                     return TRANSLATEDMSG_MOVE_DOWN;
@@ -300,6 +313,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
             }
         }
         return MSG_VOID;
+    }
+    case MODE::Connecting:
+    {
+        ButtonFieldMode = MODE::Connecting;
     }
     }
 }
