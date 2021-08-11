@@ -16,6 +16,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\BTN_DOWN.bmp", this->Btn_DownTextureID);
     LoadTexture((char*)"Textures\\BTN_LEFT.bmp", this->Btn_LeftTextureID);
     LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", this->Btn_RightTextureID);
+    LoadTexture((char*)"Textures\\BTN_FIRE.bmp", this->Btn_RandomAimTextureID);
     LoadTexture((char*)"Textures\\BTN_FIRE.bmp", this->Btn_FireTextureID);
     LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", this->Btn_DeployTextureID);
     LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
