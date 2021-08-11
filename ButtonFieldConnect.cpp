@@ -1,9 +1,7 @@
 #include "ButtonFieldConnect.h"
+#include "TextureManager.h"
 
-extern GLuint   Btn_ConnectTextureID;
-extern GLuint	Btn_CancelTextureID;
-extern GLuint   Btn_DisconnectTextureID;
-extern GLuint	WaterTextureID;
+extern TextureManager textureManager;
 
 ButtonFieldConnect::ButtonFieldConnect(int StartX, int StartY)
 {
@@ -46,7 +44,7 @@ void ButtonFieldConnect::Draw()
 			if (this->Cells[i][j].ButtonID == BF_CONNECT && this->Cells[i + 1][j].ButtonID == BF_CONNECT && this->Cells[i + 2][j].ButtonID == BF_CONNECT)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_ConnectTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_ConnectTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
@@ -59,7 +57,7 @@ void ButtonFieldConnect::Draw()
 			if (this->Cells[i][j].ButtonID == BF_DISCONNECT && this->Cells[i + 1][j].ButtonID == BF_DISCONNECT && this->Cells[i + 2][j].ButtonID == BF_DISCONNECT)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_DisconnectTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_DisconnectTextureID);
 
 				glBegin(GL_QUADS);
 
@@ -73,7 +71,7 @@ void ButtonFieldConnect::Draw()
 			if (this->Cells[i][j].ButtonID == BF_CANCEL && this->Cells[i + 1][j].ButtonID == BF_CANCEL && this->Cells[i + 2][j].ButtonID == BF_CANCEL)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_CancelTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_CancelTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);

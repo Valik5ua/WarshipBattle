@@ -1,12 +1,7 @@
 #include "ButtonFieldFire.h"
+#include "TextureManager.h"
 
-extern GLuint	Btn_DownTextureID;
-extern GLuint	Btn_UpTextureID;
-extern GLuint	Btn_LeftTextureID;
-extern GLuint	Btn_RightTextureID;
-extern GLuint   Btn_RandomAimTextureID;
-extern GLuint   Btn_FireTextureID;
-extern GLuint	WaterTextureID;
+extern TextureManager textureManager;
 
 ButtonFieldFire::ButtonFieldFire(int StartX, int StartY)
 {
@@ -52,7 +47,7 @@ void ButtonFieldFire::Draw()
 			if (this->Cells[i][j].ButtonID == BF_MOVE_UP && this->Cells[i + 1][j].ButtonID == BF_MOVE_UP)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_UpTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_UpTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
@@ -65,7 +60,7 @@ void ButtonFieldFire::Draw()
 			if (this->Cells[i][j].ButtonID == BF_MOVE_DOWN && this->Cells[i + 1][j].ButtonID == BF_MOVE_DOWN)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_DownTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_DownTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
@@ -78,7 +73,7 @@ void ButtonFieldFire::Draw()
 			if (this->Cells[i][j].ButtonID == BF_MOVE_LEFT && this->Cells[i][j + 1].ButtonID == BF_MOVE_LEFT)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_LeftTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_LeftTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
@@ -91,7 +86,7 @@ void ButtonFieldFire::Draw()
 			if (this->Cells[i][j].ButtonID == BF_MOVE_RIGHT && this->Cells[i][j + 1].ButtonID == BF_MOVE_RIGHT)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_RightTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_RightTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
@@ -104,7 +99,7 @@ void ButtonFieldFire::Draw()
 			if (this->Cells[i][j].ButtonID == BF_RANDOMAIM)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_RandomAimTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_RandomAimTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
@@ -117,7 +112,7 @@ void ButtonFieldFire::Draw()
 			if (this->Cells[i][j].ButtonID == BF_FIRE && this->Cells[i][j + 1].ButtonID == BF_FIRE && this->Cells[i][j + 2].ButtonID == BF_FIRE)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, Btn_FireTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_FireTextureID);
 
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);

@@ -1,61 +1,42 @@
-﻿#include <GL\glew.h>
+#include "TextureManager.h"
+#include "GL\freeglut.h"
 #include <fstream>
-#include "Texture.h"
 #include <string>
 
-GLuint	ShipFrontTextureID;
-GLuint	ShipMiddleTextureID;
-GLuint	ShipBackTextureID;
-
-GLuint	ShipFrontAimTextureID;
-GLuint	ShipMiddleAimTextureID;
-GLuint	ShipBackAimTextureID;
-
-GLuint	ShipFrontAfireTextureID;
-GLuint	ShipMiddleAfireTextureID;
-GLuint	ShipBackAfireTextureID;
-
-GLuint	ShipFrontAfireAimTextureID;
-GLuint	ShipMiddleAfireAimTextureID;
-GLuint	ShipBackAfireAimTextureID;
-
-GLuint	ShipFrontCrackedTextureID;
-GLuint	ShipMiddleCrackedTextureID;
-GLuint	ShipBackCrackedTextureID;
-
-GLuint	ShipFrontCrackedAimTextureID;
-GLuint	ShipMiddleCrackedAimTextureID;
-GLuint	ShipBackCrackedAimTextureID;
-
-GLuint   SingleShipTextureID;
-GLuint   SingleShipAimTextureID;
-GLuint   SingleShipCrackedTextureID;
-GLuint   SingleShipCrackedAimTextureID;
-
-GLuint  Btn_RotateTextureID;
-GLuint	Btn_RandomAimTextureID;
-GLuint	WaterAimTextureID;
-
-GLuint	Btn_DownTextureID;
-GLuint	Btn_UpTextureID;
-GLuint	Btn_LeftTextureID;
-GLuint	Btn_RightTextureID;
-GLuint	Btn_FireTextureID;
-GLuint	Btn_DeployTextureID;
-GLuint	Btn_ConnectTextureID;
-GLuint	Btn_CancelTextureID;
-GLuint	Btn_DisconnectTextureID;
-GLuint	WaterTextureID;
-
-bool LoadTexture(char* FileName, GLuint& Texture_ID)
+void TextureManager::LoadAllTextures()
 {
-   // uint8_t* datBuff[2] = { nullptr, nullptr }; // Header buffers
-   // uint8_t* pixels = nullptr; // Pixels
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  // (Actually, this one is the default)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    LoadTexture((char*)"Textures\\BTN_ROTATE.bmp", this->Btn_RotateTextureID);
+    LoadTexture((char*)"Textures\\WaterAim.bmp", this->WaterAimTextureID);
+    LoadTexture((char*)"Textures\\BTN_UP.bmp", this->Btn_UpTextureID);
+    LoadTexture((char*)"Textures\\BTN_DOWN.bmp", this->Btn_DownTextureID);
+    LoadTexture((char*)"Textures\\BTN_LEFT.bmp", this->Btn_LeftTextureID);
+    LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", this->Btn_RightTextureID);
+    LoadTexture((char*)"Textures\\BTN_FIRE.bmp", this->Btn_FireTextureID);
+    LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", this->Btn_DeployTextureID);
+    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
+    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
+    LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
+    LoadTexture((char*)"Textures\\sea.bmp", this->WaterTextureID);
+    LoadTexture((char*)"Textures\\Ship front Afire.bmp", this->ShipFrontTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Afire.bmp", this->ShipMiddleTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Afire.bmp", this->ShipBackTextureID);
+    LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->SingleShipTextureID);
+}
+
+bool TextureManager::LoadTexture(char* FileName, GLuint& Texture_ID)
+{
+    // uint8_t* datBuff[2] = { nullptr, nullptr }; // Header buffers
+    // uint8_t* pixels = nullptr; // Pixels
     BITMAPFILEHEADER* bmpHeader = nullptr; // Header
     BITMAPINFOHEADER* bmpInfo = nullptr; // Info 
     uint8_t* BMPHeaderBuffer = new uint8_t[sizeof(BITMAPFILEHEADER)];
     uint8_t* BMPInfoBuffer = new uint8_t[sizeof(BITMAPINFOHEADER)];
-    
+
     std::ifstream file(FileName, std::ios::binary);
     if (!file)
     {
@@ -71,7 +52,7 @@ bool LoadTexture(char* FileName, GLuint& Texture_ID)
 
     if (bmpHeader->bfType != 0x4D42)
     {
-        std::string FailureMSG="File \"";
+        std::string FailureMSG = "File \"";
         FailureMSG += FileName;
         FailureMSG += "\" isn't a bitmap file\n";
         MessageBoxA(NULL, FailureMSG.c_str(), "Texture Failure", MB_OK);

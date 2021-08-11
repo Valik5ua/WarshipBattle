@@ -1,7 +1,7 @@
 #include "UserField.h"
-#include <string>
+#include "TextureManager.h"
 
-extern GLuint WaterTextureID;
+extern TextureManager textureManager;
 
 #ifdef TEXTURES_TEST
 
@@ -155,7 +155,7 @@ void UserField::Draw()
 		for (int j{}; j < MyGameFieldH; j++)
 		{
 			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, WaterTextureID);
+			glBindTexture(GL_TEXTURE_2D, textureManager.WaterTextureID);
 
 			glBegin(GL_QUADS);
 			glTexCoord2d(0, 0); glVertex2f(i+this->StartX, j + this->StartY);

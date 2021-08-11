@@ -6,7 +6,7 @@
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
-#include "Texture.h"
+#include "TextureManager.h"
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
@@ -24,6 +24,7 @@ ButtonFieldFire buttonFieldFire(3, 1);
 ButtonFieldConnect buttonFieldConnect(3, 1);
 UserField userField(3,5);
 EnemyField enemyField(19, 5);
+TextureManager textureManager;
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -39,11 +40,6 @@ GLvoid DrawScene(GLvoid);
 
 //Custom prototypes
 void TimerFunc(LPVOID);
-
-//Texture IDs
-extern GLuint	ShipFrontTextureID;
-extern GLuint	ShipMiddleTextureID;
-extern GLuint	ShipBackTextureID;
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance,
@@ -259,7 +255,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
 
 	//load textures into memory
-	_Engine.LoadAllTextures();
+	textureManager.LoadAllTextures();
 
 	//Setting screen offset + size info
 	_Engine.SetWindowGLParam(width, height);
@@ -277,10 +273,13 @@ GLvoid DrawScene(GLvoid)
 	{
 	case Engine::MODE::Deploying:
 	buttonFieldDeploy.Draw();
+	break;
 	case Engine::MODE::MainGame:
 		buttonFieldFire.Draw();
+		break;
 	case Engine::MODE::Connecting:
 		buttonFieldConnect.Draw();
+		break;
 	default:
 		buttonFieldDeploy.Draw();
 	}

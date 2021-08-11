@@ -1,8 +1,7 @@
 #include "EnemyField.h"
-#include <string>
+#include "TextureManager.h"
 
-extern GLuint WaterTextureID;
-extern GLuint WaterAimTextureID;
+extern TextureManager textureManager;
 
 bool EnemyField::Click(POINT& coordinates)
 {
@@ -22,7 +21,7 @@ void EnemyField::Draw()
 		for (int j{}; j < OpponentGameFieldH; j++)
 		{
 			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, WaterTextureID);
+			glBindTexture(GL_TEXTURE_2D, textureManager.WaterTextureID);
 			glBegin(GL_QUADS);
 			glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
 			glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + this->StartY + 1.0f);
@@ -33,7 +32,7 @@ void EnemyField::Draw()
 			if (Cells[i][j].Selected)
 			{
 				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, WaterAimTextureID);
+				glBindTexture(GL_TEXTURE_2D, textureManager.WaterAimTextureID);
 				glBegin(GL_QUADS);
 				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
 				glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + this->StartY + 1.0f);

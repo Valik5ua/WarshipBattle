@@ -168,7 +168,7 @@
     <ClCompile Include="Field.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="UserField.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,7 +182,7 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="UserField.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

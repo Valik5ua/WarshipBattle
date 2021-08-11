@@ -6,7 +6,6 @@
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
-#include "Texture.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -19,53 +18,9 @@ extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 
-//Texture IDs
-extern GLuint	ShipFrontTextureID;
-extern GLuint	ShipMiddleTextureID;
-extern GLuint	ShipBackTextureID;
-
-extern GLuint	ShipFrontAimTextureID;
-extern GLuint	ShipMiddleAimTextureID;
-extern GLuint	ShipBackAimTextureID;
-
-extern GLuint	ShipFrontAfireTextureID;
-extern GLuint	ShipMiddleAfireTextureID;
-extern GLuint	ShipBackAfireTextureID;
-
-extern GLuint	ShipFrontAfireAimTextureID;
-extern GLuint	ShipMiddleAfireAimTextureID;
-extern GLuint	ShipBackAfireAimTextureID;
-
-extern GLuint	ShipFrontCrackedTextureID;
-extern GLuint	ShipMiddleCrackedTextureID;
-extern GLuint	ShipBackCrackedTextureID;
-
-extern GLuint	ShipFrontCrackedAimTextureID;
-extern GLuint	ShipMiddleCrackedAimTextureID;
-extern GLuint	ShipBackCrackedAimTextureID;
-
-extern GLuint   SingleShipTextureID;
-extern GLuint   SingleShipAimTextureID;
-extern GLuint   SingleShipCrackedTextureID;
-extern GLuint   SingleShipCrackedAimTextureID;
-
-extern GLuint   Btn_RotateTextureID;
-extern GLuint	Btn_RandomAimTextureID;
-extern GLuint	WaterAimTextureID;
-
-extern GLuint	Btn_DownTextureID;
-extern GLuint	Btn_UpTextureID;
-extern GLuint	Btn_LeftTextureID;
-extern GLuint	Btn_RightTextureID;
-extern GLuint	Btn_FireTextureID;
-extern GLuint	Btn_DeployTextureID;
-extern GLuint	Btn_CancelTextureID;
-extern GLuint	Btn_ConnectTextureID;
-extern GLuint	Btn_DisconnectTextureID;
-extern GLuint	WaterTextureID;
-
 Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
+    ButtonFieldMode = this->Mode;
 }
 
 /// <summary>
@@ -188,32 +143,6 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         return false;
     }
     return true;
-}
-
-void Engine::LoadAllTextures()
-{
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  // (Actually, this one is the default)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", Btn_RandomAimTextureID);
-    LoadTexture((char*)"Textures\\BTN_ROTATE.bmp", Btn_RotateTextureID);
-    LoadTexture((char*)"Textures\\WaterAim.bmp", WaterAimTextureID);
-    LoadTexture((char*)"Textures\\BTN_UP.bmp", Btn_UpTextureID);
-    LoadTexture((char*)"Textures\\BTN_DOWN.bmp", Btn_DownTextureID);
-    LoadTexture((char*)"Textures\\BTN_LEFT.bmp", Btn_LeftTextureID);
-    LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", Btn_RightTextureID);
-    LoadTexture((char*)"Textures\\BTN_FIRE.bmp", Btn_FireTextureID);
-    LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", Btn_DeployTextureID);
-    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", Btn_ConnectTextureID);
-    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", Btn_CancelTextureID);
-    LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", Btn_DisconnectTextureID);
-    LoadTexture((char*)"Textures\\sea.bmp", WaterTextureID);
-    LoadTexture((char*)"Textures\\Ship front Afire.bmp", ShipFrontTextureID);
-    LoadTexture((char*)"Textures\\Ship middle Afire.bmp", ShipMiddleTextureID);
-    LoadTexture((char*)"Textures\\Ship Back Afire.bmp", ShipBackTextureID);
-    LoadTexture((char*)"Textures\\Rocket Missed.bmp", SingleShipTextureID);
 }
 
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)

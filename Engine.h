@@ -10,7 +10,6 @@ public:
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
-	void LoadAllTextures();
 public:
 	enum MODE { WaitingForAction, Connecting, Deploying, MainGame, ComputerTurn };
 private:
