@@ -17,8 +17,7 @@ HGLRC  hRC{};
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
-Engine _Engine;
-Engine::MODE ButtonFieldMode;
+Engine engine;
 ButtonFieldDeploy buttonFieldDeploy(3, 1);
 ButtonFieldFire buttonFieldFire(3, 1);
 ButtonFieldConnect buttonFieldConnect(3, 1);
@@ -162,13 +161,13 @@ LONG WINAPI MainWndProc(
 	case WM_LBUTTONDOWN:
 	{
 		POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
-		_Engine.ConvertPixelsToGL(&ClickCoordinate);
-		_Engine.Event(MSG_LBTTNDOWN, ClickCoordinate);
+		engine.ConvertPixelsToGL(&ClickCoordinate);
+		engine.Event(MSG_LBTTNDOWN, ClickCoordinate);
 	}
 	break;
 	case WM_KEYDOWN:
 	{
-		_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, wParam);
+		engine.Event(MSG_KEYPRESS, { NULL, NULL }, wParam);
 	}
 	break;
 	case WM_CLOSE:
@@ -241,10 +240,10 @@ BOOL B_SetupPixelFormat(HDC hdc)
 
 GLvoid Resize(GLsizei width, GLsizei height)
 {
-	_Engine.SetWindowGLParam(width, height);
+	engine.SetWindowGLParam(width, height);
 	glViewport(0, 0, width, height);
 	glLoadIdentity(); //Reset Coordinate System
-	gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
+	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 	DrawScene();
 }
@@ -258,10 +257,10 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	textureManager.LoadAllTextures();
 
 	//Setting screen offset + size info
-	_Engine.SetWindowGLParam(width, height);
+	engine.SetWindowGLParam(width, height);
 	glViewport(0, 0, width, height);
 	glLoadIdentity(); //Reset Coordinate System
-	gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
+	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
@@ -269,19 +268,22 @@ GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	userField.Draw();
-	switch (ButtonFieldMode)
+	switch (engine.Mode)
 	{
 	case Engine::MODE::Deploying:
-	buttonFieldDeploy.Draw();
+	{
+		buttonFieldDeploy.Draw();
+	}
 	break;
 	case Engine::MODE::MainGame:
+	{
 		buttonFieldFire.Draw();
+	}
 		break;
 	case Engine::MODE::Connecting:
+	{
 		buttonFieldConnect.Draw();
-		break;
-	default:
-		buttonFieldDeploy.Draw();
+	}
 	}
 	enemyField.Draw();
 

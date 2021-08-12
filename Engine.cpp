@@ -11,7 +11,6 @@ extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
 
-extern Engine::MODE ButtonFieldMode;
 extern UserField userField;
 extern EnemyField enemyField;
 extern ButtonFieldDeploy buttonFieldDeploy;
@@ -20,7 +19,6 @@ extern ButtonFieldConnect buttonFieldConnect;
 
 Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
-    ButtonFieldMode = this->Mode;
 }
 
 /// <summary>
@@ -151,7 +149,6 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     {
     case MODE::Deploying:
     {
-        ButtonFieldMode = MODE::Deploying;
         if (MSG == MSG_LBTTNDOWN)
         {
             if (buttonFieldDeploy.Click(Coordinates))
@@ -191,9 +188,9 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
             }
         }
     }
+    break;
     case MODE::MainGame:
     {
-        ButtonFieldMode = MODE::MainGame;
         if (MSG == MSG_LBTTNDOWN)
         {
             if (enemyField.Click(Coordinates))
@@ -201,10 +198,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 MSGParam.FieldCoordinates = Coordinates;
                 return TRANSLATEDMSG_AIM;
             }
-            if (buttonFieldDeploy.Click(Coordinates))
+            if (buttonFieldFire.Click(Coordinates))
             {
                 MSGParam.FieldCoordinates = Coordinates;
-                switch (buttonFieldDeploy.Cells[Coordinates.x][Coordinates.y].ButtonID)
+                switch (buttonFieldFire.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:
                     return TRANSLATEDMSG_MOVE_DOWN;
@@ -243,9 +240,9 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         }
         return MSG_VOID;
     }
+    break;
     case MODE::Connecting:
     {
-        ButtonFieldMode = MODE::Connecting;
     }
     }
 }
