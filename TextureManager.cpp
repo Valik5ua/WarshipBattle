@@ -19,7 +19,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", this->Btn_RandomAimTextureID);
     LoadTexture((char*)"Textures\\BTN_FIRE.bmp", this->Btn_FireTextureID);
     LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", this->Btn_DeployTextureID);
-    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
+    //LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
     LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
     LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
     LoadTexture((char*)"Textures\\sea.bmp", this->WaterTextureID);
