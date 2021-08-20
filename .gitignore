@@ -371,3 +371,6 @@ other components
 warship.ods
 /.PSD
 WarshipBattle.sln
+WarshipBattle.vcxproj
+WarshipBattle.vcxproj.filters
+WarshipBattle.vcxproj.user
