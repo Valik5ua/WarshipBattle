@@ -7,8 +7,9 @@ class Cell
 public:
 	Cell();
 public:
-	enum Status { opened, closed };
+	enum Status { Water, Ship_Whole, Ship_Afire, Ship_Cracked, Missed };
 	Status Stat;
+	bool Cell_Aim;
 	bool Selected;
 	int ButtonID;
 };

@@ -3,8 +3,10 @@
 #include "Engine.h"
 #include "UserField.h"
 #include "EnemyField.h"
-#include "ButtonField.h"
-
+#include "ButtonFieldDeploy.h"
+#include "ButtonFieldFire.h"
+#include "ButtonFieldConnect.h"
+#include "TextureManager.h"
 // Windows globals
 CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
@@ -15,10 +17,13 @@ HGLRC  hRC{};
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
-Engine _Engine;
-ButtonField _ButtonField(3, 1);
-UserField _UserField(3,5);
-EnemyField _EnemyField(19, 5);
+Engine engine;
+ButtonFieldDeploy buttonFieldDeploy(3, 1);
+ButtonFieldFire buttonFieldFire(3, 1);
+ButtonFieldConnect buttonFieldConnect(3, 1);
+UserField userField(3,5);
+EnemyField enemyField(19, 5);
+TextureManager textureManager;
 
 //Windows prototypes
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -80,10 +85,13 @@ int WINAPI WinMain(
 	ShowWindow(hwnd, SW_SHOWMAXIMIZED);
 
 	UpdateWindow(hwnd);
-
+	
+	//Loading Textures into memory
+	
 	//Create thread to Implement TimerFunc, which tells the program when to redraw the window 
 	TimerFuncHandler = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)TimerFunc, NULL, NULL, NULL);
 	
+
 	/* animation loop */
 	while (true) {
 
@@ -153,32 +161,13 @@ LONG WINAPI MainWndProc(
 	case WM_LBUTTONDOWN:
 	{
 		POINT ClickCoordinate{ GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam) };
-		_Engine.ConvertPixelsToGL(&ClickCoordinate);
-		_Engine.Event(MSG_LBTTNDOWN, ClickCoordinate);
+		engine.ConvertPixelsToGL(&ClickCoordinate);
+		engine.Event(MSG_LBTTNDOWN, ClickCoordinate);
 	}
 	break;
 	case WM_KEYDOWN:
 	{
-		switch (wParam) {
-		case VK_LEFT:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_LEFT);
-			break;
-		case VK_RIGHT:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_RIGHT);
-			break;
-		case VK_UP:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_UP);
-			break;
-		case VK_DOWN:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_MOVE_DOWN);
-			break;
-		case 13:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_FIRE);
-			break;
-		case 32:
-			_Engine.Event(MSG_KEYPRESS, { NULL, NULL }, BF_ROTATE);
-			break;
-		}
+		engine.Event(MSG_KEYPRESS, { NULL, NULL }, wParam);
 	}
 	break;
 	case WM_CLOSE:
@@ -251,43 +240,62 @@ BOOL B_SetupPixelFormat(HDC hdc)
 
 GLvoid Resize(GLsizei width, GLsizei height)
 {
-	_Engine.SetWindowGLParam(width, height);
+	engine.SetWindowGLParam(width, height);
 	glViewport(0, 0, width, height);
 	glLoadIdentity(); //Reset Coordinate System
-	gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
+	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 	DrawScene();
 }
 
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
+	//sets backround color
 	glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
-	
-	_Engine.SetWindowGLParam(width, height);
+
+	//load textures into memory
+	textureManager.LoadAllTextures();
+
+	//Setting screen offset + size info
+	engine.SetWindowGLParam(width, height);
 	glViewport(0, 0, width, height);
 	glLoadIdentity(); //Reset Coordinate System
-	gluOrtho2D(-(_Engine.GetOffsetW()), OpenGLWidth + _Engine.GetOffsetW(), -(_Engine.GetOffsetH()), OpenGLHeight + _Engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
+	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
 GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBegin(GL_QUADS);
-	glLoadIdentity();
-	_UserField.Draw();
-	_EnemyField.Draw();
-	_ButtonField.Draw();
-	glEnd();
+	userField.Draw();
+	switch (engine.Mode)
+	{
+	case Engine::MODE::Deploying:
+	{
+		buttonFieldDeploy.Draw();
+	}
+	break;
+	case Engine::MODE::MainGame:
+	{
+		buttonFieldFire.Draw();
+	}
+		break;
+	case Engine::MODE::Connecting:
+	{
+		buttonFieldConnect.Draw();
+	}
+	}
+	enemyField.Draw();
+
 	SWAPBUFFERS;
 }
 
 //Custom Functions
 
 /// <summary>
-/// Function that tells the program when to redraw the window
+/// Function that tells the program when to redraw the window.
 /// </summary>
-/// <param name="">No paraneters required</param>
+/// <param name="">No parameters required</param>
 void TimerFunc(LPVOID)
 {
 	while (true)

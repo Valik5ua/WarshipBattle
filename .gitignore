@@ -362,5 +362,15 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-#OpenGl Folder - all OpenGl related functions
+#OpenGl - all OpenGl related functions and DLL's
 /OpenGl
+freeglut.dll
+glew32.dll
+
+other components
+warship.ods
+/.PSD
+WarshipBattle.sln
+WarshipBattle.vcxproj
+WarshipBattle.vcxproj.filters
+WarshipBattle.vcxproj.user
