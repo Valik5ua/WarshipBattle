@@ -3,6 +3,11 @@
 
 extern TextureManager textureManager;
 
+/// <summary>
+/// Default constructor for the ButtonFieldConnect class.
+/// </summary>
+/// <param name="StartX">The X coordinate of the ButtonField.</param>
+/// <param name="StartY">The Y coordinate of the ButtonField.</param>
 ButtonFieldConnect::ButtonFieldConnect(int StartX, int StartY)
 {
 	this->StartX = StartX;
@@ -25,6 +30,11 @@ ButtonFieldConnect::ButtonFieldConnect(int StartX, int StartY)
 
 }
 
+/// <summary>
+/// Changes OpenGL coordinates to ButtonField coordinates.
+/// </summary>
+/// <param name="coordinates: ">The coordinates of the click to be converted.</param>
+/// <returns>Wether or not the user has clicked on the ButtonField.</returns>
 bool ButtonFieldConnect::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < ButtonFieldW + this->StartX && coordinates.y < ButtonFieldH + this->StartY)
@@ -36,6 +46,9 @@ bool ButtonFieldConnect::Click(POINT& coordinates)
 	return false;
 }
 
+/// <summary>
+/// Draws the ButtonField.
+/// </summary>
 void ButtonFieldConnect::Draw()
 {
 	for (int i = 0; i < ButtonFieldW; i++)

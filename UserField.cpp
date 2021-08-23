@@ -4,10 +4,10 @@
 extern TextureManager textureManager;
 
 /// <summary>
-/// Changes OpenGL coordinates to field coordinates.
+/// Changes OpenGL coordinates to UserField coordinates.
 /// </summary>
-/// <param name="coordinates"></param>
-/// <returns></returns>
+/// <param name="coordinates: ">The coordinates of the click to be converted.</param>
+/// <returns>Wether or not the user has clicked on the UserField.</returns>
 bool UserField::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < MyGameFieldW + this->StartX && coordinates.y < MyGameFieldH + this->StartY)
@@ -20,7 +20,7 @@ bool UserField::Click(POINT& coordinates)
 }
 
 /// <summary>
-/// Draws the Field
+/// Draws the Field.
 /// </summary>
 void UserField::Draw()
 {
@@ -39,23 +39,6 @@ void UserField::Draw()
 			glEnd();
 
 			glDisable(GL_TEXTURE_2D);
-		}
-	}
-}
-
-void UserField::Select(const size_t CellX, const size_t CellY)
-{
-	Deselect();
-	this->Cells[CellX][CellY].Selected = true;
-}
-
-void UserField::Deselect()
-{
-	for (int i{}; i<MyGameFieldW;i++)
-	{
-		for (int j{}; j < MyGameFieldH; j++)
-		{
-			if (this->Cells[i][j].Selected) { this->Cells[i][j].Selected = false; return; }
 		}
 	}
 }

@@ -3,6 +3,9 @@
 #include <fstream>
 #include <string>
 
+/// <summary>
+/// Loads all the textures used in the program into memory.
+/// </summary>
 void TextureManager::LoadAllTextures()
 {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -29,10 +32,14 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->SingleShipTextureID);
 }
 
+/// <summary>
+/// Loads a texture into memory.
+/// </summary>
+/// <param name="FileName: ">The path of the texture to be loaded.</param>
+/// <param name="Texture_ID: ">The ID of the texture to be binded to.</param>
+/// <returns>True if successful load, otherwise false.</returns>
 bool TextureManager::LoadTexture(char* FileName, GLuint& Texture_ID)
 {
-    // uint8_t* datBuff[2] = { nullptr, nullptr }; // Header buffers
-    // uint8_t* pixels = nullptr; // Pixels
     BITMAPFILEHEADER* bmpHeader = nullptr; // Header
     BITMAPINFOHEADER* bmpInfo = nullptr; // Info 
     uint8_t* BMPHeaderBuffer = new uint8_t[sizeof(BITMAPFILEHEADER)];

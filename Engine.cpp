@@ -17,6 +17,9 @@ extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 
+/// <summary>
+/// Default constructor for engine class.
+/// </summary>
 Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
 {
 }
@@ -24,7 +27,7 @@ Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), 
 /// <summary>
 /// Converts pixels to OpenGL units.
 /// </summary>
-/// <param name="Pixels: ">pointer to the desired POINT struct to convert.</param>
+/// <param name="Pixels: ">Pointer to the desired POINT struct to convert.</param>
 void Engine::ConvertPixelsToGL(POINT* Pixels)
 {
     Pixels->y = OpenGLHeight * fGLUnitSize - Pixels->y;
@@ -55,10 +58,17 @@ void Engine::SetWindowGLParam(int Width, int Height)
     }
 }
 
+/// <summary>
+/// This function takes an input, translates it, and then does something dependent on the translation.
+/// </summary>
+/// <param name="MSG: ">The untranslated message.</param>
+/// <param name="Coordinates: ">The coordinates of the mouse click.</param>
+/// <param name="key: ">The key of the keyboard that has been pressed.</param>
+/// <returns></returns>
 bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 {
     int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
-    switch (Mode)
+    switch (this->Mode)
     {
     case MODE::Connecting:
     {
@@ -115,7 +125,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_AIM:
-            enemyField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
             break;
         case TRANSLATEDMSG_MOVE_LEFT:
             enemyField.MoveSelection(BF_MOVE_LEFT);
@@ -143,9 +153,16 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     return true;
 }
 
+/// <summary>
+/// Translates the Message for Engine::Event.
+/// </summary>
+/// <param name="Coordinates: ">The coordinates of the mouse click.</param>
+/// <param name="MSG: ">The untranslated message.</param>
+/// <param name="Key: "><The key of the keyboard that has been pressed./param>
+/// <returns></returns>
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
-    switch (Mode)
+    switch (this->Mode)
     {
     case MODE::Deploying:
     {
@@ -153,7 +170,7 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         {
             if (buttonFieldDeploy.Click(Coordinates))
             {
-                MSGParam.FieldCoordinates = Coordinates;
+                this->MSGParam.FieldCoordinates = Coordinates;
                 switch (buttonFieldDeploy.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:
@@ -195,12 +212,12 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         {
             if (enemyField.Click(Coordinates))
             {
-                MSGParam.FieldCoordinates = Coordinates;
+                this->MSGParam.FieldCoordinates = Coordinates;
                 return TRANSLATEDMSG_AIM;
             }
             if (buttonFieldFire.Click(Coordinates))
             {
-                MSGParam.FieldCoordinates = Coordinates;
+                this->MSGParam.FieldCoordinates = Coordinates;
                 switch (buttonFieldFire.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:

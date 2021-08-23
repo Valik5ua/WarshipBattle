@@ -3,6 +3,11 @@
 
 extern TextureManager textureManager;
 
+/// <summary>
+/// Changes OpenGL coordinates to EnemyField coordinates.
+/// </summary>
+/// <param name="coordinates: ">The coordinates of the click to be converted.</param>
+/// <returns>Wether or not the user has clicked on the Enemyfield.</returns>
 bool EnemyField::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < OpponentGameFieldW + this->StartX && coordinates.y < OpponentGameFieldH + this->StartY)
@@ -14,6 +19,9 @@ bool EnemyField::Click(POINT& coordinates)
 	return false;
 }
 
+/// <summary>
+/// Draws the EnemyField.
+/// </summary>
 void EnemyField::Draw()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)
@@ -29,7 +37,7 @@ void EnemyField::Draw()
 			glTexCoord2d(1.f, 0); glVertex2f(i + this->StartX + 1.0f, j + this->StartY);
 			glEnd();
 			glDisable(GL_TEXTURE_2D);
-			if (Cells[i][j].Selected)
+			if (this->Cells[i][j].Selected)
 			{
 				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, textureManager.WaterAimTextureID);
@@ -45,13 +53,18 @@ void EnemyField::Draw()
 	}
 }
 
+/// <summary>
+/// Moves the selected cell of the EnemyField.
+/// </summary>
+/// <param name="Direction: ">The direction of the arrow of where to move the selection.</param>
+/// <returns>Wether or not the direction was valid.</returns>
 bool EnemyField::MoveSelection(int Direction)
 {
 	for (int x{}; x < OpponentGameFieldW; x++)
 	{
 		for (int y{}; y < OpponentGameFieldH; y++)
 		{
-			if (Cells[x][y].Selected)
+			if (this->Cells[x][y].Selected)
 			{
 				switch (Direction)
 				{
@@ -96,12 +109,20 @@ bool EnemyField::MoveSelection(int Direction)
 	return false;
 }
 
+/// <summary>
+/// Selects a cell on the EnemyField.
+/// </summary>
+/// <param name="CellX: ">The X position of the cell to be selected.</param>
+/// <param name="CellY: ">The Y position of the cell to be selected.</param>
 void EnemyField::Select(const size_t CellX, const size_t CellY)
 {
-	Deselect();
+	this->Deselect();
 	this->Cells[CellX][CellY].Selected = true;
 }
 
+/// <summary>
+/// Deselects a cell on the EnemyField.
+/// </summary>
 void EnemyField::Deselect()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)

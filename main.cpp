@@ -7,13 +7,16 @@
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
 #include "TextureManager.h"
+
 // Windows globals
+
 CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
 HDC    hDC{};
 HGLRC  hRC{};
 
 // Custom globals
+
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 float  FrameRate = (float)1000 / 60;
@@ -26,20 +29,32 @@ EnemyField enemyField(19, 5);
 TextureManager textureManager;
 
 //Windows prototypes
+
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL B_SetupPixelFormat(HDC);
 
 //OpenGL defines 
+
 #define SWAPBUFFERS SwapBuffers(hDC) 
 
 // OpenGL prototypes 
+
 GLvoid Resize(GLsizei, GLsizei);
 GLvoid InitGL(GLsizei, GLsizei);
 GLvoid DrawScene(GLvoid);
 
 //Custom prototypes
+
 void TimerFunc(LPVOID);
 
+/// <summary>
+/// The starting point of the program.
+/// </summary>
+/// <param name="hInstance: ">A handle to the current instance of the application.</param>
+/// <param name="hPrevInstance: ">A handle to the previous instance of the application. (Always supposed to be NULL)</param>
+/// <param name="lpCmdLine: ">The command line for the application, excluding the program name.</param>
+/// <param name="nShowCmd: ">Controls how the window is to be shown.</param>
+/// <returns>A value of 1 (0x1) when succesful.</returns>
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -116,7 +131,14 @@ int WINAPI WinMain(
 	}
 }
 
-// main window procedure 
+/// <summary>
+/// Main loop.
+/// </summary>
+/// <param name="hWnd: ">Handle to the main window.</param>
+/// <param name="uMsg: ">Message identifier.</param>
+/// <param name="wParam: ">First message parameter.</param>
+/// <param name="lParam: ">Second message parameter.</param>
+/// <returns>A value of 1 unless the default case is activated.</returns>
 LONG WINAPI MainWndProc(
 	HWND    hWnd,
 	UINT    uMsg,
@@ -203,6 +225,11 @@ LONG WINAPI MainWndProc(
 	return lRet;
 }
 
+/// <summary>
+/// Sets up Pixel Format.
+/// </summary>
+/// <param name="hdc: ">A handle to the current DC.</param>
+/// <returns>True if success, else false.</returns>
 BOOL B_SetupPixelFormat(HDC hdc)
 {
 	PIXELFORMATDESCRIPTOR pfd, * ppfd;
@@ -236,8 +263,13 @@ BOOL B_SetupPixelFormat(HDC hdc)
 
 	return TRUE;
 }
-// OpenGL code
 
+/// <summary>
+/// A function that is activated whenever the window is being resized.
+/// </summary>
+/// <param name="width: ">The desired width of the window.</param>
+/// <param name="height: ">The desired Height of the window.</param>
+/// <returns>A value of void.</returns>
 GLvoid Resize(GLsizei width, GLsizei height)
 {
 	engine.SetWindowGLParam(width, height);
@@ -248,6 +280,12 @@ GLvoid Resize(GLsizei width, GLsizei height)
 	DrawScene();
 }
 
+/// <summary>
+/// Initializes OpenGL.
+/// </summary>
+/// <param name="width: ">The desired starting width of the window.</param>
+/// <param name="height: ">The desired starting height of the window.</param>
+/// <returns>A value of void.</returns>
 GLvoid InitGL(GLsizei width, GLsizei height)
 {
 	//sets backround color
@@ -264,6 +302,11 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
 }
 
+/// <summary>
+/// Draws everything onscreen except backround.
+/// </summary>
+/// /// <param name="">No parameters required.</param>
+/// <returns>A value of void</returns>
 GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -290,12 +333,10 @@ GLvoid DrawScene(GLvoid)
 	SWAPBUFFERS;
 }
 
-//Custom Functions
-
 /// <summary>
 /// Function that tells the program when to redraw the window.
 /// </summary>
-/// <param name="">No parameters required</param>
+/// <param name="">No parameters required.</param>
 void TimerFunc(LPVOID)
 {
 	while (true)
