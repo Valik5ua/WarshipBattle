@@ -37,6 +37,13 @@
 #define BF_DISCONNECT			14112
 #define BF_CANCEL				14113
 
+//TextureID Directions
+
+#define ROTATION_LEFT			20001
+#define ROTATION_RIGHT			20002
+#define ROTATION_DOWN			20003
+#define ROTATION_UP				20004
+
 // Program Metrics
 
 const float MinSizeFactor = 30;

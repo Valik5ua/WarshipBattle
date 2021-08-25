@@ -1,6 +1,7 @@
 #pragma once
-#include <windows.h>
 #include "resource.h"
+#include <windows.h>
+#include "Ship.h"
 
 extern HWND hwnd;
 
@@ -15,6 +16,9 @@ public:
 	};
 	virtual bool Click(POINT& coordinates) = 0;
 	virtual void Draw() = 0;
+	bool ShipExistsAround(Cell);
+	bool ShipExistsAround(Ship);
+public:
 	int StartX;
 	int StartY;
 };

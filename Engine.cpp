@@ -262,4 +262,5 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     {
     }
     }
+    return MSG_VOID;
 }

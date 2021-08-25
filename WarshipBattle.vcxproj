@@ -163,11 +163,13 @@
     <ClCompile Include="ButtonFieldDeploy.cpp" />
     <ClCompile Include="ButtonFieldFire.cpp" />
     <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="Deck.cpp" />
     <ClCompile Include="EnemyField.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Field.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Ship.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="UserField.cpp" />
   </ItemGroup>
@@ -176,12 +178,14 @@
     <ClInclude Include="ButtonFieldDeploy.h" />
     <ClInclude Include="ButtonFieldFire.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="Deck.h" />
     <ClInclude Include="EnemyField.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Field.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="Ship.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="UserField.h" />
   </ItemGroup>

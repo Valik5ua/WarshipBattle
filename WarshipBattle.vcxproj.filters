@@ -48,6 +48,12 @@
     <ClCompile Include="TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Ship.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Deck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -84,6 +90,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ship.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Deck.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -76,7 +76,7 @@ bool TextureManager::LoadTexture(char* FileName, GLuint& Texture_ID)
     GLuint _width = bmpInfo->biWidth;
     GLuint _height = bmpInfo->biHeight;
 
-    glGenTextures(1, &Texture_ID);             // Generate a texture
+    glGenTextures(1, &Texture_ID);            // Generate a texture
     glBindTexture(GL_TEXTURE_2D, Texture_ID); // Bind that texture temporarily
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

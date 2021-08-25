@@ -37,7 +37,7 @@ void EnemyField::Draw()
 			glTexCoord2d(1.f, 0); glVertex2f(i + this->StartX + 1.0f, j + this->StartY);
 			glEnd();
 			glDisable(GL_TEXTURE_2D);
-			if (this->Cells[i][j].Selected)
+			if (this->Cells[i][j].Cell_Aim)
 			{
 				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, textureManager.WaterAimTextureID);
@@ -64,7 +64,7 @@ bool EnemyField::MoveSelection(int Direction)
 	{
 		for (int y{}; y < OpponentGameFieldH; y++)
 		{
-			if (this->Cells[x][y].Selected)
+			if (this->Cells[x][y].Cell_Aim)
 			{
 				switch (Direction)
 				{
@@ -117,7 +117,7 @@ bool EnemyField::MoveSelection(int Direction)
 void EnemyField::Select(const size_t CellX, const size_t CellY)
 {
 	this->Deselect();
-	this->Cells[CellX][CellY].Selected = true;
+	this->Cells[CellX][CellY].Cell_Aim = true;
 }
 
 /// <summary>
@@ -129,7 +129,7 @@ void EnemyField::Deselect()
 	{
 		for (int j{}; j < OpponentGameFieldH; j++)
 		{
-			if (this->Cells[i][j].Selected) { this->Cells[i][j].Selected = false; return; }
+			if (this->Cells[i][j].Cell_Aim) { this->Cells[i][j].Cell_Aim = false; return; }
 		}
 	}
 }
