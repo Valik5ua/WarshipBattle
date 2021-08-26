@@ -16,8 +16,8 @@ public:
 	};
 	virtual bool Click(POINT& coordinates) = 0;
 	virtual void Draw() = 0;
-	bool ShipExistsAround(Cell);
-	bool ShipExistsAround(Ship);
+	bool ShipExistsAround(const POINT coordinates);
+	bool ShipExistsAround(Ship&);
 public:
 	int StartX;
 	int StartY;

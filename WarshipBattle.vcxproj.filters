@@ -54,6 +54,18 @@
     <ClCompile Include="Deck.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="OneDeckShip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TwoDeckShip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreeDeckShip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FourDeckShip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -96,6 +108,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Deck.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OneDeckShip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TwoDeckShip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreeDeckShip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FourDeckShip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

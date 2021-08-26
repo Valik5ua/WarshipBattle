@@ -167,10 +167,14 @@
     <ClCompile Include="EnemyField.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Field.cpp" />
+    <ClCompile Include="FourDeckShip.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="OneDeckShip.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="ThreeDeckShip.cpp" />
+    <ClCompile Include="TwoDeckShip.cpp" />
     <ClCompile Include="UserField.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -182,11 +186,15 @@
     <ClInclude Include="EnemyField.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="Field.h" />
+    <ClInclude Include="FourDeckShip.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="OneDeckShip.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="ThreeDeckShip.h" />
+    <ClInclude Include="TwoDeckShip.h" />
     <ClInclude Include="UserField.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

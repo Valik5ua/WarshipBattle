@@ -7,11 +7,12 @@ class Ship
 public:
 	Ship(POINT StartPos);
 	Ship();
-	virtual bool Click(POINT Coordinates) = 0;
+	//bool Click(POINT Coordinates);
+	virtual int GetSize() = 0;
 public:
 	POINT StartPos;
 	bool Deployed;
 	bool Deployable;
-private:
+protected:
 	int Size;
 };
