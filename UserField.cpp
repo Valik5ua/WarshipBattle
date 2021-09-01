@@ -1,7 +1,10 @@
 #include "UserField.h"
+#include "Engine.h"
 #include "TextureManager.h"
 
 extern TextureManager textureManager;
+extern Ship* Ships[10];
+extern Engine engine;
 
 /// <summary>
 /// Changes OpenGL coordinates to UserField coordinates.
@@ -19,26 +22,26 @@ bool UserField::Click(POINT& coordinates)
 	return false;
 }
 
-/// <summary>
-/// Draws the Field.
-/// </summary>
-void UserField::Draw()
+void UserField::StartDeploying()
 {
-	for (int i{}; i < MyGameFieldW; i++)
+	DrawShip(this->Ships[0]);
+}
+
+void UserField::MoveActiveShip(int Direction)
+{
+	switch (Direction)
 	{
-		for (int j{}; j < MyGameFieldH; j++)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, textureManager.WaterTextureID);
-
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0); glVertex2f(i+this->StartX, j + this->StartY);
-			glTexCoord2d(1.f, 0); glVertex2f(i + 1.f + this->StartX, j + this->StartY);
-			glTexCoord2d(1.f, 1.f); glVertex2f(i+ 1.f + this->StartX, j + 1.f + this->StartY);
-			glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + 1.f + this->StartY);
-			glEnd();
-
-			glDisable(GL_TEXTURE_2D);
-		}
+	case BF_MOVE_LEFT:
+		this->Ships[engine.ShipsDeployed].StartPos.x += 1;
+		break;
+	case BF_MOVE_RIGHT:
+		this->Ships[engine.ShipsDeployed].StartPos.x -= 1;
+		break;
+	case BF_MOVE_UP:
+		this->Ships[engine.ShipsDeployed].StartPos.y += 1;
+		break;
+	case BF_MOVE_DOWN:
+		this->Ships[engine.ShipsDeployed].StartPos.y -= 1;
+		break;
 	}
 }

@@ -13,23 +13,54 @@ void TextureManager::LoadAllTextures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  // (Actually, this one is the default)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+    LoadTexture((char*)"Textures\\Ship front.bmp", this->ShipFrontTextureID);
+    LoadTexture((char*)"Textures\\Ship middle.bmp", this->ShipMiddleTextureID);
+    LoadTexture((char*)"Textures\\Ship Back.bmp", this->ShipBackTextureID);
+
+    LoadTexture((char*)"Textures\\Ship front Aim.bmp", this->ShipFrontAimTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Aim.bmp", this->ShipMiddleAimTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Aim.bmp", this->ShipBackAimTextureID);
+
+    LoadTexture((char*)"Textures\\Ship front Afire.bmp", this->ShipFrontAfireTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Afire.bmp", this->ShipMiddleAfireTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Afire.bmp", this->ShipBackAfireTextureID);
+
+    LoadTexture((char*)"Textures\\Ship front Afire Aim.bmp", this->ShipFrontAfireAimTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Afire Aim.bmp", this->ShipMiddleAfireAimTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Afire Aim.bmp", this->ShipBackAfireAimTextureID);
+
+    LoadTexture((char*)"Textures\\Ship front Cracked.bmp", this->ShipFrontCrackedTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Cracked.bmp", this->ShipMiddleCrackedTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Cracked.bmp", this->ShipBackCrackedTextureID);
+
+    LoadTexture((char*)"Textures\\Ship front Cracked Aim.bmp", this->ShipFrontCrackedAimTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Cracked Aim.bmp", this->ShipMiddleCrackedAimTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Cracked Aim.bmp", this->ShipBackCrackedAimTextureID);
+
+    LoadTexture((char*)"Textures\\Single Ship.bmp", this->SingleShipTextureID);
+    LoadTexture((char*)"Textures\\Single Ship Aim.bmp", this->SingleShipAimTextureID);
+    LoadTexture((char*)"Textures\\Single Ship Cracked.bmp", this->SingleShipCrackedTextureID);
+    LoadTexture((char*)"Textures\\Single Ship Cracked Aim.bmp", this->SingleShipCrackedAimTextureID);
+
     LoadTexture((char*)"Textures\\BTN_ROTATE.bmp", this->Btn_RotateTextureID);
+    LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", this->Btn_RandomAimTextureID);
     LoadTexture((char*)"Textures\\WaterAim.bmp", this->WaterAimTextureID);
-    LoadTexture((char*)"Textures\\BTN_UP.bmp", this->Btn_UpTextureID);
+
     LoadTexture((char*)"Textures\\BTN_DOWN.bmp", this->Btn_DownTextureID);
+    LoadTexture((char*)"Textures\\BTN_UP.bmp", this->Btn_UpTextureID);
     LoadTexture((char*)"Textures\\BTN_LEFT.bmp", this->Btn_LeftTextureID);
     LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", this->Btn_RightTextureID);
-    LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", this->Btn_RandomAimTextureID);
+
     LoadTexture((char*)"Textures\\BTN_FIRE.bmp", this->Btn_FireTextureID);
     LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", this->Btn_DeployTextureID);
-    //LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
-    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
+
     LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
+    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
+    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
+
     LoadTexture((char*)"Textures\\sea.bmp", this->WaterTextureID);
-    LoadTexture((char*)"Textures\\Ship front Afire.bmp", this->ShipFrontTextureID);
-    LoadTexture((char*)"Textures\\Ship middle Afire.bmp", this->ShipMiddleTextureID);
-    LoadTexture((char*)"Textures\\Ship Back Afire.bmp", this->ShipBackTextureID);
-    LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->SingleShipTextureID);
+    LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->MissTextureID);
+    LoadTexture((char*)"Textures\\Rocket Missed Aim.bmp", this->MissAimTextureID);
 }
 
 /// <summary>

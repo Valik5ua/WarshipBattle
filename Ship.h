@@ -5,14 +5,16 @@
 class Ship
 {
 public:
-	Ship(POINT StartPos);
-	Ship();
+	Ship(POINT StartPos, int Size);
+	Ship() {};
+	void SetSize(int Size);
 	//bool Click(POINT Coordinates);
-	virtual int GetSize() = 0;
+	void SetDamageToDeck(int Coordinates);
 public:
 	POINT StartPos;
 	bool Deployed;
 	bool Deployable;
-protected:
+	bool Killed;
 	int Size;
+	Deck Decks[4];
 };

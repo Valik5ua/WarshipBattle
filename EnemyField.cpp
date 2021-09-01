@@ -1,7 +1,10 @@
 #include "EnemyField.h"
+#include "UserField.h"
 #include "TextureManager.h"
 
 extern TextureManager textureManager;
+extern UserField userField;
+extern Engine engine;
 
 /// <summary>
 /// Changes OpenGL coordinates to EnemyField coordinates.
@@ -19,39 +22,6 @@ bool EnemyField::Click(POINT& coordinates)
 	return false;
 }
 
-/// <summary>
-/// Draws the EnemyField.
-/// </summary>
-void EnemyField::Draw()
-{
-	for (int i{}; i < OpponentGameFieldW; i++)
-	{
-		for (int j{}; j < OpponentGameFieldH; j++)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, textureManager.WaterTextureID);
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-			glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + this->StartY + 1.0f);
-			glTexCoord2d(1.f, 1.f); glVertex2f(i + this->StartX + 1.0f, j + this->StartY + 1.0f);
-			glTexCoord2d(1.f, 0); glVertex2f(i + this->StartX + 1.0f, j + this->StartY);
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-			if (this->Cells[i][j].Cell_Aim)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.WaterAimTextureID);
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(0, 1.f); glVertex2f(i + this->StartX, j + this->StartY + 1.0f);
-				glTexCoord2d(1.f, 1.f); glVertex2f(i + this->StartX + 1.0f, j + this->StartY + 1.0f);
-				glTexCoord2d(1.f, 0); glVertex2f(i + this->StartX + 1.0f, j + this->StartY);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-		}
-	}
-}
 
 /// <summary>
 /// Moves the selected cell of the EnemyField.
@@ -107,6 +77,55 @@ bool EnemyField::MoveSelection(int Direction)
 		}
 	}
 	return false;
+}
+
+void EnemyField::CreateShips(Engine::MODE Mode)
+{
+	this->ClearField();
+	this->CleanShips();
+	switch (Mode)
+	{
+	case Engine::MODE::Deploying:
+	{
+		this->Ships[0].SetSize(4);
+		this->Ships[1].SetSize(3);
+		this->Ships[2].SetSize(3);
+		for (int i = 3; i < 6; i++)
+			this->Ships[i].SetSize(2);
+		for (int i = 6; i < 10; i++)
+			this->Ships[i].SetSize(1);
+
+		for (int i{}; i < 10; i++)
+		{
+			this->Ships[i].StartPos.x += i;
+			this->Ships[i].Deployed = false;
+		}
+	}
+	break;
+	}
+}
+
+void EnemyField::CloseShip()
+{
+	for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
+		this->Ships[i].Decks[i].Open = false;
+}
+
+void EnemyField::ClearField()
+{
+	for (int i{}; i < 10; i++)
+		for (int j{}; j < 10; j++)
+			this->Cells[i][j].Open == true;
+}
+
+void EnemyField::CleanShips()
+{
+	for (int i{}; i < 10; i++)
+	{
+		this->Ships[i].Killed = false;
+		for (int j{}; j < Ships[i].Size; j++)
+			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
+	}
 }
 
 /// <summary>

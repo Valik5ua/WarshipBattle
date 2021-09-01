@@ -8,49 +8,54 @@ public:
 private:
 	bool LoadTexture(char* FileName, GLuint& Texture_ID);
 public:
-
 	//Texture IDs
-	GLuint	ShipFrontTextureID;
-	GLuint	ShipMiddleTextureID;
-	GLuint	ShipBackTextureID;
 
-	GLuint	ShipFrontAimTextureID;
-	GLuint	ShipMiddleAimTextureID;
-	GLuint	ShipBackAimTextureID;
+	GLuint	ShipFrontTextureID = 1;
+	GLuint	ShipMiddleTextureID = 2;
+	GLuint	ShipBackTextureID = 3;
 
-	GLuint	ShipFrontAfireTextureID;
-	GLuint	ShipMiddleAfireTextureID;
-	GLuint	ShipBackAfireTextureID;
+	GLuint	ShipFrontAimTextureID = 4;
+	GLuint	ShipMiddleAimTextureID = 5;
+	GLuint	ShipBackAimTextureID = 6;
 
-	GLuint	ShipFrontAfireAimTextureID;
-	GLuint	ShipMiddleAfireAimTextureID;
-	GLuint	ShipBackAfireAimTextureID;
+	GLuint	ShipFrontAfireTextureID = 7;
+	GLuint	ShipMiddleAfireTextureID = 8;
+	GLuint	ShipBackAfireTextureID = 9;
 
-	GLuint	ShipFrontCrackedTextureID;
-	GLuint	ShipMiddleCrackedTextureID;
-	GLuint	ShipBackCrackedTextureID;
+	GLuint	ShipFrontAfireAimTextureID = 10;
+	GLuint	ShipMiddleAfireAimTextureID = 11;
+	GLuint	ShipBackAfireAimTextureID = 12;
 
-	GLuint	ShipFrontCrackedAimTextureID;
-	GLuint	ShipMiddleCrackedAimTextureID;
-	GLuint	ShipBackCrackedAimTextureID;
+	GLuint	ShipFrontCrackedTextureID = 13;
+	GLuint	ShipMiddleCrackedTextureID = 14;
+	GLuint	ShipBackCrackedTextureID = 15;
 
-	GLuint   SingleShipTextureID;
-	GLuint   SingleShipAimTextureID;
-	GLuint   SingleShipCrackedTextureID;
-	GLuint   SingleShipCrackedAimTextureID;
+	GLuint	ShipFrontCrackedAimTextureID = 16;
+	GLuint	ShipMiddleCrackedAimTextureID = 17;
+	GLuint	ShipBackCrackedAimTextureID = 18;
 
-	GLuint  Btn_RotateTextureID;
-	GLuint	Btn_RandomAimTextureID;
-	GLuint	WaterAimTextureID;
+	GLuint   SingleShipTextureID = 19;
+	GLuint   SingleShipAimTextureID = 20;
+	GLuint   SingleShipCrackedTextureID = 21;
+	GLuint   SingleShipCrackedAimTextureID = 22;
 
-	GLuint	Btn_DownTextureID;
-	GLuint	Btn_UpTextureID;
-	GLuint	Btn_LeftTextureID;
-	GLuint	Btn_RightTextureID;
-	GLuint	Btn_FireTextureID;
-	GLuint	Btn_DeployTextureID;
-	GLuint  Btn_DisconnectTextureID;
-	GLuint  Btn_ConnectTextureID;
-	GLuint  Btn_CancelTextureID;
-	GLuint	WaterTextureID;
+	GLuint  Btn_RotateTextureID = 23;
+	GLuint	Btn_RandomAimTextureID = 24;
+	GLuint	WaterAimTextureID = 25;
+
+	GLuint	Btn_DownTextureID = 26;
+	GLuint	Btn_UpTextureID = 27;
+	GLuint	Btn_LeftTextureID = 28;
+	GLuint	Btn_RightTextureID = 29;
+
+	GLuint	Btn_FireTextureID = 30;
+	GLuint	Btn_DeployTextureID = 31;
+
+	GLuint  Btn_DisconnectTextureID = 32;
+	GLuint  Btn_ConnectTextureID = 33;
+	GLuint  Btn_CancelTextureID = 34;
+
+	GLuint	WaterTextureID = 35;
+	GLuint	MissTextureID = 36;
+	GLuint	MissAimTextureID = 37;
 };

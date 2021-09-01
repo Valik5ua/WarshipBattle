@@ -1,6 +1,12 @@
 #include "ButtonFieldDeploy.h"
 #include "TextureManager.h"
+#include "UserField.h"
+#include "EnemyField.h"
+#include "Engine.h"
 
+extern Engine engine;
+extern UserField userField;
+extern EnemyField enemyField;
 extern TextureManager textureManager;
 
 /// <summary>
@@ -137,4 +143,12 @@ void ButtonFieldDeploy::Draw()
 				return;
 			}
 		}
+}
+
+void ButtonFieldDeploy::Deploy()
+{
+	if (userField.Ships[engine.ShipsDeployed].Deployable) userField.Ships[engine.ShipsDeployed].Deployed = true;
+	engine.ShipsDeployed++;
+	engine.MoveShipToUserField(enemyField.Ships[engine.ShipsDeployed], userField.Ships[engine.ShipsDeployed]);
+	if (engine.ShipsDeployed == 10) engine.SetMode(Engine::MODE::MainGame);
 }

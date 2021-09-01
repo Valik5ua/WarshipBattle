@@ -11,6 +11,7 @@ extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
 
+extern Ship Ships[10];
 extern UserField userField;
 extern EnemyField enemyField;
 extern ButtonFieldDeploy buttonFieldDeploy;
@@ -20,7 +21,7 @@ extern ButtonFieldConnect buttonFieldConnect;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
+Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0)
 {
 }
 
@@ -89,6 +90,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     break;
     case MODE::Deploying:
     {
+
         switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_SELECTSHIP:
@@ -97,22 +99,29 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         break;
         case TRANSLATEDMSG_MOVESHIPL:
         {
+            userField.MoveActiveShip(BF_MOVE_LEFT);
         }
         break;
         case TRANSLATEDMSG_MOVESHIPR:
         {
+            userField.MoveActiveShip(BF_MOVE_RIGHT);
         }
         break;
         case TRANSLATEDMSG_MOVESHIPUP:
         {
+            userField.MoveActiveShip(BF_MOVE_UP);
         }
         break;
         case TRANSLATEDMSG_MOVESHIPDOWN:
         {
+            userField.MoveActiveShip(BF_MOVE_DOWN);
         }
         break;
         case TRANSLATEDMSG_DEPLOY:
-            break;
+        {
+            buttonFieldDeploy.Deploy();
+        }
+        break;
         case TRANSLATEDMSG_ROTATE:
             break;
         default:
@@ -153,6 +162,30 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     return true;
 }
 
+void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
+{
+    UserFieldShip = EnemyFieldShip;
+    UserFieldShip.StartPos.x = userField.StartX + ShipsDeployed;
+}
+
+void Engine::SetMode(MODE Mode)
+{
+    switch (Mode)
+    {
+    case MODE::Deploying:
+    {
+        enemyField.CreateShips(Mode);
+        this->MoveShipToUserField(enemyField.Ships[ShipsDeployed], userField.Ships[ShipsDeployed]);
+        this->Mode = Mode;
+    }
+    break;
+    case MODE::MainGame:
+    {
+        this->Mode = Mode;
+    }
+    }
+}
+
 /// <summary>
 /// Translates the Message for Engine::Event.
 /// </summary>
@@ -181,6 +214,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                     return TRANSLATEDMSG_MOVESHIPUP;
                 case BF_MOVE_RIGHT:
                     return TRANSLATEDMSG_MOVESHIPR;
+                case BF_DEPLOY:
+                    return TRANSLATEDMSG_DEPLOY;
+                case BF_ROTATE:
+                    return TRANSLATEDMSG_ROTATE;
                 default: return MSG_VOID;
                 }
             }

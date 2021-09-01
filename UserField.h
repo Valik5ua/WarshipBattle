@@ -9,9 +9,10 @@ class UserField : public Field
 public:
 	UserField(int x, int y) :Field(x,y) {}
 	bool Click(POINT& coordinates) override;
-	void Draw() override;
+	void StartDeploying() override;
+	void DrawActiveShip();
+	void MoveActiveShip(int Direction);
 public:
 	Cell Cells[MyGameFieldW][MyGameFieldH];
-private:
-	
+	Ship Ships[10];
 };

@@ -28,6 +28,8 @@ UserField userField(3,5);
 EnemyField enemyField(19, 5);
 TextureManager textureManager;
 
+Ship Ships[10]{};
+
 //Windows prototypes
 
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -300,6 +302,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glLoadIdentity(); //Reset Coordinate System
 	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
+	engine.SetMode(engine.Mode);
 }
 
 /// <summary>
@@ -316,6 +319,7 @@ GLvoid DrawScene(GLvoid)
 	case Engine::MODE::Deploying:
 	{
 		buttonFieldDeploy.Draw();
+		userField.StartDeploying();
 	}
 	break;
 	case Engine::MODE::MainGame:
