@@ -111,6 +111,7 @@ void EnemyField::CreateShips(Engine::MODE Mode)
 			Ship ship({ i,0 }, 1);
 			this->Ships[i] = ship;
 		}
+		this->CloseNextShip();
 	}
 	break;
 	}
