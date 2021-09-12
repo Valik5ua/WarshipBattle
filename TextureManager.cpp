@@ -17,17 +17,17 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Ship middle.bmp", this->ShipMiddleTextureID);
     LoadTexture((char*)"Textures\\Ship Back.bmp", this->ShipBackTextureID);
 
-    LoadTexture((char*)"Textures\\Ship front Aim.bmp", this->ShipFrontAimTextureID);
-    LoadTexture((char*)"Textures\\Ship middle Aim.bmp", this->ShipMiddleAimTextureID);
-    LoadTexture((char*)"Textures\\Ship Back Aim.bmp", this->ShipBackAimTextureID);
+    LoadTexture((char*)"Textures\\Ship front Deployable.bmp", this->ShipFrontDeployableTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Deployable.bmp", this->ShipMiddleDeployableTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Deployable.bmp", this->ShipBackDeployableTextureID);
+
+    LoadTexture((char*)"Textures\\Ship front Undeployable.bmp", this->ShipFrontUndeployableTextureID);
+    LoadTexture((char*)"Textures\\Ship middle Undeployable.bmp", this->ShipMiddleUndeployableTextureID);
+    LoadTexture((char*)"Textures\\Ship Back Undeployable.bmp", this->ShipBackUndeployableTextureID);
 
     LoadTexture((char*)"Textures\\Ship front Afire.bmp", this->ShipFrontAfireTextureID);
     LoadTexture((char*)"Textures\\Ship middle Afire.bmp", this->ShipMiddleAfireTextureID);
     LoadTexture((char*)"Textures\\Ship Back Afire.bmp", this->ShipBackAfireTextureID);
-
-    LoadTexture((char*)"Textures\\Ship front Afire Aim.bmp", this->ShipFrontAfireAimTextureID);
-    LoadTexture((char*)"Textures\\Ship middle Afire Aim.bmp", this->ShipMiddleAfireAimTextureID);
-    LoadTexture((char*)"Textures\\Ship Back Afire Aim.bmp", this->ShipBackAfireAimTextureID);
 
     LoadTexture((char*)"Textures\\Ship front Cracked.bmp", this->ShipFrontCrackedTextureID);
     LoadTexture((char*)"Textures\\Ship middle Cracked.bmp", this->ShipMiddleCrackedTextureID);
@@ -41,6 +41,8 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Single Ship Aim.bmp", this->SingleShipAimTextureID);
     LoadTexture((char*)"Textures\\Single Ship Cracked.bmp", this->SingleShipCrackedTextureID);
     LoadTexture((char*)"Textures\\Single Ship Cracked Aim.bmp", this->SingleShipCrackedAimTextureID);
+    LoadTexture((char*)"Textures\\Single Ship Deployable.bmp", this->SingleShipDeployableTextureID);
+    LoadTexture((char*)"Textures\\Single Ship Undeployable.bmp", this->SingleShipUndeployableTextureID);
 
     LoadTexture((char*)"Textures\\BTN_ROTATE.bmp", this->Btn_RotateTextureID);
     LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", this->Btn_RandomAimTextureID);
@@ -59,8 +61,8 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
 
     LoadTexture((char*)"Textures\\sea.bmp", this->WaterTextureID);
-    LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->MissTextureID);
-    LoadTexture((char*)"Textures\\Rocket Missed Aim.bmp", this->MissAimTextureID);
+    LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->MissedTextureID);
+    LoadTexture((char*)"Textures\\Rocket Missed Aim.bmp", this->MissedAimTextureID);
 }
 
 /// <summary>

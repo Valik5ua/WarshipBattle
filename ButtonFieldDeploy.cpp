@@ -148,7 +148,9 @@ void ButtonFieldDeploy::Draw()
 void ButtonFieldDeploy::Deploy()
 {
 	if (userField.Ships[engine.ShipsDeployed].Deployable) userField.Ships[engine.ShipsDeployed].Deployed = true;
+	else return;
+	enemyField.CloseNextShip();
 	engine.ShipsDeployed++;
+	if (engine.ShipsDeployed == 10) { engine.SetMode(Engine::MODE::MainGame); return; }
 	engine.MoveShipToUserField(enemyField.Ships[engine.ShipsDeployed], userField.Ships[engine.ShipsDeployed]);
-	if (engine.ShipsDeployed == 10) engine.SetMode(Engine::MODE::MainGame);
 }

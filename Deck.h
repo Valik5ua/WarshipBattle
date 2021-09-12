@@ -5,9 +5,9 @@
 class Deck : public Cell
 {
 public:
-	Deck() {};
+	Deck() :Cell(), integrityStatus(IntegrityStatus::Whole) {};
 
-	bool Rotated;
+	POINT Position;
 
 	enum DeckType { Front, Back, Middle, Single };
 	DeckType Type;

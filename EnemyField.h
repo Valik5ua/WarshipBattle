@@ -13,8 +13,13 @@ public:
 	bool Click(POINT& coordinates) override;
 	void Select(const size_t, const size_t);
 	bool MoveSelection(int Direction);
+
+	bool ShipExists(POINT Coordinates);
 	void CreateShips(Engine::MODE);
-	void CloseShip();
+	void CloseNextShip();
+	
+	void SetShipMarkers();
+	void Draw() override;
 private:
 	void ClearField();
 	void CleanShips();

@@ -11,7 +11,6 @@ extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
 
-extern Ship Ships[10];
 extern UserField userField;
 extern EnemyField enemyField;
 extern ButtonFieldDeploy buttonFieldDeploy;
@@ -165,23 +164,28 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 {
     UserFieldShip = EnemyFieldShip;
-    UserFieldShip.StartPos.x = userField.StartX + ShipsDeployed;
+    if (this->ShipsDeployed != 0)
+        userField.Ships[this->ShipsDeployed - 1].Deployed = true;
+    userField.Ships[this->ShipsDeployed].Deployed = false;
+    userField.SetShipDeployableStatus();
 }
 
 void Engine::SetMode(MODE Mode)
 {
+    this->Mode = Mode;
     switch (Mode)
     {
     case MODE::Deploying:
     {
         enemyField.CreateShips(Mode);
-        this->MoveShipToUserField(enemyField.Ships[ShipsDeployed], userField.Ships[ShipsDeployed]);
-        this->Mode = Mode;
+        this->MoveShipToUserField(enemyField.Ships[this->ShipsDeployed], userField.Ships[this->ShipsDeployed]);
+        enemyField.SetShipMarkers();
+        userField.SetShipMarkers();
     }
     break;
     case MODE::MainGame:
     {
-        this->Mode = Mode;
+        userField.Ships[this->ShipsDeployed - 1].Deployed = true;
     }
     }
 }
@@ -221,24 +225,24 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 default: return MSG_VOID;
                 }
             }
-            if (MSG == MSG_KEYPRESS)
+        }
+        else if (MSG == MSG_KEYPRESS)
+        {
+            switch (Key)
             {
-                switch (Key)
-                {
-                case VK_DOWN:
-                    return TRANSLATEDMSG_MOVE_DOWN;
-                case VK_LEFT:
-                    return TRANSLATEDMSG_MOVE_LEFT;
-                case VK_UP:
-                    return TRANSLATEDMSG_MOVE_UP;
-                case VK_RIGHT:
-                    return TRANSLATEDMSG_MOVE_RIGHT;
-                case 13:
-                    return TRANSLATEDMSG_DEPLOY;
-                case 32:
-                    return TRANSLATEDMSG_ROTATE;
-                default: return MSG_VOID;
-                }
+            case VK_DOWN:
+                return TRANSLATEDMSG_MOVESHIPDOWN;
+            case VK_LEFT:
+                return TRANSLATEDMSG_MOVESHIPL;
+            case VK_UP:
+                return TRANSLATEDMSG_MOVESHIPUP;
+            case VK_RIGHT:
+                return TRANSLATEDMSG_MOVESHIPR;
+            case 13:
+                return TRANSLATEDMSG_DEPLOY;
+            case 32:
+                return TRANSLATEDMSG_ROTATE;
+            default: return MSG_VOID;
             }
         }
     }
@@ -295,9 +299,6 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         return MSG_VOID;
     }
     break;
-    case MODE::Connecting:
-    {
-    }
     }
     return MSG_VOID;
 }

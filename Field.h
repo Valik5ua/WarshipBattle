@@ -15,11 +15,7 @@ public:
 		this->StartY = StartY;
 	};
 	virtual bool Click(POINT& coordinates) = 0;
-	virtual void StartDeploying() {};
-	virtual void Draw();
-	bool ShipExistsAround(const POINT Coordinates, Ship* ship = (Ship*)NULL);
-	bool ShipExistsAround(Ship&);
-	virtual void DrawShip(Ship ship) {};
+	virtual void Draw() = 0;
 public:
 	int StartX;
 	int StartY;

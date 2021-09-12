@@ -28,8 +28,6 @@ UserField userField(3,5);
 EnemyField enemyField(19, 5);
 TextureManager textureManager;
 
-Ship Ships[10]{};
-
 //Windows prototypes
 
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -319,7 +317,6 @@ GLvoid DrawScene(GLvoid)
 	case Engine::MODE::Deploying:
 	{
 		buttonFieldDeploy.Draw();
-		userField.StartDeploying();
 	}
 	break;
 	case Engine::MODE::MainGame:
@@ -327,10 +324,7 @@ GLvoid DrawScene(GLvoid)
 		buttonFieldFire.Draw();
 	}
 		break;
-	case Engine::MODE::Connecting:
-	{
-		buttonFieldConnect.Draw();
-	}
+
 	}
 	enemyField.Draw();
 

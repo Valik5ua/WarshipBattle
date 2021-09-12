@@ -44,6 +44,10 @@
 #define ROTATION_DOWN			20003
 #define ROTATION_UP				20004
 
+//Max Ship Count
+
+#define MAX_SHIPS_COUNT			10
+
 // Program Metrics
 
 const float MinSizeFactor = 30;
@@ -58,8 +62,8 @@ const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3f);
 
 //Field Metrics
 
-const int MyGameFieldW = 10;
-const int MyGameFieldH = 10;
+const int UserGameFieldW = 10;
+const int UserGameFieldH = 10;
 
 const int OpponentGameFieldW = 10;
 const int OpponentGameFieldH = 10;

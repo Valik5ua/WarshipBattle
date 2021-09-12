@@ -6,8 +6,11 @@ class Cell
 {
 public:
 	Cell();
+	void Draw(POINT Coordinates, GLuint TextureID);
 public:
-	int ButtonID;
+	bool MarkedShip;
 	bool Cell_Aim;
 	bool Open;
+	bool Missed;
+	int ButtonID;
 };
