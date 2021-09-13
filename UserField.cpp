@@ -22,6 +22,9 @@ bool UserField::Click(POINT& coordinates)
 	return false;
 }
 
+/// <summary>
+/// Sets the current active the status "Deployable"(true) or "Undeployable"(false)
+/// </summary>
 void UserField::SetShipDeployableStatus()
 {
 	for (int DeckCounter{}; DeckCounter < this->Ships[engine.ShipsDeployed].Size; DeckCounter++)
@@ -38,6 +41,10 @@ void UserField::SetShipDeployableStatus()
 	this->Ships[engine.ShipsDeployed].Deployable = true;
 }
 
+/// <summary>
+/// Moves the current active ship.
+/// </summary>
+/// <param name="Direction: ">The direction in which to move the ship.</param>
 void UserField::MoveActiveShip(int Direction)
 {
 	switch (Direction)
@@ -67,6 +74,11 @@ void UserField::MoveActiveShip(int Direction)
 	this->SetShipDeployableStatus();
 }
 
+/// <summary>
+/// A function that checks whether or not a ship is located in specific loacation.
+/// </summary>
+/// <param name="Coordinates: ">The coordinates of the location to be checked.</param>
+/// <returns>True if the ship is located in the loacation.</returns>
 bool UserField::ShipExists(POINT Coordinates)
 {
 	for (int Arrnum = 0; Arrnum < engine.ShipsDeployed; Arrnum++)
@@ -76,6 +88,10 @@ bool UserField::ShipExists(POINT Coordinates)
 	return false;
 }
 
+/// <summary>
+/// Creates all the ships to be located in the field.
+/// </summary>
+/// <param name="Mode: ">The mode of the creation.</param>
 void UserField::SetShipMarkers()
 {
 	for (int i{}; i < UserGameFieldW; i++)
@@ -87,6 +103,9 @@ void UserField::SetShipMarkers()
 			this->Cells[this->Ships[Shipnum].Decks[Decknum].Position.x][this->Ships[Shipnum].Decks[Decknum].Position.y].MarkedShip = true;
 }
 
+/// <summary>
+/// Draws the field.
+/// </summary>
 void UserField::Draw()
 {
 	GLuint TextureID{};
@@ -195,6 +214,11 @@ void UserField::Draw()
 		}
 }
 
+/// <summary>
+/// Checks wether or not a certain position is in range of the field.
+/// </summary>
+/// <param name="Coordinates: ">The position to check.</param>
+/// <returns>Wether or not the coordinates given are in range of the field.</returns>
 bool UserField::In_Range(POINT Coordinates)
 {
 	if (Coordinates.x >= 0 && Coordinates.x < UserGameFieldW)

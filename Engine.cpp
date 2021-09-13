@@ -161,6 +161,11 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     return true;
 }
 
+/// <summary>
+/// Moves a ship from enemyField to userField.
+/// </summary>
+/// <param name="EnemyFieldShip: ">The ship to be given to userField from enemyField.</param>
+/// <param name="UserFieldShip: ">The ship that will be recieving EnemyFieldShip.</param>
 void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 {
     UserFieldShip = EnemyFieldShip;
@@ -170,6 +175,10 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
     userField.SetShipDeployableStatus();
 }
 
+/// <summary>
+/// Sets the game mode.
+/// </summary>
+/// <param name="Mode: ">The new mode to be set.</param>
 void Engine::SetMode(MODE Mode)
 {
     this->Mode = Mode;

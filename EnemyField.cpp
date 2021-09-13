@@ -79,14 +79,24 @@ bool EnemyField::MoveSelection(int Direction)
 	return false;
 }
 
+/// <summary>
+/// A function that checks whether or not a ship is located in specific loacation.
+/// </summary>
+/// <param name="Coordinates: ">The coordinates of the location to be checked.</param>
+/// <returns>True if the ship is located in the loacation.</returns>
 bool EnemyField::ShipExists(POINT Coordinates)
 {
-	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
-		if (this->Ships[Arrnum].Decks[0].Position.x == Coordinates.x && this->Ships[Arrnum].Decks[0].Position.y == Coordinates.y)
-			return true;
+	for (int Arrnum = 0; Arrnum < engine.ShipsDeployed; Arrnum++)
+		for (int DeckCounter{}; DeckCounter < this->Ships[Arrnum].Size; DeckCounter++)
+			if (this->Ships[Arrnum].Decks[DeckCounter].Position.x == Coordinates.x && this->Ships[Arrnum].Decks[DeckCounter].Position.y == Coordinates.y)
+				return true;
 	return false;
 }
 
+/// <summary>
+/// Creates all the ships to be located in the field.
+/// </summary>
+/// <param name="Mode: ">The mode of the creation.</param>
 void EnemyField::CreateShips(Engine::MODE Mode)
 {
 	this->ClearField();
@@ -117,6 +127,9 @@ void EnemyField::CreateShips(Engine::MODE Mode)
 	}
 }
 
+/// <summary>
+/// Closes the next active ship.
+/// </summary>
 void EnemyField::CloseNextShip()
 {
 	for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
@@ -126,6 +139,9 @@ void EnemyField::CloseNextShip()
 	}
 }
 
+/// <summary>
+/// Sets all cells markers that tell the field that there is a ship located in the cell's position.
+/// </summary>
 void EnemyField::SetShipMarkers()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)
@@ -137,6 +153,9 @@ void EnemyField::SetShipMarkers()
 			this->Cells[this->Ships[Shipnum].Decks[Decknum].Position.x][this->Ships[Shipnum].Decks[Decknum].Position.y].MarkedShip = true;
 }
 
+/// <summary>
+/// Draws the field.
+/// </summary>
 void EnemyField::Draw()
 {
 	GLuint TextureID{};
@@ -261,13 +280,24 @@ void EnemyField::Draw()
 		}
 }
 
+/// <summary>
+/// Clears the field of any markers set before.
+/// </summary>
 void EnemyField::ClearField()
 {
 	for (int i{}; i < 10; i++)
 		for (int j{}; j < 10; j++)
-			this->Cells[i][j].Open == true;
+		{
+			this->Cells[i][j].Open = true;
+			this->Cells[i][j].MarkedShip = false;
+			this->Cells[i][j].Missed = false;
+			this->Cells[i][j].Cell_Aim = false;
+		}
 }
 
+/// <summary>
+/// Cleans all the ships of any markers set before.
+/// </summary>
 void EnemyField::CleanShips()
 {
 	for (int i{}; i < 10; i++)

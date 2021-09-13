@@ -145,6 +145,9 @@ void ButtonFieldDeploy::Draw()
 		}
 }
 
+/// <summary>
+/// Deploys the current active ship.
+/// </summary>
 void ButtonFieldDeploy::Deploy()
 {
 	if (userField.Ships[engine.ShipsDeployed].Deployable) userField.Ships[engine.ShipsDeployed].Deployed = true;

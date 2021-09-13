@@ -163,7 +163,6 @@
     <ClCompile Include="ButtonFieldDeploy.cpp" />
     <ClCompile Include="ButtonFieldFire.cpp" />
     <ClCompile Include="Cell.cpp" />
-    <ClCompile Include="Deck.cpp" />
     <ClCompile Include="EnemyField.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Field.cpp" />

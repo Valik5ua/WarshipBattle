@@ -1,5 +1,10 @@
 #include "Ship.h"
 
+/// <summary>
+/// A detailed consturctor for the Ship class.
+/// </summary>
+/// <param name="Position: ">The position of the ship.</param>
+/// <param name="Size: ">The size of the ship.</param>
 Ship::Ship(POINT Position, int Size) :Deployable(false), Deployed(false), Killed(false), Rotated(false)
 {
 	for (int i{}; i < Size; i++)
@@ -30,8 +35,3 @@ Ship::Ship(POINT Position, int Size) :Deployable(false), Deployed(false), Killed
 		break;
 	}
 }
-
-//bool Ship::Click(POINT Coordinates)
-//{
-//    return false;
-//}

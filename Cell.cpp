@@ -7,6 +7,11 @@ Cell::Cell() :ButtonID(0), Open(true), Cell_Aim(false)
 {
 }
 
+/// <summary>
+/// Draws a cell.
+/// </summary>
+/// <param name="Coordinates: ">The position of the cell to be drawn.</param>
+/// <param name="TextureID: ">The texture of the cell to be drawn.</param>
 void Cell::Draw(POINT Coordinates, GLuint TextureID)
 {
 	glEnable(GL_TEXTURE_2D);

@@ -7,7 +7,6 @@ class Ship
 public:
 	Ship(POINT Position, int Size);
 	Ship() {};
-	//bool Click(POINT Coordinates);
 	void SetDamageToDeck(int Coordinates);
 public:
 	bool Deployed;
