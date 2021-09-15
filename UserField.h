@@ -12,6 +12,7 @@ public:
 	
 	void SetShipDeployableStatus();
 	void MoveActiveShip(int Direction);
+	void RotateActiveShip();
 	
 	void SetShipMarkers();
 	void Draw() override;

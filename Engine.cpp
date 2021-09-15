@@ -122,7 +122,10 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         }
         break;
         case TRANSLATEDMSG_ROTATE:
-            break;
+        {
+            userField.RotateActiveShip();
+        }
+        break;
         default:
             break;
         }

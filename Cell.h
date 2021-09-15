@@ -6,7 +6,7 @@ class Cell
 {
 public:
 	Cell();
-	void Draw(POINT Coordinates, GLuint TextureID);
+	void Draw(POINT Coordinates, GLuint TextureID, bool Rotated = false);
 public:
 	bool MarkedShip;
 	bool Cell_Aim;

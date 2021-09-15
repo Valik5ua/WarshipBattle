@@ -50,26 +50,53 @@ void UserField::MoveActiveShip(int Direction)
 	switch (Direction)
 	{
 	case BF_MOVE_LEFT:
-		if (this->Ships[engine.ShipsDeployed].Decks[0].Position.x > 0)
+		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x - 1,this->Ships[engine.ShipsDeployed].Decks[0].Position.y }))
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.x -= 1;
 		break;
 	case BF_MOVE_RIGHT:
-		if (this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size - 1].Position.x < UserGameFieldW - 1)
+		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size - 1].Position.x + 1,this->Ships[engine.ShipsDeployed].Decks[0].Position.y }))
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.x += 1;
 		break;
 	case BF_MOVE_UP:
-		if (this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size - 1].Position.y < UserGameFieldH - 1)
+		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x,this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size-1].Position.y + 1 }))
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
-		this->Ships[engine.ShipsDeployed].Decks[i].Position.y += 1;
+				this->Ships[engine.ShipsDeployed].Decks[i].Position.y += 1;
 		break;
 	case BF_MOVE_DOWN:
-		if (this->Ships[engine.ShipsDeployed].Decks[0].Position.y > 0)
+		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x,this->Ships[engine.ShipsDeployed].Decks[0].Position.y - 1 }))
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
-		this->Ships[engine.ShipsDeployed].Decks[i].Position.y -= 1;
+				this->Ships[engine.ShipsDeployed].Decks[i].Position.y -= 1;
 		break;
 	}
+	this->SetShipMarkers();
+	this->SetShipDeployableStatus();
+}
+
+void UserField::RotateActiveShip()
+{
+	switch (this->Ships[engine.ShipsDeployed].Rotated)
+	{
+	case true:
+	{
+		for (int i = 0; i < this->Ships[engine.ShipsDeployed].Size; i++)
+		{
+			this->Ships[engine.ShipsDeployed].Decks[i].Position.y += i;
+			this->Ships[engine.ShipsDeployed].Decks[i].Position.x -= i;
+		}
+	}
+	break;
+	case false:
+	{
+		for (int i = 0; i < this->Ships[engine.ShipsDeployed].Size; i++)
+		{
+			this->Ships[engine.ShipsDeployed].Decks[i].Position.y -= i;
+			this->Ships[engine.ShipsDeployed].Decks[i].Position.x += i;
+		}
+	}
+	}
+	this->Ships[engine.ShipsDeployed].Rotated = !this->Ships[engine.ShipsDeployed].Rotated;
 	this->SetShipMarkers();
 	this->SetShipDeployableStatus();
 }
@@ -201,16 +228,17 @@ void UserField::Draw()
 				};
 			}
 			}
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, TextureID);
+			this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
+				.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
+			, TextureID);
 
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY);
-			glTexCoord2d(1.f, 0); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + 1.f + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY);
-			glTexCoord2d(1.f, 1.f); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + 1.f + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + 1.f + this->StartY);
-			glTexCoord2d(0, 1.f); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + 1.f + this->StartY);
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
+			if (this->Ships[Arrnum].Rotated)
+			{
+				this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
+					.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
+				, TextureID, true);
+			}
+
 		}
 }
 
