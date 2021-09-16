@@ -1,8 +1,19 @@
 #include "ButtonFieldDeploy.h"
 #include "TextureManager.h"
+#include "UserField.h"
+#include "EnemyField.h"
+#include "Engine.h"
 
+extern Engine engine;
+extern UserField userField;
+extern EnemyField enemyField;
 extern TextureManager textureManager;
 
+/// <summary>
+/// Default constructor for the ButtonFieldDeploy class.
+/// </summary>
+/// <param name="StartX">The X coordinate of the ButtonField.</param>
+/// <param name="StartY">The Y coordinate of the ButtonField.</param>
 ButtonFieldDeploy::ButtonFieldDeploy(int StartX, int StartY)
 {
 	this->StartX = StartX;
@@ -28,6 +39,11 @@ ButtonFieldDeploy::ButtonFieldDeploy(int StartX, int StartY)
 	this->Cells[3][2].ButtonID = BF_DEPLOY;
 }
 
+/// <summary>
+/// Changes OpenGL coordinates to ButtonField coordinates.
+/// </summary>
+/// <param name="coordinates: ">The coordinates of the click to be converted.</param>
+/// <returns>Wether or not the user has clicked on the ButtonField.</returns>
 bool ButtonFieldDeploy::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < ButtonFieldW + this->StartX && coordinates.y < ButtonFieldH + this->StartY)
@@ -39,6 +55,9 @@ bool ButtonFieldDeploy::Click(POINT& coordinates)
 	return false;
 }
 
+/// <summary>
+/// Draws the ButtonField.
+/// </summary>
 void ButtonFieldDeploy::Draw()
 {
 	for (int i = 0; i < ButtonFieldW; i++)
@@ -124,4 +143,17 @@ void ButtonFieldDeploy::Draw()
 				return;
 			}
 		}
+}
+
+/// <summary>
+/// Deploys the current active ship.
+/// </summary>
+void ButtonFieldDeploy::Deploy()
+{
+	if (userField.Ships[engine.ShipsDeployed].Deployable) userField.Ships[engine.ShipsDeployed].Deployed = true;
+	else return;
+	engine.ShipsDeployed++;
+	if (engine.ShipsDeployed == 10) { engine.SetMode(Engine::MODE::MainGame); return; }
+	enemyField.CloseNextShip();
+	engine.MoveShipToUserField(enemyField.Ships[engine.ShipsDeployed], userField.Ships[engine.ShipsDeployed]);
 }

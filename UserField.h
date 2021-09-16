@@ -1,21 +1,25 @@
 #pragma once
 #include "Field.h"
-#include "Cell.h"
 
-extern const int MyGameFieldW;
-extern const int MyGameFieldH;
+extern const int UserGameFieldW;
+extern const int UserGameFieldH;
 
 class UserField : public Field
 {
 public:
-	UserField(int x, int y)
-	{
-		this->StartX = x;
-		this->StartY = y;
-	}
+	UserField(int x, int y) :Field(x,y) {}
 	bool Click(POINT& coordinates) override;
+	
+	void SetShipDeployableStatus();
+	void MoveActiveShip(int Direction);
+	void RotateActiveShip();
+	
+	void SetShipMarkers();
 	void Draw() override;
-	void Select(const size_t, const size_t) override;
-	void Deselect() override;
-	Cell Cells[MyGameFieldW][MyGameFieldH];
+private:
+	bool In_Range(POINT Coordinates);
+	bool ShipExists(POINT Coordinates);
+public:
+	Cell Cells[UserGameFieldW][UserGameFieldH];
+	Ship Ships[10];
 };

@@ -6,10 +6,11 @@ class Cell
 {
 public:
 	Cell();
+	void Draw(POINT Coordinates, GLuint TextureID, bool Rotated = false);
 public:
-	enum Status { Water, Ship_Whole, Ship_Afire, Ship_Cracked, Missed };
-	Status Stat;
+	bool MarkedShip;
 	bool Cell_Aim;
-	bool Selected;
+	bool Open;
+	bool Missed;
 	int ButtonID;
 };
