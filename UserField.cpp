@@ -77,7 +77,6 @@ void UserField::MoveActiveShip(int Direction)
 void UserField::RotateActiveShip()
 {
 	Ship TempShip(this->Ships[engine.ShipsDeployed]);
-
 	TempShip.Rotated = !TempShip.Rotated;
 
 	switch (this->Ships[engine.ShipsDeployed].Rotated)
