@@ -76,27 +76,57 @@ void UserField::MoveActiveShip(int Direction)
 
 void UserField::RotateActiveShip()
 {
+	Ship TempShip(this->Ships[engine.ShipsDeployed]);
+
+	TempShip.Rotated = !TempShip.Rotated;
+
 	switch (this->Ships[engine.ShipsDeployed].Rotated)
 	{
 	case true:
 	{
-		for (int i = 0; i < this->Ships[engine.ShipsDeployed].Size; i++)
+		for (int i = 0; i < TempShip.Size; i++)
 		{
-			this->Ships[engine.ShipsDeployed].Decks[i].Position.y += i;
-			this->Ships[engine.ShipsDeployed].Decks[i].Position.x -= i;
+			TempShip.Decks[i].Position.y += i;
+			TempShip.Decks[i].Position.x -= i;
+		}
+		if (!this->In_Range(TempShip.Decks[TempShip.Size - 1].Position))
+		{
+			do
+			{
+				for (int Decknum = 0; Decknum < TempShip.Size; Decknum++)
+				{
+					TempShip.Decks[Decknum].Position.y -= 1;
+				}
+				if (this->In_Range(TempShip.Decks[TempShip.Size - 1].Position))
+					break;
+			} while (true);
+			break;
 		}
 	}
 	break;
 	case false:
 	{
-		for (int i = 0; i < this->Ships[engine.ShipsDeployed].Size; i++)
+		for (int i = 0; i < TempShip.Size; i++)
 		{
-			this->Ships[engine.ShipsDeployed].Decks[i].Position.y -= i;
-			this->Ships[engine.ShipsDeployed].Decks[i].Position.x += i;
+			TempShip.Decks[i].Position.y -= i;
+			TempShip.Decks[i].Position.x += i;
+		}
+		if (!this->In_Range(TempShip.Decks[TempShip.Size-1].Position))
+		{
+			do
+			{
+				for (int Decknum = 0; Decknum < TempShip.Size; Decknum++)
+				{
+					TempShip.Decks[Decknum].Position.x -= 1;
+				}
+				if (this->In_Range(TempShip.Decks[TempShip.Size - 1].Position))
+					break;
+			} while (true);
+			break;
 		}
 	}
 	}
-	this->Ships[engine.ShipsDeployed].Rotated = !this->Ships[engine.ShipsDeployed].Rotated;
+	this->Ships[engine.ShipsDeployed] = TempShip;
 	this->SetShipMarkers();
 	this->SetShipDeployableStatus();
 }
