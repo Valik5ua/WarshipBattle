@@ -1,6 +1,7 @@
 #include "EnemyField.h"
 #include "UserField.h"
 #include "TextureManager.h"
+#include "time.h"
 
 extern TextureManager textureManager;
 extern UserField userField;
@@ -317,6 +318,19 @@ void EnemyField::Select(const size_t CellX, const size_t CellY)
 {
 	this->Deselect();
 	this->Cells[CellX][CellY].Cell_Aim = true;
+}
+
+void EnemyField::RandomSelect(const size_t, const size_t)
+{
+	srand((unsigned)time(0));
+	int RandX = rand() % 10;
+	int RandY = rand() % 10;
+	while (this->Cells[RandX][RandY].MarkedShip && this->Cells[RandX][RandY].Missed)
+	{
+		RandX = rand() % 10;
+		RandY = rand() % 10;
+	}
+	this->Select(RandX, RandY);
 }
 
 /// <summary>

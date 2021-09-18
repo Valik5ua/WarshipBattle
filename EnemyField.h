@@ -12,6 +12,7 @@ public:
 	EnemyField(int x, int y) :Field(x, y) {}
 	bool Click(POINT& coordinates) override;
 	void Select(const size_t, const size_t);
+	void RandomSelect(const size_t, const size_t);
 	bool MoveSelection(int Direction);
 
 	bool ShipExists(POINT Coordinates);

@@ -135,6 +135,9 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
+        case TRANSLATEDMSG_RANDOMAIM:
+            enemyField.RandomSelect(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
+            break;
         case TRANSLATEDMSG_AIM:
             enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
             break;
