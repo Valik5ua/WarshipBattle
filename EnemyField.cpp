@@ -322,10 +322,9 @@ void EnemyField::Select(const size_t CellX, const size_t CellY)
 
 void EnemyField::RandomSelect(const size_t, const size_t)
 {
-	srand((unsigned)time(0));
 	int RandX = rand() % 10;
 	int RandY = rand() % 10;
-	while (this->Cells[RandX][RandY].MarkedShip && this->Cells[RandX][RandY].Missed)
+	while (this->Cells[RandX][RandY].MarkedShip || this->Cells[RandX][RandY].Missed)
 	{
 		RandX = rand() % 10;
 		RandY = rand() % 10;

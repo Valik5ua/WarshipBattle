@@ -5,9 +5,9 @@
 class Ship
 {
 public:
-	Ship(POINT Position, int Size);
+	Ship(const POINT Position, const size_t Size);
 	Ship() {};
-	void SetDamageToDeck(int Coordinates);
+	//bool Click(POINT& Coordinates);
 public:
 	bool Deployed;
 	bool Deployable;

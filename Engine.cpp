@@ -89,11 +89,11 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     break;
     case MODE::Deploying:
     {
-
         switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_SELECTSHIP:
         {
+
         }
         break;
         case TRANSLATEDMSG_MOVESHIPL:
@@ -218,9 +218,18 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     {
     case MODE::Deploying:
     {
-        if (MSG == MSG_LBTTNDOWN)
+        switch(MSG)
         {
-            if (buttonFieldDeploy.Click(Coordinates))
+        case MSG_LBTTNDOWN:
+        {
+            if (userField.Click(Coordinates))
+            {
+                if (!userField.Ships[this->ShipsDeployed].Deployable) break;
+                int TempShipID = userField.ShipExists(Coordinates);
+                if (TempShipID >= 0 && TempShipID != this->ShipsDeployed)
+                    userField.SwapActiveShip(TempShipID);
+            }
+            else if (buttonFieldDeploy.Click(Coordinates))
             {
                 this->MSGParam.FieldCoordinates = Coordinates;
                 switch (buttonFieldDeploy.Cells[Coordinates.x][Coordinates.y].ButtonID)
@@ -241,7 +250,8 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 }
             }
         }
-        else if (MSG == MSG_KEYPRESS)
+        break;
+        case MSG_KEYPRESS:
         {
             switch (Key)
             {
@@ -259,6 +269,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 return TRANSLATEDMSG_ROTATE;
             default: return MSG_VOID;
             }
+        }
+        break;
+
+        default: return MSG_VOID;
         }
     }
     break;
