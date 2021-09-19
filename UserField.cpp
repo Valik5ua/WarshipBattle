@@ -31,8 +31,8 @@ void UserField::SetShipDeployableStatus()
 		for (int i = -1; i <= 1; i++)
 			for (int j = -1; j <= 1; j++)
 			{
-				if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i,this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }))
-					if (this->ShipExists({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i,this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }))
+				if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i, this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }))
+					if (this->ShipExists({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i, this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }) >= 0)
 					{
 						this->Ships[engine.ShipsDeployed].Deployable = false;
 						return;
@@ -135,13 +135,23 @@ void UserField::RotateActiveShip()
 /// </summary>
 /// <param name="Coordinates: ">The coordinates of the location to be checked.</param>
 /// <returns>True if the ship is located in the loacation.</returns>
-bool UserField::ShipExists(POINT Coordinates)
+int UserField::ShipExists(POINT Coordinates)
 {
 	for (int Arrnum = 0; Arrnum < engine.ShipsDeployed; Arrnum++)
 		for (int DeckCounter{}; DeckCounter < this->Ships[Arrnum].Size; DeckCounter++)
 			if (this->Ships[Arrnum].Decks[DeckCounter].Position.x == Coordinates.x && this->Ships[Arrnum].Decks[DeckCounter].Position.y == Coordinates.y)
-			return true;
-	return false;
+			return Arrnum;
+	return -1;
+}
+
+void UserField::SwapActiveShip(const unsigned int ShipNum)
+{
+	Ship tempShip(this->Ships[ShipNum]);
+	this->Ships[ShipNum] = this->Ships[engine.ShipsDeployed];
+	this->Ships[engine.ShipsDeployed] = tempShip;
+	this->Ships[ShipNum].Deployed = true;
+	this->Ships[engine.ShipsDeployed].Deployed = false;
+	this->Ships[engine.ShipsDeployed].Deployable = true;
 }
 
 /// <summary>

@@ -1,11 +1,14 @@
 #include "Ship.h"
+#include "UserField.h"
+
+extern UserField userField;
 
 /// <summary>
 /// A detailed consturctor for the Ship class.
 /// </summary>
 /// <param name="Position: ">The position of the ship.</param>
 /// <param name="Size: ">The size of the ship.</param>
-Ship::Ship(POINT Position, int Size) :Deployable(false), Deployed(false), Killed(false), Rotated(false)
+Ship::Ship(const POINT Position, const size_t Size) :Deployable(false), Deployed(false), Killed(false), Rotated(false)
 {
 	for (int i{}; i < Size; i++)
 	{
@@ -35,3 +38,11 @@ Ship::Ship(POINT Position, int Size) :Deployable(false), Deployed(false), Killed
 		break;
 	}
 }
+//
+//bool Ship::Click(POINT& Coordinates)
+//{
+//	if (Coordinates.x == userField.StartX + this->Decks[0].Position.x)
+//		if (Coordinates.y == userField.StartY + this->Decks[0].Position.y)
+//			return true;
+//	return false;
+//}
