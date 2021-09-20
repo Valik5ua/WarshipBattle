@@ -3,7 +3,6 @@
 #include "TextureManager.h"
 
 extern TextureManager textureManager;
-extern Ship* Ships[10];
 extern Engine engine;
 
 /// <summary>

@@ -278,7 +278,9 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     break;
     case MODE::MainGame:
     {
-        if (MSG == MSG_LBTTNDOWN)
+        switch (MSG)
+        {
+        case MSG_LBTTNDOWN:
         {
             if (enemyField.Click(Coordinates))
             {
@@ -306,7 +308,8 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 }
             }
         }
-        if (MSG == MSG_KEYPRESS)
+        break;
+        case MSG_KEYPRESS:
         {
             switch (Key)
             {
@@ -324,8 +327,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 return TRANSLATEDMSG_RANDOMAIM;
             default: return MSG_VOID;
             }
+            break;
         }
-        return MSG_VOID;
+        default: return MSG_VOID;
+        }
     }
     break;
     }

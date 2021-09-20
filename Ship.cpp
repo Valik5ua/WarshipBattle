@@ -38,11 +38,3 @@ Ship::Ship(const POINT Position, const size_t Size) :Deployable(false), Deployed
 		break;
 	}
 }
-//
-//bool Ship::Click(POINT& Coordinates)
-//{
-//	if (Coordinates.x == userField.StartX + this->Decks[0].Position.x)
-//		if (Coordinates.y == userField.StartY + this->Decks[0].Position.y)
-//			return true;
-//	return false;
-//}

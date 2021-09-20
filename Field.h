@@ -1,6 +1,5 @@
 #pragma once
 #include "resource.h"
-#include <windows.h>
 #include "Ship.h"
 
 extern HWND hwnd;
