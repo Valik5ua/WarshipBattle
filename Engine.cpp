@@ -91,11 +91,6 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
-        case TRANSLATEDMSG_SELECTSHIP:
-        {
-
-        }
-        break;
         case TRANSLATEDMSG_MOVESHIPL:
         {
             userField.MoveActiveShip(BF_MOVE_LEFT);

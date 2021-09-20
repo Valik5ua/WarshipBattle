@@ -3,12 +3,9 @@
 // Bottom level Menus For New Game
 
 #define MENU_GAME_PVP			1
+#define MENU_GAME_PVE			2
 
-#define MENU_GAME_EASY			11
-#define MENU_GAME_MEDIUM		12
-#define MENU_GAME_HARD			13
-
-#define MENU_GAME_EXIT			21
+#define MENU_GAME_EXIT			11
 
 //Bottom level Menu For Help
 
