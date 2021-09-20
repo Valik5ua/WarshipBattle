@@ -17,14 +17,17 @@ extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 
-Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0)
+/// <summary>
+/// Default constructor for engine class.
+/// </summary>
+Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0)
 {
 }
 
 /// <summary>
 /// Converts pixels to OpenGL units.
 /// </summary>
-/// <param name="Pixels: ">pointer to the desired POINT struct to convert.</param>
+/// <param name="Pixels: ">Pointer to the desired POINT struct to convert.</param>
 void Engine::ConvertPixelsToGL(POINT* Pixels)
 {
     Pixels->y = OpenGLHeight * fGLUnitSize - Pixels->y;
@@ -55,10 +58,17 @@ void Engine::SetWindowGLParam(int Width, int Height)
     }
 }
 
+/// <summary>
+/// This function takes an input, translates it, and then does something dependent on the translation.
+/// </summary>
+/// <param name="MSG: ">The untranslated message.</param>
+/// <param name="Coordinates: ">The coordinates of the mouse click.</param>
+/// <param name="key: ">The key of the keyboard that has been pressed.</param>
+/// <returns></returns>
 bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 {
     int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
-    switch (Mode)
+    switch (this->Mode)
     {
     case MODE::Connecting:
     {
@@ -79,6 +89,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     break;
     case MODE::Deploying:
     {
+
         switch (TranslatedMSG)
         {
         case TRANSLATEDMSG_SELECTSHIP:
@@ -87,24 +98,34 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         break;
         case TRANSLATEDMSG_MOVESHIPL:
         {
+            userField.MoveActiveShip(BF_MOVE_LEFT);
         }
         break;
         case TRANSLATEDMSG_MOVESHIPR:
         {
+            userField.MoveActiveShip(BF_MOVE_RIGHT);
         }
         break;
         case TRANSLATEDMSG_MOVESHIPUP:
         {
+            userField.MoveActiveShip(BF_MOVE_UP);
         }
         break;
         case TRANSLATEDMSG_MOVESHIPDOWN:
         {
+            userField.MoveActiveShip(BF_MOVE_DOWN);
         }
         break;
         case TRANSLATEDMSG_DEPLOY:
-            break;
+        {
+            buttonFieldDeploy.Deploy();
+        }
+        break;
         case TRANSLATEDMSG_ROTATE:
-            break;
+        {
+            userField.RotateActiveShip();
+        }
+        break;
         default:
             break;
         }
@@ -114,8 +135,11 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
+        case TRANSLATEDMSG_RANDOMAIM:
+            enemyField.RandomSelect(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
+            break;
         case TRANSLATEDMSG_AIM:
-            enemyField.Select(MSGParam.FieldCoordinates.x, MSGParam.FieldCoordinates.y);
+            enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
             break;
         case TRANSLATEDMSG_MOVE_LEFT:
             enemyField.MoveSelection(BF_MOVE_LEFT);
@@ -143,9 +167,54 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     return true;
 }
 
+/// <summary>
+/// Moves a ship from enemyField to userField.
+/// </summary>
+/// <param name="EnemyFieldShip: ">The ship to be given to userField from enemyField.</param>
+/// <param name="UserFieldShip: ">The ship that will be recieving EnemyFieldShip.</param>
+void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
+{
+    UserFieldShip = EnemyFieldShip;
+    if (this->ShipsDeployed != 0)
+        userField.Ships[this->ShipsDeployed - 1].Deployed = true;
+    userField.Ships[this->ShipsDeployed].Deployed = false;
+    userField.SetShipDeployableStatus();
+}
+
+/// <summary>
+/// Sets the game mode.
+/// </summary>
+/// <param name="Mode: ">The new mode to be set.</param>
+void Engine::SetMode(MODE Mode)
+{
+    this->Mode = Mode;
+    switch (Mode)
+    {
+    case MODE::Deploying:
+    {
+        enemyField.CreateShips(Mode);
+        this->MoveShipToUserField(enemyField.Ships[this->ShipsDeployed], userField.Ships[this->ShipsDeployed]);
+        enemyField.SetShipMarkers();
+        userField.SetShipMarkers();
+    }
+    break;
+    case MODE::MainGame:
+    {
+        userField.Ships[this->ShipsDeployed - 1].Deployed = true;
+    }
+    }
+}
+
+/// <summary>
+/// Translates the Message for Engine::Event.
+/// </summary>
+/// <param name="Coordinates: ">The coordinates of the mouse click.</param>
+/// <param name="MSG: ">The untranslated message.</param>
+/// <param name="Key: "><The key of the keyboard that has been pressed./param>
+/// <returns></returns>
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
-    switch (Mode)
+    switch (this->Mode)
     {
     case MODE::Deploying:
     {
@@ -153,7 +222,7 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         {
             if (buttonFieldDeploy.Click(Coordinates))
             {
-                MSGParam.FieldCoordinates = Coordinates;
+                this->MSGParam.FieldCoordinates = Coordinates;
                 switch (buttonFieldDeploy.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:
@@ -164,27 +233,31 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                     return TRANSLATEDMSG_MOVESHIPUP;
                 case BF_MOVE_RIGHT:
                     return TRANSLATEDMSG_MOVESHIPR;
-                default: return MSG_VOID;
-                }
-            }
-            if (MSG == MSG_KEYPRESS)
-            {
-                switch (Key)
-                {
-                case VK_DOWN:
-                    return TRANSLATEDMSG_MOVE_DOWN;
-                case VK_LEFT:
-                    return TRANSLATEDMSG_MOVE_LEFT;
-                case VK_UP:
-                    return TRANSLATEDMSG_MOVE_UP;
-                case VK_RIGHT:
-                    return TRANSLATEDMSG_MOVE_RIGHT;
-                case 13:
+                case BF_DEPLOY:
                     return TRANSLATEDMSG_DEPLOY;
-                case 32:
+                case BF_ROTATE:
                     return TRANSLATEDMSG_ROTATE;
                 default: return MSG_VOID;
                 }
+            }
+        }
+        else if (MSG == MSG_KEYPRESS)
+        {
+            switch (Key)
+            {
+            case VK_DOWN:
+                return TRANSLATEDMSG_MOVESHIPDOWN;
+            case VK_LEFT:
+                return TRANSLATEDMSG_MOVESHIPL;
+            case VK_UP:
+                return TRANSLATEDMSG_MOVESHIPUP;
+            case VK_RIGHT:
+                return TRANSLATEDMSG_MOVESHIPR;
+            case 13:
+                return TRANSLATEDMSG_DEPLOY;
+            case 32:
+                return TRANSLATEDMSG_ROTATE;
+            default: return MSG_VOID;
             }
         }
     }
@@ -195,12 +268,12 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         {
             if (enemyField.Click(Coordinates))
             {
-                MSGParam.FieldCoordinates = Coordinates;
+                this->MSGParam.FieldCoordinates = Coordinates;
                 return TRANSLATEDMSG_AIM;
             }
             if (buttonFieldFire.Click(Coordinates))
             {
-                MSGParam.FieldCoordinates = Coordinates;
+                this->MSGParam.FieldCoordinates = Coordinates;
                 switch (buttonFieldFire.Cells[Coordinates.x][Coordinates.y].ButtonID)
                 {
                 case BF_MOVE_DOWN:
@@ -241,8 +314,6 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         return MSG_VOID;
     }
     break;
-    case MODE::Connecting:
-    {
     }
-    }
+    return MSG_VOID;
 }

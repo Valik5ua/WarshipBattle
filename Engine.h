@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+#include "Ship.h"
 
 class Engine
 {
@@ -10,8 +10,12 @@ public:
 	float GetOffsetW() { return fOffsetW; }
 	float GetOffsetH() { return fOffsetH; }
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
+	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
 public:
-	enum MODE { WaitingForAction, Connecting, Deploying, MainGame, ComputerTurn } Mode;
+	enum MODE { WaitingForAction, Connecting, Deploying, MainGame } Mode;
+	int ShipsDeployed;
+public:
+	void SetMode(MODE Mode);
 private:
 
 	float fOffsetH;

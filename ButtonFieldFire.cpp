@@ -3,6 +3,11 @@
 
 extern TextureManager textureManager;
 
+/// <summary>
+/// The default constructor for the ButtonFieldFire class.
+/// </summary>
+/// <param name="StartX: ">The X position of the ButtonField.</param>
+/// <param name="StartY: ">The Y position of the ButtonField.</param>
 ButtonFieldFire::ButtonFieldFire(int StartX, int StartY)
 {
 	this->StartX = StartX;
@@ -28,6 +33,11 @@ ButtonFieldFire::ButtonFieldFire(int StartX, int StartY)
 	this->Cells[3][2].ButtonID = BF_FIRE;
 }
 
+/// <summary>
+/// Changes OpenGL coordinates to ButtonField coordinates.
+/// </summary>
+/// <param name="coordinates: ">The coordinates of the click to be converted.</param>
+/// <returns>Wether or not the user has clicked on the ButtonField.</returns>
 bool ButtonFieldFire::Click(POINT& coordinates)
 {
 	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < ButtonFieldW + this->StartX && coordinates.y < ButtonFieldH + this->StartY)
@@ -39,6 +49,9 @@ bool ButtonFieldFire::Click(POINT& coordinates)
 	return false;
 }
 
+/// <summary>
+/// Draws the ButtonField.
+/// </summary>
 void ButtonFieldFire::Draw()
 {
 	for (int i = 0; i < ButtonFieldW; i++)

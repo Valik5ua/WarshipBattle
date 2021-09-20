@@ -2,9 +2,9 @@
 #include <Windows.h>
 
 /// <summary>
-/// This function creates the menus
+/// This function creates the menus.
 /// </summary>
-/// <param name="hwnd:">Handle to the window of interest</param>
+/// <param name="hwnd:">Handle to the window of interest.</param>
 void CreateMenus(HWND hwnd)
 {
     //Menus
