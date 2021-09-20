@@ -1,6 +1,7 @@
 #pragma once
-#include <windows.h>
 #include "resource.h"
+#include <windows.h>
+#include "Ship.h"
 
 extern HWND hwnd;
 
@@ -8,10 +9,14 @@ class Field
 {
 public:
 	Field();
+	Field(int StartX, int StartY)
+	{
+		this->StartX = StartX;
+		this->StartY = StartY;
+	};
 	virtual bool Click(POINT& coordinates) = 0;
 	virtual void Draw() = 0;
-	virtual void Select(const size_t, const size_t) = 0;
-	virtual void Deselect() = 0;
+public:
 	int StartX;
 	int StartY;
 };
