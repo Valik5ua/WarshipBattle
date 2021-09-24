@@ -17,11 +17,17 @@ extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 
+// define while only PVE game is avaliable
+#define GAMEMODE_PVE_ONLY
+
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
 Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0)
 {
+#ifdef GAMEMODE_PVE_ONLY
+    this->MainGameSubMode = this->SUBMODE::PVE;
+#endif // GAMEMODE_PVE_ONLY
 }
 
 /// <summary>
@@ -195,7 +201,7 @@ void Engine::SetMode(MODE Mode)
     break;
     case MODE::MainGame:
     {
-        userField.Ships[this->ShipsDeployed - 1].Deployed = true;
+        enemyField.CreateShips(Mode);
     }
     }
 }
