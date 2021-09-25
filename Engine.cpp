@@ -17,11 +17,17 @@ extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 
+// define while only PVE game is avaliable
+#define GAMEMODE_PVE_ONLY
+
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
 Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0)
 {
+#ifdef GAMEMODE_PVE_ONLY
+    this->MainGameSubMode = this->SUBMODE::PVE;
+#endif // GAMEMODE_PVE_ONLY
 }
 
 /// <summary>
@@ -91,11 +97,6 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
     {
         switch (TranslatedMSG)
         {
-        case TRANSLATEDMSG_SELECTSHIP:
-        {
-
-        }
-        break;
         case TRANSLATEDMSG_MOVESHIPL:
         {
             userField.MoveActiveShip(BF_MOVE_LEFT);
@@ -154,7 +155,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
             enemyField.MoveSelection(BF_MOVE_UP);
             break;
         case TRANSLATEDMSG_FIRE:
-
+            
             break;
         default:
             break;
@@ -200,7 +201,7 @@ void Engine::SetMode(MODE Mode)
     break;
     case MODE::MainGame:
     {
-        userField.Ships[this->ShipsDeployed - 1].Deployed = true;
+        enemyField.CreateShips(Mode);
     }
     }
 }
@@ -278,7 +279,9 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     break;
     case MODE::MainGame:
     {
-        if (MSG == MSG_LBTTNDOWN)
+        switch (MSG)
+        {
+        case MSG_LBTTNDOWN:
         {
             if (enemyField.Click(Coordinates))
             {
@@ -306,7 +309,8 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 }
             }
         }
-        if (MSG == MSG_KEYPRESS)
+        break;
+        case MSG_KEYPRESS:
         {
             switch (Key)
             {
@@ -324,8 +328,10 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
                 return TRANSLATEDMSG_RANDOMAIM;
             default: return MSG_VOID;
             }
+            break;
         }
-        return MSG_VOID;
+        default: return MSG_VOID;
+        }
     }
     break;
     }

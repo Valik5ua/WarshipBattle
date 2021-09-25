@@ -7,7 +7,6 @@ class Ship
 public:
 	Ship(const POINT Position, const size_t Size);
 	Ship() {};
-	//bool Click(POINT& Coordinates);
 public:
 	bool Deployed;
 	bool Deployable;

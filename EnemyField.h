@@ -9,24 +9,27 @@ extern const int OpponentGameFieldH;
 class EnemyField : public Field
 {
 public:
-	EnemyField(int x, int y) :Field(x, y) {}
+	EnemyField(int x, int y) :Field(x, y), DeployingShipID(0) {}
 	bool Click(POINT& coordinates) override;
 	void Select(const size_t, const size_t);
 	void RandomSelect(const size_t, const size_t);
 	bool MoveSelection(int Direction);
 
-	bool ShipExists(POINT Coordinates);
+	int ShipExists(POINT Coordinates);
 	void CreateShips(Engine::MODE);
 	void CloseNextShip();
 	
 	void SetShipMarkers();
 	void Draw() override;
 private:
+	void SetShipDeployableStatus(Ship& ship);
+	void DeployEnemyShips();
 	void ClearField();
 	void CleanShips();
+	void Deselect();
 public:
 	Cell Cells[OpponentGameFieldW][OpponentGameFieldH];
 	Ship Ships[10];
 private:
-	void Deselect();
+	unsigned int DeployingShipID;
 };

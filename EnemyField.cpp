@@ -85,13 +85,16 @@ bool EnemyField::MoveSelection(int Direction)
 /// </summary>
 /// <param name="Coordinates: ">The coordinates of the location to be checked.</param>
 /// <returns>True if the ship is located in the loacation.</returns>
-bool EnemyField::ShipExists(POINT Coordinates)
+int EnemyField::ShipExists(POINT Coordinates)
 {
-	for (int Arrnum = 0; Arrnum < engine.ShipsDeployed; Arrnum++)
+	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
+	{
+		if (Arrnum == this->DeployingShipID) continue;
 		for (int DeckCounter{}; DeckCounter < this->Ships[Arrnum].Size; DeckCounter++)
 			if (this->Ships[Arrnum].Decks[DeckCounter].Position.x == Coordinates.x && this->Ships[Arrnum].Decks[DeckCounter].Position.y == Coordinates.y)
-				return true;
-	return false;
+				return Arrnum;
+	}
+	return -1;
 }
 
 /// <summary>
@@ -125,6 +128,22 @@ void EnemyField::CreateShips(Engine::MODE Mode)
 		this->CloseNextShip();
 	}
 	break;
+	case Engine::MODE::MainGame:
+	{
+		switch (engine.MainGameSubMode)
+		{
+		case Engine::SUBMODE::PVE:
+		{
+			DeployEnemyShips();
+		}
+		break;
+		case Engine::SUBMODE::PVP:
+		{
+
+		}
+		break;
+		}
+	}
 	}
 }
 
@@ -149,9 +168,346 @@ void EnemyField::SetShipMarkers()
 		for (int j{}; j < OpponentGameFieldH; j++)
 			this->Cells[i][j].MarkedShip = false;
 
-	for (int Shipnum{}; Shipnum < engine.ShipsDeployed; Shipnum++)
+	for (int Shipnum{}; Shipnum < MAX_SHIPS_COUNT; Shipnum++)
 		for (int Decknum{}; Decknum < this->Ships[Shipnum].Size; Decknum++)
 			this->Cells[this->Ships[Shipnum].Decks[Decknum].Position.x][this->Ships[Shipnum].Decks[Decknum].Position.y].MarkedShip = true;
+}
+
+void EnemyField::SetShipDeployableStatus(Ship& ship)
+{
+	for (int DeckCounter{}; DeckCounter < ship.Size; DeckCounter++)
+		for (int i = -1; i <= 1; i++)
+			for (int j = -1; j <= 1; j++)
+			{
+				if (ship.Decks[DeckCounter].Position.x + i >= 0 && ship.Decks[DeckCounter].Position.x + i < OpponentGameFieldW)
+					if (ship.Decks[DeckCounter].Position.y + j >= 0 && ship.Decks[DeckCounter].Position.y + j < OpponentGameFieldH)
+						if (this->ShipExists({ ship.Decks[DeckCounter].Position.x + i, ship.Decks[DeckCounter].Position.y + j }) >= 0)
+						{
+							ship.Deployable = false;
+							return;
+						}
+			}
+	ship.Deployable = true;
+}
+
+void EnemyField::DeployEnemyShips()
+{
+	const unsigned short int MinShipsOnEdge = 2;
+	const unsigned short int MaxShipsOnEdge = 5;
+	time_t t;
+	srand((unsigned)time(&t));
+
+	int ShipsOnEdgeToSet = rand() % (MaxShipsOnEdge - 1) + MinShipsOnEdge;
+	bool SetShipOnEdge = true;
+	bool PrevShipSet = true;
+	int EdgePosShift{};
+	int EdgePos{};
+
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		if (ShipsOnEdgeToSet > 0)
+		{
+			switch (PrevShipSet)
+			{
+			case true:
+			{
+				if (i >= MinShipsOnEdge)
+				{
+					if ((((rand() % 10)+1) % 2) == 1)
+					{
+						EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
+						EdgePos = rand() % 4;
+						SetShipOnEdge = true;
+					}
+					else if (ShipsOnEdgeToSet >= MAX_SHIPS_COUNT - i)
+					{
+						EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
+						EdgePos = rand() % 4;
+						SetShipOnEdge = true;
+					}
+					else SetShipOnEdge = false;
+				}
+				else
+				{
+					EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
+					EdgePos = rand() % 4;
+					SetShipOnEdge = true;
+				}
+			}
+			break;
+			case false:
+			{
+				i--;
+				SetShipOnEdge = true;
+				if (EdgePos != 3) EdgePos++;
+				else EdgePos = 0;
+				EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
+				PrevShipSet = true;
+			}
+			break;
+			}
+		}
+		else
+		{
+			SetShipOnEdge = false;
+		}
+
+		this->DeployingShipID = i;
+		switch (SetShipOnEdge)
+		{
+		case true:
+		{
+			switch (EdgePos)
+			{
+			case 0:
+			{
+				this->Ships[i].Rotated = true;
+				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+				{
+					this->Ships[i].Decks[DeckNum].Position.x = EdgePosShift + DeckNum;
+					this->Ships[i].Decks[DeckNum].Position.y = 0;
+				}
+				this->SetShipDeployableStatus(this->Ships[i]);
+				if (!this->Ships[i].Deployable)
+				{
+					PrevShipSet = false;
+					for (int ShipPos = 0; ShipPos <= OpponentGameFieldW - this->Ships[i].Size; ShipPos++)
+					{
+						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+						{
+							this->Ships[i].Decks[DeckNum].Position.x = ShipPos + DeckNum;
+							this->Ships[i].Decks[DeckNum].Position.y = 0;
+						}
+						this->SetShipDeployableStatus(this->Ships[i]);
+						if (this->Ships[i].Deployable)
+						{
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
+							break;
+						}
+					}
+				}
+				else
+				{
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
+				}
+			}
+			break;
+			case 1:
+			{
+				this->Ships[i].Rotated = false;
+				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+				{
+					this->Ships[i].Decks[DeckNum].Position.x = 0;
+					this->Ships[i].Decks[DeckNum].Position.y = EdgePosShift + DeckNum;
+				}
+				this->SetShipDeployableStatus(this->Ships[i]);
+				if (!this->Ships[i].Deployable)
+				{
+					PrevShipSet = false;
+					for (int ShipPos = 0; ShipPos <= OpponentGameFieldH - this->Ships[i].Size; ShipPos++)
+					{
+						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+						{
+							this->Ships[i].Decks[DeckNum].Position.x = 0;
+							this->Ships[i].Decks[DeckNum].Position.y = ShipPos + DeckNum;
+						}
+						this->SetShipDeployableStatus(this->Ships[i]);
+						if (this->Ships[i].Deployable)
+						{
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
+							break;
+						}
+					}
+				}
+				else
+				{
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
+				}
+			}
+			break;
+			case 2:
+			{
+				this->Ships[i].Rotated = true;
+				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+				{
+					this->Ships[i].Decks[DeckNum].Position.x = EdgePosShift + DeckNum;
+					this->Ships[i].Decks[DeckNum].Position.y = 9;
+				}
+				this->SetShipDeployableStatus(this->Ships[i]);
+				if (!this->Ships[i].Deployable)
+				{
+					PrevShipSet = false;
+					for (int ShipPos = 0; ShipPos <= OpponentGameFieldW - this->Ships[i].Size; ShipPos++)
+					{
+						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+						{
+							this->Ships[i].Decks[DeckNum].Position.x = ShipPos + DeckNum;
+							this->Ships[i].Decks[DeckNum].Position.y = 9;
+						}
+						this->SetShipDeployableStatus(this->Ships[i]);
+						if (this->Ships[i].Deployable)
+						{
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
+							break;
+						}
+					}
+				}
+				else
+				{
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
+				}
+			}
+			break;
+			case 3:
+			{
+				this->Ships[i].Rotated = false;
+				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+				{
+					this->Ships[i].Decks[DeckNum].Position.x = 9;
+					this->Ships[i].Decks[DeckNum].Position.y = EdgePosShift + DeckNum;
+				}
+				this->SetShipDeployableStatus(this->Ships[i]);
+				if (!this->Ships[i].Deployable)
+				{
+					PrevShipSet = false;
+					for (int ShipPos = 0; ShipPos <= OpponentGameFieldH - this->Ships[i].Size; ShipPos++)
+					{
+						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+						{
+							this->Ships[i].Decks[DeckNum].Position.x = 9;
+							this->Ships[i].Decks[DeckNum].Position.y = ShipPos + DeckNum;
+						}
+						this->SetShipDeployableStatus(this->Ships[i]);
+						if (this->Ships[i].Deployable)
+						{
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
+							break;
+						}
+					}
+				}
+				else
+				{
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
+				}
+			}
+			break;
+			}
+		}
+		break;
+		case false:
+		{
+			this->Ships[i].Rotated = (((rand() % 10)+1) % 2);
+			switch (this->Ships[i].Rotated)
+			{
+			case true:
+			{
+				do
+				{
+					POINT RandPoint = { rand() % (OpponentGameFieldW - this->Ships[i].Size + 1) ,(rand() % (OpponentGameFieldH - 2)) + 1 };
+					for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+					{
+						this->Ships[i].Decks[DeckNum].Position.x = RandPoint.x + DeckNum;
+						this->Ships[i].Decks[DeckNum].Position.y = RandPoint.y;
+					}
+					this->SetShipDeployableStatus(this->Ships[i]);
+				} while (!this->Ships[i].Deployable);
+			}
+			break;
+			case false:
+			{
+				do
+				{
+					POINT RandPoint = { (rand() % (OpponentGameFieldW - 2)) + 1 ,rand() % (OpponentGameFieldH - this->Ships[i].Size + 1) };
+					for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
+					{
+						this->Ships[i].Decks[DeckNum].Position.x = RandPoint.x;
+						this->Ships[i].Decks[DeckNum].Position.y = RandPoint.y + DeckNum;
+					}
+					this->SetShipDeployableStatus(this->Ships[i]);
+				} while (!this->Ships[i].Deployable);
+			}
+			}
+		}
+		break;
+		}
+	}
+	SetShipMarkers();
+}
+
+/// <summary>
+/// Clears the field of any markers set before.
+/// </summary>
+void EnemyField::ClearField()
+{
+	for (int i{}; i < 10; i++)
+		for (int j{}; j < 10; j++)
+		{
+			this->Cells[i][j].Open = true;
+			this->Cells[i][j].MarkedShip = false;
+			this->Cells[i][j].Missed = false;
+			this->Cells[i][j].Cell_Aim = false;
+		}
+}
+
+/// <summary>
+/// Cleans all the ships of any markers set before.
+/// </summary>
+void EnemyField::CleanShips()
+{
+	for (int i{}; i < 10; i++)
+	{
+		this->Ships[i].Killed = false;
+		for (int j{}; j < Ships[i].Size; j++)
+		{
+			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
+			this->Ships[i].Decks[j].Position = { -1,-1 };
+		}
+	}
+}
+
+/// <summary>
+/// Selects a cell on the EnemyField.
+/// </summary>
+/// <param name="CellX: ">The X position of the cell to be selected.</param>
+/// <param name="CellY: ">The Y position of the cell to be selected.</param>
+void EnemyField::Select(const size_t CellX, const size_t CellY)
+{
+	this->Deselect();
+	this->Cells[CellX][CellY].Cell_Aim = true;
+}
+
+void EnemyField::RandomSelect(const size_t, const size_t)
+{
+	int RandX = rand() % 10;
+	int RandY = rand() % 10;
+	while (this->Cells[RandX][RandY].MarkedShip || this->Cells[RandX][RandY].Missed)
+	{
+		RandX = rand() % 10;
+		RandY = rand() % 10;
+	}
+	this->Select(RandX, RandY);
+}
+
+/// <summary>
+/// Deselects a cell on the EnemyField.
+/// </summary>
+void EnemyField::Deselect()
+{
+	for (int i{}; i < OpponentGameFieldW; i++)
+	{
+		for (int j{}; j < OpponentGameFieldH; j++)
+		{
+			if (this->Cells[i][j].Cell_Aim) { this->Cells[i][j].Cell_Aim = false;}
+		}
+	}
 }
 
 /// <summary>
@@ -183,13 +539,12 @@ void EnemyField::Draw()
 					TextureID = textureManager.WaterAimTextureID;
 				else TextureID = textureManager.WaterTextureID;
 			}
-			Cells[i][j].Draw({ this->StartX + i,this->StartY + j }, TextureID);
+			Cells[i][j].Draw({ this->StartX + i, this->StartY + j }, TextureID);
 		}
 	}
 	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
 		for (int DeckNum{}; DeckNum < this->Ships[Arrnum].Size; DeckNum++)
 		{
-			if (!this->Ships[Arrnum].Decks[DeckNum].Open) break;
 			switch (this->Ships[Arrnum].Decks[DeckNum].integrityStatus)
 			{
 			case Deck::IntegrityStatus::Whole:
@@ -268,80 +623,15 @@ void EnemyField::Draw()
 				}
 			}
 			}
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, TextureID);
+			this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
+				.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
+			, TextureID);
 
-			glBegin(GL_QUADS);
-			glTexCoord2d(0, 0); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY);
-			glTexCoord2d(1.f, 0); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + 1.f + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY);
-			glTexCoord2d(1.f, 1.f); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + 1.f + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + 1.f + this->StartY);
-			glTexCoord2d(0, 1.f); glVertex2f(this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX, this->Ships[Arrnum].Decks[DeckNum].Position.y + 1.f + this->StartY);
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
+			if (this->Ships[Arrnum].Rotated)
+			{
+				this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
+					.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
+				, TextureID, true);
+			}
 		}
-}
-
-/// <summary>
-/// Clears the field of any markers set before.
-/// </summary>
-void EnemyField::ClearField()
-{
-	for (int i{}; i < 10; i++)
-		for (int j{}; j < 10; j++)
-		{
-			this->Cells[i][j].Open = true;
-			this->Cells[i][j].MarkedShip = false;
-			this->Cells[i][j].Missed = false;
-			this->Cells[i][j].Cell_Aim = false;
-		}
-}
-
-/// <summary>
-/// Cleans all the ships of any markers set before.
-/// </summary>
-void EnemyField::CleanShips()
-{
-	for (int i{}; i < 10; i++)
-	{
-		this->Ships[i].Killed = false;
-		for (int j{}; j < Ships[i].Size; j++)
-			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
-	}
-}
-
-/// <summary>
-/// Selects a cell on the EnemyField.
-/// </summary>
-/// <param name="CellX: ">The X position of the cell to be selected.</param>
-/// <param name="CellY: ">The Y position of the cell to be selected.</param>
-void EnemyField::Select(const size_t CellX, const size_t CellY)
-{
-	this->Deselect();
-	this->Cells[CellX][CellY].Cell_Aim = true;
-}
-
-void EnemyField::RandomSelect(const size_t, const size_t)
-{
-	int RandX = rand() % 10;
-	int RandY = rand() % 10;
-	while (this->Cells[RandX][RandY].MarkedShip || this->Cells[RandX][RandY].Missed)
-	{
-		RandX = rand() % 10;
-		RandY = rand() % 10;
-	}
-	this->Select(RandX, RandY);
-}
-
-/// <summary>
-/// Deselects a cell on the EnemyField.
-/// </summary>
-void EnemyField::Deselect()
-{
-	for (int i{}; i < OpponentGameFieldW; i++)
-	{
-		for (int j{}; j < OpponentGameFieldH; j++)
-		{
-			if (this->Cells[i][j].Cell_Aim) { this->Cells[i][j].Cell_Aim = false; return; }
-		}
-	}
 }

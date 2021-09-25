@@ -13,6 +13,7 @@ public:
 	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
 public:
 	enum MODE { WaitingForAction, Connecting, Deploying, MainGame } Mode;
+	enum SUBMODE { PVE, PVP } MainGameSubMode;
 	int ShipsDeployed;
 public:
 	void SetMode(MODE Mode);
