@@ -89,7 +89,7 @@ int EnemyField::ShipExists(POINT Coordinates)
 {
 	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
 	{
-		if (Arrnum == this->ShipsDeployed) continue;
+		if (Arrnum == this->DeployingShipID) continue;
 		for (int DeckCounter{}; DeckCounter < this->Ships[Arrnum].Size; DeckCounter++)
 			if (this->Ships[Arrnum].Decks[DeckCounter].Position.x == Coordinates.x && this->Ships[Arrnum].Decks[DeckCounter].Position.y == Coordinates.y)
 				return Arrnum;
@@ -168,7 +168,7 @@ void EnemyField::SetShipMarkers()
 		for (int j{}; j < OpponentGameFieldH; j++)
 			this->Cells[i][j].MarkedShip = false;
 
-	for (int Shipnum{}; Shipnum < engine.ShipsDeployed; Shipnum++)
+	for (int Shipnum{}; Shipnum < MAX_SHIPS_COUNT; Shipnum++)
 		for (int Decknum{}; Decknum < this->Ships[Shipnum].Size; Decknum++)
 			this->Cells[this->Ships[Shipnum].Decks[Decknum].Position.x][this->Ships[Shipnum].Decks[Decknum].Position.y].MarkedShip = true;
 }
@@ -192,66 +192,68 @@ void EnemyField::SetShipDeployableStatus(Ship& ship)
 
 void EnemyField::DeployEnemyShips()
 {
+	const unsigned short int MinShipsOnEdge = 2;
+	const unsigned short int MaxShipsOnEdge = 5;
 	time_t t;
 	srand((unsigned)time(&t));
 
-	int On_Edge = rand() % 4 + 2;
-	bool ShipOnEdgeCheck = true;
-	bool Set = true;
-	int Pos{};
+	int ShipsOnEdgeToSet = rand() % (MaxShipsOnEdge - 1) + MinShipsOnEdge;
+	bool SetShipOnEdge = true;
+	bool PrevShipSet = true;
+	int EdgePosShift{};
 	int EdgePos{};
 
 	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
 	{
-		if (On_Edge != 0)
+		if (ShipsOnEdgeToSet > 0)
 		{
-			switch (Set)
+			switch (PrevShipSet)
 			{
 			case true:
 			{
-				if (i >= 2)
+				if (i >= MinShipsOnEdge)
 				{
-					if ((rand() % 100) % 2 == 1)
+					if ((((rand() % 10)+1) % 2) == 1)
 					{
-						Pos = rand() % (10 - this->Ships[i].Size + 1);
+						EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
 						EdgePos = rand() % 4;
-						ShipOnEdgeCheck = true;
+						SetShipOnEdge = true;
 					}
-					else if (On_Edge >= 10 - i)
+					else if (ShipsOnEdgeToSet >= MAX_SHIPS_COUNT - i)
 					{
-						Pos = rand() % (10 - this->Ships[i].Size + 1);
+						EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
 						EdgePos = rand() % 4;
-						ShipOnEdgeCheck = true;
+						SetShipOnEdge = true;
 					}
-					else ShipOnEdgeCheck = false;
+					else SetShipOnEdge = false;
 				}
 				else
 				{
-					Pos = rand() % (10 - this->Ships[i].Size + 1);
+					EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
 					EdgePos = rand() % 4;
-					ShipOnEdgeCheck = true;
+					SetShipOnEdge = true;
 				}
 			}
 			break;
 			case false:
 			{
 				i--;
-				ShipOnEdgeCheck = true;
+				SetShipOnEdge = true;
 				if (EdgePos != 3) EdgePos++;
 				else EdgePos = 0;
-				Pos = rand() % (10 - this->Ships[i].Size + 1);
-				Set = true;
+				EdgePosShift = rand() % (10 - this->Ships[i].Size + 1);
+				PrevShipSet = true;
 			}
 			break;
 			}
 		}
 		else
 		{
-			ShipOnEdgeCheck = false;
+			SetShipOnEdge = false;
 		}
 
-		this->ShipsDeployed = i;
-		switch (ShipOnEdgeCheck)
+		this->DeployingShipID = i;
+		switch (SetShipOnEdge)
 		{
 		case true:
 		{
@@ -262,13 +264,13 @@ void EnemyField::DeployEnemyShips()
 				this->Ships[i].Rotated = true;
 				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 				{
-					this->Ships[i].Decks[DeckNum].Position.x = Pos + DeckNum;
+					this->Ships[i].Decks[DeckNum].Position.x = EdgePosShift + DeckNum;
 					this->Ships[i].Decks[DeckNum].Position.y = 0;
 				}
 				this->SetShipDeployableStatus(this->Ships[i]);
 				if (!this->Ships[i].Deployable)
 				{
-					Set = false;
+					PrevShipSet = false;
 					for (int ShipPos = 0; ShipPos <= OpponentGameFieldW - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
@@ -279,16 +281,16 @@ void EnemyField::DeployEnemyShips()
 						this->SetShipDeployableStatus(this->Ships[i]);
 						if (this->Ships[i].Deployable)
 						{
-							Set = true;
-							On_Edge--;
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
 							break;
 						}
 					}
 				}
 				else
 				{
-					Set = true;
-					On_Edge--;
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
 				}
 			}
 			break;
@@ -298,12 +300,12 @@ void EnemyField::DeployEnemyShips()
 				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 				{
 					this->Ships[i].Decks[DeckNum].Position.x = 0;
-					this->Ships[i].Decks[DeckNum].Position.y = Pos + DeckNum;
+					this->Ships[i].Decks[DeckNum].Position.y = EdgePosShift + DeckNum;
 				}
 				this->SetShipDeployableStatus(this->Ships[i]);
 				if (!this->Ships[i].Deployable)
 				{
-					Set = false;
+					PrevShipSet = false;
 					for (int ShipPos = 0; ShipPos <= OpponentGameFieldH - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
@@ -314,16 +316,16 @@ void EnemyField::DeployEnemyShips()
 						this->SetShipDeployableStatus(this->Ships[i]);
 						if (this->Ships[i].Deployable)
 						{
-							Set = true;
-							On_Edge--;
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
 							break;
 						}
 					}
 				}
 				else
 				{
-					Set = true;
-					On_Edge--;
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
 				}
 			}
 			break;
@@ -332,13 +334,13 @@ void EnemyField::DeployEnemyShips()
 				this->Ships[i].Rotated = true;
 				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 				{
-					this->Ships[i].Decks[DeckNum].Position.x = Pos + DeckNum;
+					this->Ships[i].Decks[DeckNum].Position.x = EdgePosShift + DeckNum;
 					this->Ships[i].Decks[DeckNum].Position.y = 9;
 				}
 				this->SetShipDeployableStatus(this->Ships[i]);
 				if (!this->Ships[i].Deployable)
 				{
-					Set = false;
+					PrevShipSet = false;
 					for (int ShipPos = 0; ShipPos <= OpponentGameFieldW - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
@@ -349,16 +351,16 @@ void EnemyField::DeployEnemyShips()
 						this->SetShipDeployableStatus(this->Ships[i]);
 						if (this->Ships[i].Deployable)
 						{
-							Set = true;
-							On_Edge--;
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
 							break;
 						}
 					}
 				}
 				else
 				{
-					Set = true;
-					On_Edge--;
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
 				}
 			}
 			break;
@@ -368,12 +370,12 @@ void EnemyField::DeployEnemyShips()
 				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 				{
 					this->Ships[i].Decks[DeckNum].Position.x = 9;
-					this->Ships[i].Decks[DeckNum].Position.y = Pos + DeckNum;
+					this->Ships[i].Decks[DeckNum].Position.y = EdgePosShift + DeckNum;
 				}
 				this->SetShipDeployableStatus(this->Ships[i]);
 				if (!this->Ships[i].Deployable)
 				{
-					Set = false;
+					PrevShipSet = false;
 					for (int ShipPos = 0; ShipPos <= OpponentGameFieldH - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
@@ -384,16 +386,16 @@ void EnemyField::DeployEnemyShips()
 						this->SetShipDeployableStatus(this->Ships[i]);
 						if (this->Ships[i].Deployable)
 						{
-							Set = true;
-							On_Edge--;
+							PrevShipSet = true;
+							ShipsOnEdgeToSet--;
 							break;
 						}
 					}
 				}
 				else
 				{
-					Set = true;
-					On_Edge--;
+					PrevShipSet = true;
+					ShipsOnEdgeToSet--;
 				}
 			}
 			break;
@@ -402,7 +404,7 @@ void EnemyField::DeployEnemyShips()
 		break;
 		case false:
 		{
-			this->Ships[i].Rotated = (rand() % 100) % 2;
+			this->Ships[i].Rotated = (((rand() % 10)+1) % 2);
 			switch (this->Ships[i].Rotated)
 			{
 			case true:
@@ -464,7 +466,10 @@ void EnemyField::CleanShips()
 	{
 		this->Ships[i].Killed = false;
 		for (int j{}; j < Ships[i].Size; j++)
+		{
 			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
+			this->Ships[i].Decks[j].Position = { -1,-1 };
+		}
 	}
 }
 

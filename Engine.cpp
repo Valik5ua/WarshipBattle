@@ -155,7 +155,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
             enemyField.MoveSelection(BF_MOVE_UP);
             break;
         case TRANSLATEDMSG_FIRE:
-
+            
             break;
         default:
             break;

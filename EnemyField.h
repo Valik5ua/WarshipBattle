@@ -9,7 +9,7 @@ extern const int OpponentGameFieldH;
 class EnemyField : public Field
 {
 public:
-	EnemyField(int x, int y) :Field(x, y), ShipsDeployed(0) {}
+	EnemyField(int x, int y) :Field(x, y), DeployingShipID(0) {}
 	bool Click(POINT& coordinates) override;
 	void Select(const size_t, const size_t);
 	void RandomSelect(const size_t, const size_t);
@@ -31,5 +31,5 @@ public:
 	Cell Cells[OpponentGameFieldW][OpponentGameFieldH];
 	Ship Ships[10];
 private:
-	unsigned int ShipsDeployed;
+	unsigned int DeployingShipID;
 };

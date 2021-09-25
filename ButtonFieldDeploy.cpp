@@ -150,7 +150,7 @@ void ButtonFieldDeploy::Draw()
 /// </summary>
 void ButtonFieldDeploy::Deploy()
 {
-	if (userField.Ships[engine.ShipsDeployed].Deployable||true) userField.Ships[engine.ShipsDeployed].Deployed = true;
+	if (userField.Ships[engine.ShipsDeployed].Deployable) userField.Ships[engine.ShipsDeployed].Deployed = true;
 	else return;
 	engine.ShipsDeployed++;
 	if (engine.ShipsDeployed == 10) { engine.SetMode(Engine::MODE::MainGame); return; }
