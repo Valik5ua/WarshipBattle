@@ -109,13 +109,13 @@ int EnemyField::ShipExists(const POINT Coordinates)
 /// Creates all the ships to be located in the field.
 /// </summary>
 /// <param name="Mode: ">The mode of the creation.</param>
-void EnemyField::CreateShips(const Engine::MODE Mode)
+void EnemyField::CreateShips(const Engine::GAMESTATUS GameStatus)
 {
 	this->ClearField();
 	this->CleanShips();
-	switch (Mode)
+	switch (GameStatus)
 	{
-	case Engine::MODE::Deploying:
+	case Engine::GAMESTATUS::Deploying:
 	{
 		Ship ship({ 0,0 }, 4);
 		this->Ships[0] = ship;
@@ -136,16 +136,16 @@ void EnemyField::CreateShips(const Engine::MODE Mode)
 		this->CloseNextShip();
 	}
 	break;
-	case Engine::MODE::MainGame:
+	case Engine::GAMESTATUS::MainGame:
 	{
-		switch (engine.MainGameSubMode)
+		switch (engine.GameMode)
 		{
-		case Engine::SUBMODE::PVE:
+		case Engine::GAMEMODE::PVE:
 		{
 			DeployEnemyShips();
 		}
 		break;
-		case Engine::SUBMODE::PVP:
+		case Engine::GAMEMODE::PVP:
 		{
 
 		}

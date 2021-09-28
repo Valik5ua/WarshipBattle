@@ -218,6 +218,7 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	default:
+		engine.Event(MSG_VOID);
 		lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
 		break;
 	}
@@ -300,7 +301,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glLoadIdentity(); //Reset Coordinate System
 	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
-	engine.SetMode(engine.Mode);
+	engine.SetMode(engine.GameStatus);
 }
 
 /// <summary>
@@ -312,14 +313,14 @@ GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	userField.Draw();
-	switch (engine.Mode)
+	switch (engine.GameStatus)
 	{
-	case Engine::MODE::Deploying:
+	case Engine::GAMESTATUS::Deploying:
 	{
 		buttonFieldDeploy.Draw();
 	}
 	break;
-	case Engine::MODE::MainGame:
+	case Engine::GAMESTATUS::MainGame:
 	{
 		buttonFieldFire.Draw();
 	}

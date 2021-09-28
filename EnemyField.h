@@ -16,7 +16,7 @@ public:
 	bool MoveSelection(int Direction);
 
 	int ShipExists(const POINT Coordinates);
-	void CreateShips(const Engine::MODE);
+	void CreateShips(const Engine::GAMESTATUS);
 	void CloseNextShip();
 	
 	void SetShipMarkers();
