@@ -190,6 +190,7 @@ void UserField::Draw()
 	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
 		for (int DeckNum{}; DeckNum < this->Ships[Arrnum].Size; DeckNum++)
 		{
+			if (!this->In_Range(this->Ships[Arrnum].Decks[DeckNum].Position)) return;
 			switch (this->Ships[Arrnum].Decks[DeckNum].integrityStatus)
 			{
 			case Deck::IntegrityStatus::Whole:
@@ -278,6 +279,38 @@ void UserField::Draw()
 			}
 
 		}
+}
+
+/// <summary>
+/// Clears the field of any markers set before.
+/// </summary>
+void UserField::ClearField()
+{
+	for (int i{}; i < 10; i++)
+		for (int j{}; j < 10; j++)
+		{
+			this->Cells[i][j].Open = true;
+			this->Cells[i][j].MarkedShip = false;
+			this->Cells[i][j].Missed = false;
+			this->Cells[i][j].Cell_Aim = false;
+		}
+}
+
+/// <summary>
+/// Cleans all the ships of any markers set before.
+/// </summary>
+void UserField::CleanShips()
+{
+	for (int i{}; i < 10; i++)
+	{
+		this->Ships[i].Killed = false;
+		for (int j{}; j < Ships[i].Size; j++)
+		{
+			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
+			this->Ships[i].Decks[j].Position = { -1,-1 };
+			this->Ships[i].Decks[j].Open = true;
+		}
+	}
 }
 
 /// <summary>

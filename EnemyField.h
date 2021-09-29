@@ -15,8 +15,8 @@ public:
 	void RandomSelect(const size_t, const size_t);
 	bool MoveSelection(int Direction);
 
-	int ShipExists(POINT Coordinates);
-	void CreateShips(Engine::MODE);
+	int ShipExists(const POINT Coordinates);
+	void CreateShips(const Engine::GAMESTATUS);
 	void CloseNextShip();
 	
 	void SetShipMarkers();

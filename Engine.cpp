@@ -6,6 +6,7 @@
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
+#include "ButtonFieldNewGame.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -16,6 +17,7 @@ extern EnemyField enemyField;
 extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
+extern ButtonFieldNewGame buttonFieldNewGame;
 
 // define while only PVE game is avaliable
 #define GAMEMODE_PVE_ONLY
@@ -23,10 +25,10 @@ extern ButtonFieldConnect buttonFieldConnect;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :Mode(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0)
+Engine::Engine() :GameStatus(NewGame), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0), UserTurn(true)
 {
 #ifdef GAMEMODE_PVE_ONLY
-    this->MainGameSubMode = this->SUBMODE::PVE;
+    this->GameMode = this->GAMEMODE::Menu;
 #endif // GAMEMODE_PVE_ONLY
 }
 
@@ -74,96 +76,125 @@ void Engine::SetWindowGLParam(int Width, int Height)
 bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 {
     int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
-    switch (this->Mode)
+
+    switch (this->GameMode)
     {
-    case MODE::Connecting:
+    case this->GAMEMODE::Menu:
     {
         switch (TranslatedMSG)
         {
-        case TRANSLATEDMSG_CONNECT:
+        case TRANSLATEDMSG_NEWGAMEPVE:
+        {
+            this->GameMode = this->GAMEMODE::PVE;
+            this->SetMode(this->GAMESTATUS::Deploying);
+        }
+        break;
+        case TRANSLATEDMSG_NEWGAMEPVP:
         {
         }
         break;
-        case TRANSLATEDMSG_DISCONNECT:
+        }
+    }
+    break;
+    case this->GAMEMODE::PVE:
+    {
+        switch (this->GameStatus)
         {
+        case GAMESTATUS::Deploying:
+        {
+            switch (TranslatedMSG)
+            {
+            case TRANSLATEDMSG_MOVESHIPL:
+            {
+                userField.MoveActiveShip(BF_MOVE_LEFT);
+            }
+            break;
+            case TRANSLATEDMSG_MOVESHIPR:
+            {
+                userField.MoveActiveShip(BF_MOVE_RIGHT);
+            }
+            break;
+            case TRANSLATEDMSG_MOVESHIPUP:
+            {
+                userField.MoveActiveShip(BF_MOVE_UP);
+            }
+            break;
+            case TRANSLATEDMSG_MOVESHIPDOWN:
+            {
+                userField.MoveActiveShip(BF_MOVE_DOWN);
+            }
+            break;
+            case TRANSLATEDMSG_DEPLOY:
+            {
+                buttonFieldDeploy.Deploy();
+            }
+            break;
+            case TRANSLATEDMSG_ROTATE:
+            {
+                userField.RotateActiveShip();
+            }
+            break;
+            default: 
+                return MSG_VOID;
+                break;
+            }
+        }
+        break;
+        case GAMESTATUS::MainGame:
+        {
+            switch (this->UserTurn)
+            {
+            case true:
+            {
+                switch (TranslatedMSG)
+                {
+                case TRANSLATEDMSG_RANDOMAIM:
+                    enemyField.RandomSelect(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
+                    break;
+                case TRANSLATEDMSG_AIM:
+                    enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
+                    break;
+                case TRANSLATEDMSG_MOVE_LEFT:
+                    enemyField.MoveSelection(BF_MOVE_LEFT);
+                    break;
+                case TRANSLATEDMSG_MOVE_RIGHT:
+                    enemyField.MoveSelection(BF_MOVE_RIGHT);
+                    break;
+                case TRANSLATEDMSG_MOVE_DOWN:
+                    enemyField.MoveSelection(BF_MOVE_DOWN);
+                    break;
+                case TRANSLATEDMSG_MOVE_UP:
+                    enemyField.MoveSelection(BF_MOVE_UP);
+                    break;
+                case TRANSLATEDMSG_FIRE:
+                    this->UserTurn = false;
+                    break;
+                default:
+                    break;
+                }
+            }
+            break;
+            case false:
+            {
+                //enemyField.Fire();
+                this->UserTurn = true;
+            }
+            break;
+            }
+
         }
         break;
         default:
+            return MSG_VOID;
             break;
         }
     }
     break;
-    case MODE::Deploying:
+    case this->GAMEMODE::PVP:
     {
-        switch (TranslatedMSG)
-        {
-        case TRANSLATEDMSG_MOVESHIPL:
-        {
-            userField.MoveActiveShip(BF_MOVE_LEFT);
-        }
-        break;
-        case TRANSLATEDMSG_MOVESHIPR:
-        {
-            userField.MoveActiveShip(BF_MOVE_RIGHT);
-        }
-        break;
-        case TRANSLATEDMSG_MOVESHIPUP:
-        {
-            userField.MoveActiveShip(BF_MOVE_UP);
-        }
-        break;
-        case TRANSLATEDMSG_MOVESHIPDOWN:
-        {
-            userField.MoveActiveShip(BF_MOVE_DOWN);
-        }
-        break;
-        case TRANSLATEDMSG_DEPLOY:
-        {
-            buttonFieldDeploy.Deploy();
-        }
-        break;
-        case TRANSLATEDMSG_ROTATE:
-        {
-            userField.RotateActiveShip();
-        }
-        break;
-        default:
-            break;
-        }
+
     }
     break;
-    case MODE::MainGame:
-    {
-        switch (TranslatedMSG)
-        {
-        case TRANSLATEDMSG_RANDOMAIM:
-            enemyField.RandomSelect(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
-            break;
-        case TRANSLATEDMSG_AIM:
-            enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
-            break;
-        case TRANSLATEDMSG_MOVE_LEFT:
-            enemyField.MoveSelection(BF_MOVE_LEFT);
-            break;
-        case TRANSLATEDMSG_MOVE_RIGHT:
-            enemyField.MoveSelection(BF_MOVE_RIGHT);
-            break;
-        case TRANSLATEDMSG_MOVE_DOWN:
-            enemyField.MoveSelection(BF_MOVE_DOWN);
-            break;
-        case TRANSLATEDMSG_MOVE_UP:
-            enemyField.MoveSelection(BF_MOVE_UP);
-            break;
-        case TRANSLATEDMSG_FIRE:
-            
-            break;
-        default:
-            break;
-        }
-    }
-    break;
-    default:
-        return false;
     }
     return true;
 }
@@ -186,22 +217,25 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 /// Sets the game mode.
 /// </summary>
 /// <param name="Mode: ">The new mode to be set.</param>
-void Engine::SetMode(MODE Mode)
+void Engine::SetMode(GAMESTATUS GameStatus)
 {
-    this->Mode = Mode;
-    switch (Mode)
+    this->GameStatus = GameStatus;
+    this->ShipsDeployed = 0;
+    switch (GameStatus)
     {
-    case MODE::Deploying:
+    case GAMESTATUS::Deploying:
     {
-        enemyField.CreateShips(Mode);
+        userField.CleanShips();
+        userField.ClearField();
+        enemyField.CreateShips(GameStatus);
         this->MoveShipToUserField(enemyField.Ships[this->ShipsDeployed], userField.Ships[this->ShipsDeployed]);
         enemyField.SetShipMarkers();
         userField.SetShipMarkers();
     }
     break;
-    case MODE::MainGame:
+    case GAMESTATUS::MainGame:
     {
-        enemyField.CreateShips(Mode);
+        enemyField.CreateShips(GameStatus);
     }
     }
 }
@@ -211,13 +245,35 @@ void Engine::SetMode(MODE Mode)
 /// </summary>
 /// <param name="Coordinates: ">The coordinates of the mouse click.</param>
 /// <param name="MSG: ">The untranslated message.</param>
-/// <param name="Key: "><The key of the keyboard that has been pressed./param>
+/// <param name="Key: ">The key of the keyboard that has been pressed.</param>
 /// <returns></returns>
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
-    switch (this->Mode)
+    switch (this->GameStatus)
     {
-    case MODE::Deploying:
+    case GAMESTATUS::NewGame:
+    {
+        switch (MSG)
+        {
+        case MSG_LBTTNDOWN:
+        {
+            if(!buttonFieldNewGame.Click(Coordinates)) return MSG_VOID;
+            this->MSGParam.FieldCoordinates = Coordinates;
+            switch (buttonFieldNewGame.Cells[Coordinates.x][Coordinates.y].ButtonID)
+            {
+            case BF_NEWGAME_PVE:
+                return TRANSLATEDMSG_NEWGAMEPVE;
+            case BF_NEWGAME_PVP:
+                return TRANSLATEDMSG_NEWGAMEPVP;
+            default: return MSG_VOID;
+            }
+        }
+        break;
+        default: return MSG_VOID;
+        }
+    }
+    break;
+    case GAMESTATUS::Deploying:
     {
         switch(MSG)
         {
@@ -277,7 +333,7 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
         }
     }
     break;
-    case MODE::MainGame:
+    case GAMESTATUS::MainGame:
     {
         switch (MSG)
         {

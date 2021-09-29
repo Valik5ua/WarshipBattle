@@ -30,6 +30,9 @@
 #define BF_ROTATE				14103
 #define BF_RANDOMAIM			14104
 
+#define BF_NEWGAME_PVE			14201
+#define BF_NEWGAME_PVP			14202
+
 #define BF_CONNECT				14111
 #define BF_DISCONNECT			14112
 #define BF_CANCEL				14113
@@ -44,6 +47,10 @@
 //Max Ship Count
 
 #define MAX_SHIPS_COUNT			10
+
+//Msg void
+
+#define MSG_VOID					-1
 
 // Program Metrics
 

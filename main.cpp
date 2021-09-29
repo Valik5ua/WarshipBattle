@@ -6,6 +6,7 @@
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
+#include "ButtonFieldNewGame.h"
 #include "TextureManager.h"
 
 // Windows globals
@@ -24,6 +25,7 @@ Engine engine;
 ButtonFieldDeploy buttonFieldDeploy(3, 1);
 ButtonFieldFire buttonFieldFire(3, 1);
 ButtonFieldConnect buttonFieldConnect(3, 1);
+ButtonFieldNewGame buttonFieldNewGame(3, 1);
 UserField userField(3,5);
 EnemyField enemyField(19, 5);
 TextureManager textureManager;
@@ -156,6 +158,12 @@ LONG WINAPI MainWndProc(
 		case MENU_GAME_EXIT:
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL);
 			break;
+		case MENU_GAME_PVE:
+		{
+			engine.GameMode = engine.GAMEMODE::PVE;
+			engine.SetMode(engine.GAMESTATUS::Deploying);
+		}
+		break;
 		default:
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
@@ -218,6 +226,7 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	default:
+		engine.Event(MSG_VOID);
 		lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
 		break;
 	}
@@ -300,7 +309,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glLoadIdentity(); //Reset Coordinate System
 	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
-	engine.SetMode(engine.Mode);
+	engine.SetMode(engine.GameStatus);
 }
 
 /// <summary>
@@ -312,14 +321,19 @@ GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	userField.Draw();
-	switch (engine.Mode)
+	switch (engine.GameStatus)
 	{
-	case Engine::MODE::Deploying:
+	case Engine::GAMESTATUS::NewGame:
+	{
+		buttonFieldNewGame.Draw();
+	}
+	break;
+	case Engine::GAMESTATUS::Deploying:
 	{
 		buttonFieldDeploy.Draw();
 	}
 	break;
-	case Engine::MODE::MainGame:
+	case Engine::GAMESTATUS::MainGame:
 	{
 		buttonFieldFire.Draw();
 	}
