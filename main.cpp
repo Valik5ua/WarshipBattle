@@ -6,6 +6,7 @@
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
+#include "ButtonFieldNewGame.h"
 #include "TextureManager.h"
 
 // Windows globals
@@ -24,6 +25,7 @@ Engine engine;
 ButtonFieldDeploy buttonFieldDeploy(3, 1);
 ButtonFieldFire buttonFieldFire(3, 1);
 ButtonFieldConnect buttonFieldConnect(3, 1);
+ButtonFieldNewGame buttonFieldNewGame(3, 1);
 UserField userField(3,5);
 EnemyField enemyField(19, 5);
 TextureManager textureManager;
@@ -156,6 +158,12 @@ LONG WINAPI MainWndProc(
 		case MENU_GAME_EXIT:
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL);
 			break;
+		case MENU_GAME_PVE:
+		{
+			engine.GameMode = engine.GAMEMODE::PVE;
+			engine.SetMode(engine.GAMESTATUS::Deploying);
+		}
+		break;
 		default:
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
@@ -315,6 +323,11 @@ GLvoid DrawScene(GLvoid)
 	userField.Draw();
 	switch (engine.GameStatus)
 	{
+	case Engine::GAMESTATUS::NewGame:
+	{
+		buttonFieldNewGame.Draw();
+	}
+	break;
 	case Engine::GAMESTATUS::Deploying:
 	{
 		buttonFieldDeploy.Draw();

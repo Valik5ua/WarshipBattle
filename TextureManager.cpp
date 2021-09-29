@@ -59,6 +59,10 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
     LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
     LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
+    
+    LoadTexture((char*)"Textures\\New Game Label.bmp", this->Label_NewGame);
+    LoadTexture((char*)"Textures\\New Game PVE.bmp", this->Btn_NewGame_PVE);
+    LoadTexture((char*)"Textures\\New Game PVP.bmp", this->Btn_NewGame_PVP);
 
     LoadTexture((char*)"Textures\\sea.bmp", this->WaterTextureID);
     LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->MissedTextureID);

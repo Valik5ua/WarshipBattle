@@ -14,7 +14,7 @@ void CreateMenus(HWND hwnd)
 
     AppendMenu(hMenu, MF_POPUP, (UINT_PTR)HMenuGame, L"Game");
 
-    AppendMenu(HMenuGame, MF_POPUP, (UINT_PTR)MENU_GAME_PVP, L"Player Vs Computer");
+    AppendMenu(HMenuGame, MF_POPUP, (UINT_PTR)MENU_GAME_PVE, L"Player Vs Computer");
 
     AppendMenu(HMenuGame, MF_STRING, (UINT_PTR)MENU_GAME_PVP, L"Player Vs Player (Network)");
     

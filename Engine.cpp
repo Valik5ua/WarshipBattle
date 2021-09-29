@@ -6,6 +6,7 @@
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
+#include "ButtonFieldNewGame.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -16,6 +17,7 @@ extern EnemyField enemyField;
 extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
+extern ButtonFieldNewGame buttonFieldNewGame;
 
 // define while only PVE game is avaliable
 #define GAMEMODE_PVE_ONLY
@@ -23,10 +25,10 @@ extern ButtonFieldConnect buttonFieldConnect;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :GameStatus(Deploying), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0), UserTurn(true)
+Engine::Engine() :GameStatus(NewGame), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0), UserTurn(true)
 {
 #ifdef GAMEMODE_PVE_ONLY
-    this->GameMode = this->GAMEMODE::PVE;
+    this->GameMode = this->GAMEMODE::Menu;
 #endif // GAMEMODE_PVE_ONLY
 }
 
@@ -77,6 +79,23 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 
     switch (this->GameMode)
     {
+    case this->GAMEMODE::Menu:
+    {
+        switch (TranslatedMSG)
+        {
+        case TRANSLATEDMSG_NEWGAMEPVE:
+        {
+            this->GameMode = this->GAMEMODE::PVE;
+            this->SetMode(this->GAMESTATUS::Deploying);
+        }
+        break;
+        case TRANSLATEDMSG_NEWGAMEPVP:
+        {
+        }
+        break;
+        }
+    }
+    break;
     case this->GAMEMODE::PVE:
     {
         switch (this->GameStatus)
@@ -201,10 +220,13 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 void Engine::SetMode(GAMESTATUS GameStatus)
 {
     this->GameStatus = GameStatus;
+    this->ShipsDeployed = 0;
     switch (GameStatus)
     {
     case GAMESTATUS::Deploying:
     {
+        userField.CleanShips();
+        userField.ClearField();
         enemyField.CreateShips(GameStatus);
         this->MoveShipToUserField(enemyField.Ships[this->ShipsDeployed], userField.Ships[this->ShipsDeployed]);
         enemyField.SetShipMarkers();
@@ -223,12 +245,34 @@ void Engine::SetMode(GAMESTATUS GameStatus)
 /// </summary>
 /// <param name="Coordinates: ">The coordinates of the mouse click.</param>
 /// <param name="MSG: ">The untranslated message.</param>
-/// <param name="Key: "><The key of the keyboard that has been pressed./param>
+/// <param name="Key: ">The key of the keyboard that has been pressed.</param>
 /// <returns></returns>
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
     switch (this->GameStatus)
     {
+    case GAMESTATUS::NewGame:
+    {
+        switch (MSG)
+        {
+        case MSG_LBTTNDOWN:
+        {
+            if(!buttonFieldNewGame.Click(Coordinates)) return MSG_VOID;
+            this->MSGParam.FieldCoordinates = Coordinates;
+            switch (buttonFieldNewGame.Cells[Coordinates.x][Coordinates.y].ButtonID)
+            {
+            case BF_NEWGAME_PVE:
+                return TRANSLATEDMSG_NEWGAMEPVE;
+            case BF_NEWGAME_PVP:
+                return TRANSLATEDMSG_NEWGAMEPVP;
+            default: return MSG_VOID;
+            }
+        }
+        break;
+        default: return MSG_VOID;
+        }
+    }
+    break;
     case GAMESTATUS::Deploying:
     {
         switch(MSG)

@@ -13,8 +13,8 @@ public:
 	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
 	bool GetTurn() { return this->UserTurn; }
 public:
-	enum GAMEMODE { PVE, PVP } GameMode;
-	enum GAMESTATUS { WaitingForAction, Connecting, Deploying, MainGame } GameStatus;
+	enum GAMEMODE { Menu, PVE, PVP } GameMode;
+	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
 	int ShipsDeployed;
 public:
@@ -36,12 +36,13 @@ private:
 		POINT FieldCoordinates;
 	} MSGParam;
 
-private: 
+private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 
 private:
 	//Fully translated messages for Engine::Event
-	
+
+
 	//Messages when GAMESTATUS::Connecting is the current mode
 #define TRANSLATEDMSG_CONNECT			10001
 #define TRANSLATEDMSG_DISCONNECT		10002
@@ -66,5 +67,7 @@ private:
 #define TRANSLATEDMSG_MOVE_UP			12103
 #define TRANSLATEDMSG_MOVE_DOWN			12104
 
-#define MSG_VOID						-1
+	//Messages when GAMESTATUS::NewGame is the current GAMESTATUS
+#define TRANSLATEDMSG_NEWGAMEPVE		13001
+#define TRANSLATEDMSG_NEWGAMEPVP		13002
 };

@@ -18,6 +18,9 @@ public:
 	
 	void SetShipMarkers();
 	void Draw() override;
+
+	void ClearField();
+	void CleanShips();
 private:
 	bool In_Range(POINT Coordinates);
 public:

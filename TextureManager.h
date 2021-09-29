@@ -57,6 +57,10 @@ public:
 	GLuint  Btn_ConnectTextureID;
 	GLuint  Btn_CancelTextureID;
 
+	GLuint  Label_NewGame;
+	GLuint  Btn_NewGame_PVE;
+	GLuint  Btn_NewGame_PVP;
+
 	GLuint	WaterTextureID;
 	GLuint	MissedTextureID;
 	GLuint	MissedAimTextureID;
