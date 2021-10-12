@@ -2,12 +2,14 @@
 #include "UserField.h"
 #include "TextureManager.h"
 #include "time.h"
+#include <algorithm>
+#include <iostream>
 
 #define DEVMODE_OFF 1
 #define DEVMODE_ON  2
 #define DEVMODE     DEVMODE_OFF
 
-#if DEVMODE == DEVMODE_ON
+#if DEVMODE == DEVMODE_OFF
 #undef DEVMODE
 #endif
 
@@ -31,13 +33,7 @@ bool EnemyField::Click(POINT& coordinates)
 	return false;
 }
 
-
-/// <summary>
-/// Moves the selected cell of the EnemyField.
-/// </summary>
-/// <param name="Direction: ">The direction of the arrow of where to move the selection.</param>
-/// <returns>Wether or not the direction was valid.</returns>
-bool EnemyField::MoveSelection(int Direction)
+POINT EnemyField::MoveSelection(int Direction)
 {
 	for (int x{}; x < OpponentGameFieldW; x++)
 	{
@@ -45,13 +41,14 @@ bool EnemyField::MoveSelection(int Direction)
 		{
 			if (this->Cells[x][y].Cell_Aim)
 			{
+				POINT Return = { x,y };
 				switch (Direction)
 				{
 				case BF_MOVE_LEFT:
 				{
 					if (x > 0)
 					{
-						this->Select(x - 1, y);
+						Return = this->Select(x - 1, y);
 					}
 				}
 				break;
@@ -59,7 +56,7 @@ bool EnemyField::MoveSelection(int Direction)
 				{
 					if (x < OpponentGameFieldW - 1)
 					{
-						this->Select(x + 1, y);
+						Return = this->Select(x + 1, y);
 					}
 				}
 				break;
@@ -67,7 +64,7 @@ bool EnemyField::MoveSelection(int Direction)
 				{
 					if (y < OpponentGameFieldH - 1)
 					{
-						this->Select(x, y + 1);
+						Return = this->Select(x, y + 1);
 					}
 				}
 				break;
@@ -75,17 +72,16 @@ bool EnemyField::MoveSelection(int Direction)
 				{
 					if (y > 0)
 					{
-						this->Select(x, y - 1);
+						Return = this->Select(x, y - 1);
 					}
 				}
 				break;
-				default: return false;
+				default: return Return;
 				}
-				return true;
+				return Return;
 			}
 		}
 	}
-	return false;
 }
 
 /// <summary>
@@ -162,7 +158,7 @@ void EnemyField::CloseNextShip()
 {
 	for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 	{
-		this->Ships[engine.ShipsDeployed].Decks[i].Open = false;
+		//this->Ships[engine.ShipsDeployed].Decks[i].Open = false;
 		this->Cells[this->Ships[engine.ShipsDeployed].Decks[i].Position.x][i].Open = false;
 	}
 }
@@ -200,6 +196,8 @@ void EnemyField::SetShipDeployableStatus(Ship& ship)
 
 void EnemyField::DeployEnemyShips()
 {
+	this->DeployingShipID = 0;
+
 	const unsigned short int MinShipsOnEdge = 2;
 	const unsigned short int MaxShipsOnEdge = 5;
 
@@ -454,6 +452,7 @@ void EnemyField::DeployEnemyShips()
 #endif // !DEVMODE
 	}
 	SetShipMarkers();
+	this->DeployingShipID = 10;
 }
 
 /// <summary>
@@ -493,13 +492,15 @@ void EnemyField::CleanShips()
 /// </summary>
 /// <param name="CellX: ">The X position of the cell to be selected.</param>
 /// <param name="CellY: ">The Y position of the cell to be selected.</param>
-void EnemyField::Select(const size_t CellX, const size_t CellY)
+POINT EnemyField::Select(const size_t CellX, const size_t CellY)
 {
+	POINT Return = { CellX,CellY };
 	this->Deselect();
 	this->Cells[CellX][CellY].Cell_Aim = true;
+	return Return;
 }
 
-void EnemyField::RandomSelect(const size_t, const size_t)
+POINT EnemyField::RandomSelect()
 {
 	int RandX = rand() % 10;
 	int RandY = rand() % 10;
@@ -508,7 +509,8 @@ void EnemyField::RandomSelect(const size_t, const size_t)
 		RandX = rand() % 10;
 		RandY = rand() % 10;
 	}
-	this->Select(RandX, RandY);
+	POINT Return = this->Select(RandX, RandY);
+	return Return;
 }
 
 /// <summary>
@@ -531,20 +533,29 @@ void EnemyField::Deselect()
 void EnemyField::Draw()
 {
 	GLuint TextureID{};
-	for (int i{}; i < UserGameFieldW; i++)
+	for (int i{}; i < OpponentGameFieldW; i++)
 	{
-		for (int j{}; j < UserGameFieldH; j++)
+		for (int j{}; j < OpponentGameFieldH; j++)
 		{
 			switch (this->Cells[i][j].Open)
 			{
 			case true:
-					if (this->Cells[i][j].Missed && this->Cells[i][j].Cell_Aim)
-						TextureID = textureManager.MissedAimTextureID;
-					if (this->Cells[i][j].Missed)
-						TextureID = textureManager.MissedTextureID;
-					if (this->Cells[i][j].Cell_Aim)
-						TextureID = textureManager.WaterAimTextureID;
-					else TextureID = textureManager.WaterTextureID;
+				if (this->Cells[i][j].Missed && this->Cells[i][j].Cell_Aim)
+				{
+					TextureID = textureManager.MissedAimTextureID;
+					break;
+				}
+				if (this->Cells[i][j].Missed)
+				{
+					TextureID = textureManager.MissedTextureID;
+					break;
+				}
+				if (this->Cells[i][j].Cell_Aim)
+				{
+					TextureID = textureManager.WaterAimTextureID;
+					break;
+				}
+				else TextureID = textureManager.WaterTextureID;
 				break;
 			case false:
 				if (this->Cells[i][j].Cell_Aim)
@@ -557,7 +568,7 @@ void EnemyField::Draw()
 	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
 		for (int DeckNum{}; DeckNum < this->Ships[Arrnum].Size; DeckNum++)
 		{
-			if (!Ships[Arrnum].Decks[DeckNum].Open) break;
+			if (!this->Cells[Ships[Arrnum].Decks[DeckNum].Position.x][Ships[Arrnum].Decks[DeckNum].Position.y].Open) break;
 			switch (this->Ships[Arrnum].Decks[DeckNum].integrityStatus)
 			{
 			case Deck::IntegrityStatus::Whole:
@@ -647,4 +658,270 @@ void EnemyField::Draw()
 				, TextureID, true);
 			}
 		}
+}
+
+int EnemyField::ShootRecieve(const POINT ShootCoordinates)
+{
+	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
+	int ShipID = this->ShipExists(ShootCoordinates);
+	if (ShipID >= 0)
+	{
+		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+
+		if (this->Ships[ShipID].Killed)
+			return this->Ships[ShipID].Size;
+		else
+			return Engine::ShootStatus::Damage;
+	}
+	else
+	{
+		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
+		return Engine::ShootStatus::Miss;
+	}
+}
+
+POINT EnemyField::ShootCreate()
+{
+	switch (this->opponent.strategy)
+	{
+	case this->opponent.Strategy::Damage:
+	{
+		POINT points[4] = {
+			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
+			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y + 1},
+			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
+			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y - 1},
+			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x + 1,
+			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y},
+			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x - 1,
+			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y} };
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (this->opponent.In_Range(points[i]))
+			{
+				if (this->opponent.Field[points[i].x][points[i].y] != this->opponent.Strategy::Damage)
+				{
+					this->opponent.AimPoint = points[i];
+					return this->opponent.AimPoint;
+				}
+			}
+		}
+	}
+	break;
+	case this->opponent.Strategy::Fourdeckship:
+	{
+		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.FourDeckShootingPoints);
+		return this->opponent.AimPoint;
+	}
+	break;
+	case this->opponent.Strategy::Threedeckship:
+	{
+		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.ThreeDeckShootingPoints);
+		return this->opponent.AimPoint;
+	}
+	break;
+	case this->opponent.Strategy::Twodeckship:
+	{
+		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.TwoDeckShootingPoints);
+		return this->opponent.AimPoint;
+	}
+	break;
+	case this->opponent.Strategy::OneDeckShip:
+	{
+		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.OneDeckShootingPoints);
+		return this->opponent.AimPoint;
+	}
+	break;
+	default:
+		return POINT(MSG_VOID, MSG_VOID);
+	}
+}
+
+void EnemyField::ShootAnswer(const int status)
+{
+	switch (status)
+	{
+	case Engine::ShootStatus::Miss:
+	{
+		this->opponent.Field[this->opponent.AimPoint.x][this->opponent.AimPoint.y] = Engine::ShootStatus::Damage;
+		if (this->opponent.TargetShipKilled == false)
+			this->opponent.TurnShipAround(this->opponent.TargetShip);
+	}
+	break;
+	case Engine::ShootStatus::Damage:
+	{
+		this->opponent.Field[this->opponent.AimPoint.x][this->opponent.AimPoint.y] = Engine::ShootStatus::Damage;
+		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
+		this->opponent.SetStrategy(this->opponent.Strategy::Damage);
+		this->opponent.TargetShipKilled = false;
+	}
+	break;
+	case Engine::ShootStatus::KilledOneDeckShip:
+	{
+		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 1));
+		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
+		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
+		this->opponent.TargetShip.clear();
+		this->opponent.SetStrategy();
+		this->opponent.TargetShipKilled = true;
+	}
+	break;
+	case Engine::ShootStatus::KilledTwoDeckShip:
+	{
+		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 2));
+		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
+		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
+		this->opponent.TargetShip.clear();
+		this->opponent.SetStrategy();
+		this->opponent.TargetShipKilled = true;
+	}
+	break;
+	case Engine::ShootStatus::KilledThreeDeckShip:
+	{
+		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 3));
+		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
+		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
+		this->opponent.TargetShip.clear();
+		this->opponent.SetStrategy();
+		this->opponent.TargetShipKilled = true;
+	}
+	break;
+	case Engine::ShootStatus::KilledFourDeckShip:
+	{
+		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 4));
+		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
+		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
+		this->opponent.TargetShip.clear();
+		this->opponent.SetStrategy();
+		this->opponent.TargetShipKilled = true;
+	}
+	break;
+	}
+}
+
+void EnemyField::Opponent::SetStrategy(Strategy strategy)
+{
+	if (strategy == this->Strategy::Damage)
+	{
+		this->strategy = this->Strategy::Damage;
+	}
+	if (strategy == this->Strategy::Unknown)
+	{
+		switch (this->Ships[0])
+		{
+		case 1:
+		{
+			this->strategy = this->Strategy::OneDeckShip;
+			this->AdjustShootingPoints(this->OneDeckShootingPoints);
+		}
+		break;
+		case 2:
+		{
+			this->strategy = this->Strategy::Twodeckship;
+			this->AdjustShootingPoints(this->TwoDeckShootingPoints);
+		}
+		break;
+		case 3:
+		{
+			this->strategy = this->Strategy::Threedeckship;
+			this->AdjustShootingPoints(this->ThreeDeckShootingPoints);
+		}
+		break;
+		case 4:
+		{
+			this->strategy = this->Strategy::Fourdeckship;
+			this->AdjustShootingPoints(this->FourDeckShootingPoints);
+		}
+		break;
+		}
+	}
+}
+
+bool EnemyField::Opponent::In_Range(POINT Coordinates)
+{
+	if (Coordinates.x >= 0 && Coordinates.x < OpponentGameFieldW)
+		if (Coordinates.y >= 0 && Coordinates.y < OpponentGameFieldH)
+			return true;
+	return false;
+}
+
+void EnemyField::Opponent::SetDamageAroundDeck(POINT DamagedDeck)
+{
+	POINT points[4] = { {DamagedDeck.x - 1,DamagedDeck.y + 1},{DamagedDeck.x - 1,DamagedDeck.y - 1},{DamagedDeck.x + 1,DamagedDeck.y + 1}, {DamagedDeck.x + 1,DamagedDeck.y - 1} };
+	for (int i = 0; i < 4; i++)
+		if (this->In_Range(points[i]))
+		{
+			this->Field[points[i].x][points[i].y] = Engine::ShootStatus::Damage;
+		}
+}
+
+void EnemyField::Opponent::SetDamageAroundShip(std::vector<POINT> KilledShip)
+{
+	for (unsigned int Deck = 0; Deck < KilledShip.size(); Deck++)
+	{
+		for (int i = -1; i <= 1; i++)
+			for (int j = -1; j <= 1; j++)
+				if (this->In_Range({ KilledShip[Deck].x + i,KilledShip[Deck].y + j }))
+				{
+					this->Field[KilledShip[Deck].x + i][KilledShip[Deck].y + j] = Engine::ShootStatus::Damage;
+					
+				}
+	}
+}
+
+POINT EnemyField::Opponent::RandShootingPoint(std::vector<POINT> vec)
+{
+	time_t Time;
+	srand((unsigned)time(&Time));
+
+	int Rand = rand() % vec.size();
+	return vec[Rand];
+}
+
+void EnemyField::Opponent::AssignShootingPoints(std::vector<POINT>& vec, const size_t size)
+{
+	for (int i = 0; i < 10; i += 1)
+	{
+		for (int j = i % size; j < 10; j += size)
+		{
+			vec.push_back({ i,j });
+		}
+	}
+}
+
+std::vector<POINT>::iterator EnemyField::Opponent::VectorPointExists(std::vector<POINT> vec, POINT point)
+{
+	std::vector<POINT>::iterator It;
+	for (It = vec.begin(); It != vec.end(); It++)
+	{
+		if (It->x == point.x && It->y == point.y)
+			return It;
+	}
+	return vec.end();
+}
+
+void EnemyField::Opponent::AdjustShootingPoints(std::vector<POINT>& Strategy)
+{
+	for (int i = 0; i < OpponentGameFieldW; i++)
+		for (int j = 0; j < OpponentGameFieldH; j++)
+		{
+			if (this->Field[i][j] == Engine::ShootStatus::Damage)
+			{
+				std::vector<POINT>::iterator It = this->VectorPointExists(Strategy, { i,j });
+				if (It != Strategy.end())
+					Strategy.erase(It);
+			}
+		}
+}
+
+void EnemyField::Opponent::TurnShipAround(std::vector<POINT> &ship)
+{
+	std::vector<POINT> tempShip;
+	for (int i = ship.size() - 1; i >= 0; i--)
+	{
+		tempShip.push_back(ship[i]);
+	}
+	ship.clear();
+	ship = tempShip;
 }

@@ -149,26 +149,41 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
                 switch (TranslatedMSG)
                 {
                 case TRANSLATEDMSG_RANDOMAIM:
-                    enemyField.RandomSelect(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
-                    break;
+                {
+                    userField.SetAimPoint(enemyField.RandomSelect());
+                }
+                break;
                 case TRANSLATEDMSG_AIM:
-                    enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y);
-                    break;
+                {
+                    userField.SetAimPoint(enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y));
+                }
+                break;
                 case TRANSLATEDMSG_MOVE_LEFT:
-                    enemyField.MoveSelection(BF_MOVE_LEFT);
-                    break;
+                {
+                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_LEFT));
+                }
+                break;
                 case TRANSLATEDMSG_MOVE_RIGHT:
-                    enemyField.MoveSelection(BF_MOVE_RIGHT);
-                    break;
+                {
+                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_RIGHT));
+                }
+                break;
                 case TRANSLATEDMSG_MOVE_DOWN:
-                    enemyField.MoveSelection(BF_MOVE_DOWN);
-                    break;
+                {
+                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_DOWN));
+                }
+                break;
                 case TRANSLATEDMSG_MOVE_UP:
-                    enemyField.MoveSelection(BF_MOVE_UP);
-                    break;
+                {
+                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_UP));
+                }
+                break;
                 case TRANSLATEDMSG_FIRE:
+                {
+                    this->Shoot(&userField, &enemyField);
                     this->UserTurn = false;
-                    break;
+                }
+                break;
                 default:
                     break;
                 }
@@ -213,6 +228,13 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
     userField.SetShipDeployableStatus();
 }
 
+void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
+{
+    const short int AnswerStatus = FieldTo->ShootRecieve(FieldFrom->ShootCreate());
+    FieldFrom->ShootAnswer(AnswerStatus);
+    if (AnswerStatus == this->ShootStatus::Miss) this->SwitchTurns();
+}
+
 /// <summary>
 /// Sets the game mode.
 /// </summary>
@@ -236,6 +258,7 @@ void Engine::SetMode(GAMESTATUS GameStatus)
     case GAMESTATUS::MainGame:
     {
         enemyField.CreateShips(GameStatus);
+        userField.SetAimPoint(enemyField.RandomSelect());
     }
     }
 }
@@ -392,4 +415,9 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
     break;
     }
     return MSG_VOID;
+}
+
+void Engine::SwitchTurns()
+{
+    this->UserTurn = !this->UserTurn;
 }

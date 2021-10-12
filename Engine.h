@@ -1,4 +1,5 @@
 #pragma once
+#include "Field.h"
 #include "Ship.h"
 
 class Engine
@@ -12,10 +13,13 @@ public:
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
 	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
 	bool GetTurn() { return this->UserTurn; }
+	void Shoot(Field* FieldFrom, Field* FieldTo);
+
 public:
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
 	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
+	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip	} shootStatus;
 	int ShipsDeployed;
 public:
 	void SetMode(GAMESTATUS GameStatus);
@@ -38,7 +42,7 @@ private:
 
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
-
+	void SwitchTurns();
 private:
 	//Fully translated messages for Engine::Event
 

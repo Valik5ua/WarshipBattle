@@ -7,7 +7,7 @@ extern const int UserGameFieldH;
 class UserField : public Field
 {
 public:
-	UserField(int x, int y) :Field(x,y) {}
+	UserField(int x, int y) :Field(x, y), AimPoint({5,5}) {}
 	bool Click(POINT& coordinates) override;
 	
 	void SwapActiveShip(const unsigned int ShipNum);
@@ -21,9 +21,17 @@ public:
 
 	void ClearField();
 	void CleanShips();
+
+	void SetAimPoint(POINT AimPoint);
+
+	int ShootRecieve(const POINT ShootCoordinates) override;
+	POINT ShootCreate() override;
+	void ShootAnswer(const int status) override;
 private:
 	bool In_Range(POINT Coordinates);
 public:
 	Cell Cells[UserGameFieldW][UserGameFieldH];
 	Ship Ships[10];
+private:
+	POINT AimPoint;
 };

@@ -20,7 +20,7 @@ HGLRC  hRC{};
 
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
-float  FrameRate = (float)1000 / 60;
+const float  FrameRate = (float)1000 / 60;
 Engine engine;
 ButtonFieldDeploy buttonFieldDeploy(3, 1);
 ButtonFieldFire buttonFieldFire(3, 1);

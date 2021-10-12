@@ -313,6 +313,39 @@ void UserField::CleanShips()
 	}
 }
 
+void UserField::SetAimPoint(POINT AimPoint)
+{
+	this->AimPoint = AimPoint;
+}
+
+int UserField::ShootRecieve(const POINT ShootCoordinates)
+{
+	int ShipID = this->ShipExists(ShootCoordinates);
+	if (ShipID >= 0)
+	{
+		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+
+		if (this->Ships[ShipID].Killed)
+			return this->Ships[ShipID].Size;
+		else
+			return Engine::ShootStatus::Damage;
+	}
+	else
+	{
+		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
+		return Engine::ShootStatus::Miss;
+	}
+}
+
+POINT UserField::ShootCreate()
+{
+	return this->AimPoint;
+}
+
+void UserField::ShootAnswer(const int status)
+{
+}
+
 /// <summary>
 /// Checks wether or not a certain position is in range of the field.
 /// </summary>

@@ -15,6 +15,9 @@ public:
 	};
 	virtual bool Click(POINT& coordinates) = 0;
 	virtual void Draw() = 0;
+	virtual int ShootRecieve(const POINT ShootCoordinates) { return NULL; }
+	virtual POINT ShootCreate() { return POINT(); }
+	virtual void ShootAnswer(const int status) {}
 public:
 	int StartX;
 	int StartY;
