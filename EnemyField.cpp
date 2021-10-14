@@ -2,6 +2,8 @@
 #include "UserField.h"
 #include "TextureManager.h"
 #include "time.h"
+#include <algorithm>
+#include <iostream>
 
 #define DEVMODE_OFF 1
 #define DEVMODE_ON  2
