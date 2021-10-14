@@ -18,6 +18,7 @@ public:
 	virtual int ShootRecieve(const POINT ShootCoordinates) { return NULL; }
 	virtual POINT ShootCreate() { return POINT(); }
 	virtual void ShootAnswer(const int status) {}
+	virtual bool CanFire() { return true; }
 public:
 	int StartX;
 	int StartY;

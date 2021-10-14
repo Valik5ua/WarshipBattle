@@ -11,7 +11,7 @@ public:
 	bool Click(POINT& coordinates) override;
 	
 	void SwapActiveShip(const unsigned int ShipNum);
-	int ShipExists(POINT Coordinates);
+	int ShipExists(POINT Coordinates, unsigned const int ShipsToCheck);
 	void SetShipDeployableStatus();
 	void MoveActiveShip(int Direction);
 	void RotateActiveShip();
@@ -24,6 +24,7 @@ public:
 
 	void SetAimPoint(POINT AimPoint);
 
+	bool CanFire() override { return true; }
 	int ShootRecieve(const POINT ShootCoordinates) override;
 	POINT ShootCreate() override;
 	void ShootAnswer(const int status) override;

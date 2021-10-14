@@ -23,6 +23,7 @@ public:
 	void SetShipMarkers();
 	void Draw() override;
 
+	bool CanFire() override;
 	int ShootRecieve(const POINT ShootCoordinates) override;
 	POINT ShootCreate() override;
 	void ShootAnswer(const int status) override;
@@ -43,6 +44,12 @@ private:
 	public:
 		Opponent()
 		{
+			for (int i = 0; i < OpponentGameFieldW; i++)
+				for (int j = 0; j < OpponentGameFieldH; j++)
+				{
+					this->Field[i][j] = -2;
+				}
+
 			AssignShootingPoints(FourDeckShootingPoints, 4);
 			AssignShootingPoints(ThreeDeckShootingPoints, 3);
 			AssignShootingPoints(TwoDeckShootingPoints, 2);
@@ -74,7 +81,7 @@ private:
 		void TurnShipAround(std::vector<POINT> &ship);
 		POINT RandShootingPoint(const std::vector<POINT> vec);
 		void AdjustShootingPoints(std::vector<POINT>& Strategy);
-		std::vector<POINT>::iterator VectorPointExists(std::vector<POINT> vec, POINT point);
+		int VectorPointExists(std::vector<POINT> vec, POINT point);
 	public:
 		std::vector<POINT> FourDeckShootingPoints;
 		std::vector<POINT> ThreeDeckShootingPoints;

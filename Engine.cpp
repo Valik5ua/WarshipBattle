@@ -181,18 +181,14 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
                 case TRANSLATEDMSG_FIRE:
                 {
                     this->Shoot(&userField, &enemyField);
-                    this->UserTurn = false;
                 }
                 break;
-                default:
-                    break;
                 }
             }
             break;
             case false:
             {
-                //enemyField.Fire();
-                this->UserTurn = true;
+                this->Shoot(&enemyField, &userField);
             }
             break;
             }
@@ -230,6 +226,7 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 
 void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 {
+    if (!FieldTo->CanFire()) return;
     const short int AnswerStatus = FieldTo->ShootRecieve(FieldFrom->ShootCreate());
     FieldFrom->ShootAnswer(AnswerStatus);
     if (AnswerStatus == this->ShootStatus::Miss) this->SwitchTurns();
@@ -305,7 +302,7 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
             if (userField.Click(Coordinates))
             {
                 if (!userField.Ships[this->ShipsDeployed].Deployable) break;
-                int TempShipID = userField.ShipExists(Coordinates);
+                int TempShipID = userField.ShipExists(Coordinates, this->ShipsDeployed);
                 if (TempShipID >= 0 && TempShipID != this->ShipsDeployed)
                     userField.SwapActiveShip(TempShipID);
             }

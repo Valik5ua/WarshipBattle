@@ -127,6 +127,7 @@ int WINAPI WinMain(
 		}
 		if (TimeToRedraw)
 		{
+			engine.Event(MSG_VOID);
 			DrawScene();
 			TimeToRedraw = false;
 		}
@@ -226,7 +227,7 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	default:
-		engine.Event(MSG_VOID);
+		//engine.Event(MSG_VOID);
 		lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
 		break;
 	}

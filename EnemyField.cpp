@@ -2,8 +2,6 @@
 #include "UserField.h"
 #include "TextureManager.h"
 #include "time.h"
-#include <algorithm>
-#include <iostream>
 
 #define DEVMODE_OFF 1
 #define DEVMODE_ON  2
@@ -448,7 +446,7 @@ void EnemyField::DeployEnemyShips()
 		}
 #ifndef DEVMODE
 		for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
-			this->Ships[i].Decks[DeckNum].Open = false;
+			this->Cells[this->Ships[i].Decks[DeckNum].Position.x][this->Ships[i].Decks[DeckNum].Position.y].Open = false;
 #endif // !DEVMODE
 	}
 	SetShipMarkers();
@@ -463,7 +461,7 @@ void EnemyField::ClearField()
 	for (int i{}; i < 10; i++)
 		for (int j{}; j < 10; j++)
 		{
-			this->Cells[i][j].Open = true;
+			this->Cells[i][j].Open = false;
 			this->Cells[i][j].MarkedShip = false;
 			this->Cells[i][j].Missed = false;
 			this->Cells[i][j].Cell_Aim = false;
@@ -568,7 +566,7 @@ void EnemyField::Draw()
 	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
 		for (int DeckNum{}; DeckNum < this->Ships[Arrnum].Size; DeckNum++)
 		{
-			if (!this->Cells[Ships[Arrnum].Decks[DeckNum].Position.x][Ships[Arrnum].Decks[DeckNum].Position.y].Open) break;
+			if (!this->Cells[Ships[Arrnum].Decks[DeckNum].Position.x][Ships[Arrnum].Decks[DeckNum].Position.y].Open) continue;
 			switch (this->Ships[Arrnum].Decks[DeckNum].integrityStatus)
 			{
 			case Deck::IntegrityStatus::Whole:
@@ -660,6 +658,20 @@ void EnemyField::Draw()
 		}
 }
 
+bool EnemyField::CanFire()
+{
+	for (int i = 0; i < OpponentGameFieldW; i++)
+		for (int j = 0; j < OpponentGameFieldH; j++)
+		{
+			if (this->Cells[i][j].Cell_Aim)
+			{
+				if (this->Cells[i][j].Open) return false;
+				else return true;
+			}
+		}
+	return true;
+}
+
 int EnemyField::ShootRecieve(const POINT ShootCoordinates)
 {
 	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
@@ -712,24 +724,60 @@ POINT EnemyField::ShootCreate()
 	case this->opponent.Strategy::Fourdeckship:
 	{
 		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.FourDeckShootingPoints);
+		
+		std::vector<POINT>::iterator It = this->opponent.FourDeckShootingPoints.begin();
+		for (int i = 0; i < this->opponent.FourDeckShootingPoints.size(); i++)
+			if (this->opponent.FourDeckShootingPoints[i].x == this->opponent.AimPoint.x && this->opponent.FourDeckShootingPoints[i].y == this->opponent.AimPoint.y)
+			{
+				this->opponent.FourDeckShootingPoints.erase(It + i);
+				break;
+			}
+		
 		return this->opponent.AimPoint;
 	}
 	break;
 	case this->opponent.Strategy::Threedeckship:
 	{
 		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.ThreeDeckShootingPoints);
+		
+		std::vector<POINT>::iterator It = this->opponent.ThreeDeckShootingPoints.begin();
+		for (int i = 0; i < this->opponent.ThreeDeckShootingPoints.size(); i++)
+			if (this->opponent.ThreeDeckShootingPoints[i].x == this->opponent.AimPoint.x && this->opponent.ThreeDeckShootingPoints[i].y == this->opponent.AimPoint.y)
+			{
+				this->opponent.ThreeDeckShootingPoints.erase(It + i);
+				break;
+			}
+		
 		return this->opponent.AimPoint;
 	}
 	break;
 	case this->opponent.Strategy::Twodeckship:
 	{
 		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.TwoDeckShootingPoints);
+		
+		std::vector<POINT>::iterator It = this->opponent.TwoDeckShootingPoints.begin();
+		for (int i = 0; i < this->opponent.TwoDeckShootingPoints.size(); i++)
+			if (this->opponent.TwoDeckShootingPoints[i].x == this->opponent.AimPoint.x && this->opponent.TwoDeckShootingPoints[i].y == this->opponent.AimPoint.y)
+			{
+				this->opponent.TwoDeckShootingPoints.erase(It + i);
+				break;
+			}
+		
 		return this->opponent.AimPoint;
 	}
 	break;
 	case this->opponent.Strategy::OneDeckShip:
 	{
 		this->opponent.AimPoint = this->opponent.RandShootingPoint(this->opponent.OneDeckShootingPoints);
+		
+		std::vector<POINT>::iterator It = this->opponent.OneDeckShootingPoints.begin();
+		for (int i = 0; i < this->opponent.OneDeckShootingPoints.size(); i++)
+			if (this->opponent.OneDeckShootingPoints[i].x == this->opponent.AimPoint.x && this->opponent.OneDeckShootingPoints[i].y == this->opponent.AimPoint.y)
+			{
+				this->opponent.OneDeckShootingPoints.erase(It + i);
+				break;
+			}
+		
 		return this->opponent.AimPoint;
 	}
 	break;
@@ -753,13 +801,21 @@ void EnemyField::ShootAnswer(const int status)
 	{
 		this->opponent.Field[this->opponent.AimPoint.x][this->opponent.AimPoint.y] = Engine::ShootStatus::Damage;
 		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
+		this->opponent.SetDamageAroundDeck(this->opponent.AimPoint);
 		this->opponent.SetStrategy(this->opponent.Strategy::Damage);
 		this->opponent.TargetShipKilled = false;
 	}
 	break;
 	case Engine::ShootStatus::KilledOneDeckShip:
 	{
-		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 1));
+		std::vector<int>::iterator It = this->opponent.Ships.begin();
+		for (int i = 0; i < this->opponent.Ships.size(); i++)
+			if (this->opponent.Ships[i] == 1)
+			{
+				this->opponent.Ships.erase(It + i);
+				break;
+			}
+		//this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 1));
 		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
 		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
 		this->opponent.TargetShip.clear();
@@ -769,7 +825,14 @@ void EnemyField::ShootAnswer(const int status)
 	break;
 	case Engine::ShootStatus::KilledTwoDeckShip:
 	{
-		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 2));
+		std::vector<int>::iterator It = this->opponent.Ships.begin();
+		for (int i = 0; i < this->opponent.Ships.size(); i++)
+			if (this->opponent.Ships[i] == 2)
+			{
+				this->opponent.Ships.erase(It + i);
+				break;
+			}
+		//this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 2));
 		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
 		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
 		this->opponent.TargetShip.clear();
@@ -779,7 +842,14 @@ void EnemyField::ShootAnswer(const int status)
 	break;
 	case Engine::ShootStatus::KilledThreeDeckShip:
 	{
-		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 3));
+		std::vector<int>::iterator It = this->opponent.Ships.begin();
+		for (int i = 0; i < this->opponent.Ships.size(); i++)
+			if (this->opponent.Ships[i] == 3)
+			{
+				this->opponent.Ships.erase(It + i);
+				break;
+			}
+		//this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 3));
 		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
 		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
 		this->opponent.TargetShip.clear();
@@ -789,7 +859,14 @@ void EnemyField::ShootAnswer(const int status)
 	break;
 	case Engine::ShootStatus::KilledFourDeckShip:
 	{
-		this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 4));
+		std::vector<int>::iterator It = this->opponent.Ships.begin();
+		for (int i = 0; i < this->opponent.Ships.size(); i++)
+			if (this->opponent.Ships[i] == 4)
+			{
+				this->opponent.Ships.erase(It + i);
+				break;
+			}
+		//this->opponent.Ships.erase(std::find(this->opponent.Ships.begin(), this->opponent.Ships.end(), 4));
 		this->opponent.TargetShip.push_back(this->opponent.AimPoint);
 		this->opponent.SetDamageAroundShip(this->opponent.TargetShip);
 		this->opponent.TargetShip.clear();
@@ -808,6 +885,7 @@ void EnemyField::Opponent::SetStrategy(Strategy strategy)
 	}
 	if (strategy == this->Strategy::Unknown)
 	{
+		if (!this->Ships.empty())
 		switch (this->Ships[0])
 		{
 		case 1:
@@ -849,6 +927,8 @@ bool EnemyField::Opponent::In_Range(POINT Coordinates)
 void EnemyField::Opponent::SetDamageAroundDeck(POINT DamagedDeck)
 {
 	POINT points[4] = { {DamagedDeck.x - 1,DamagedDeck.y + 1},{DamagedDeck.x - 1,DamagedDeck.y - 1},{DamagedDeck.x + 1,DamagedDeck.y + 1}, {DamagedDeck.x + 1,DamagedDeck.y - 1} };
+	
+	this->Field[DamagedDeck.x][DamagedDeck.y] = Engine::ShootStatus::Damage;
 	for (int i = 0; i < 4; i++)
 		if (this->In_Range(points[i]))
 		{
@@ -865,13 +945,13 @@ void EnemyField::Opponent::SetDamageAroundShip(std::vector<POINT> KilledShip)
 				if (this->In_Range({ KilledShip[Deck].x + i,KilledShip[Deck].y + j }))
 				{
 					this->Field[KilledShip[Deck].x + i][KilledShip[Deck].y + j] = Engine::ShootStatus::Damage;
-					
 				}
 	}
 }
 
 POINT EnemyField::Opponent::RandShootingPoint(std::vector<POINT> vec)
 {
+	if (vec.empty()) return { -1,-1 };
 	time_t Time;
 	srand((unsigned)time(&Time));
 
@@ -890,27 +970,28 @@ void EnemyField::Opponent::AssignShootingPoints(std::vector<POINT>& vec, const s
 	}
 }
 
-std::vector<POINT>::iterator EnemyField::Opponent::VectorPointExists(std::vector<POINT> vec, POINT point)
+int EnemyField::Opponent::VectorPointExists(std::vector<POINT> vec, POINT point)
 {
-	std::vector<POINT>::iterator It;
-	for (It = vec.begin(); It != vec.end(); It++)
+	for (int i = 0; i < vec.size(); i++)
 	{
-		if (It->x == point.x && It->y == point.y)
-			return It;
+		if (vec[i].x == point.x && vec[i].y == point.y)
+			return i;
 	}
-	return vec.end();
+	return -1;
 }
 
 void EnemyField::Opponent::AdjustShootingPoints(std::vector<POINT>& Strategy)
 {
+	int VectorElementPos = -1;
 	for (int i = 0; i < OpponentGameFieldW; i++)
 		for (int j = 0; j < OpponentGameFieldH; j++)
 		{
 			if (this->Field[i][j] == Engine::ShootStatus::Damage)
 			{
-				std::vector<POINT>::iterator It = this->VectorPointExists(Strategy, { i,j });
-				if (It != Strategy.end())
-					Strategy.erase(It);
+				std::vector<POINT>::iterator It = Strategy.begin();
+				VectorElementPos = this->VectorPointExists(Strategy, { i,j });
+				if (VectorElementPos != -1)
+					Strategy.erase(It+ VectorElementPos);
 			}
 		}
 }
