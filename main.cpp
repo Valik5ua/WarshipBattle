@@ -20,7 +20,7 @@ HGLRC  hRC{};
 
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
-float  FrameRate = (float)1000 / 60;
+const float  FrameRate = (float)1000 / 60;
 Engine engine;
 ButtonFieldDeploy buttonFieldDeploy(3, 1);
 ButtonFieldFire buttonFieldFire(3, 1);
@@ -127,6 +127,7 @@ int WINAPI WinMain(
 		}
 		if (TimeToRedraw)
 		{
+			engine.Event(MSG_VOID);
 			DrawScene();
 			TimeToRedraw = false;
 		}
@@ -226,7 +227,7 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	default:
-		engine.Event(MSG_VOID);
+		//engine.Event(MSG_VOID);
 		lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
 		break;
 	}

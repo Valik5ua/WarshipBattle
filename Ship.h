@@ -6,7 +6,9 @@ class Ship
 {
 public:
 	Ship(const POINT Position, const size_t Size);
-	Ship() {};
+	Ship() { this->Size = 0; }
+public:
+	void SetDamageToDeck(POINT CoordinatesOfDeck);
 public:
 	bool Deployed;
 	bool Deployable;

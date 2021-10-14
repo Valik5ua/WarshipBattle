@@ -31,7 +31,7 @@ void UserField::SetShipDeployableStatus()
 			for (int j = -1; j <= 1; j++)
 			{
 				if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i, this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }))
-					if (this->ShipExists({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i, this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }) >= 0)
+					if (this->ShipExists({ this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.x + i, this->Ships[engine.ShipsDeployed].Decks[DeckCounter].Position.y + j }, engine.ShipsDeployed) >= 0)
 					{
 						this->Ships[engine.ShipsDeployed].Deployable = false;
 						return;
@@ -134,9 +134,9 @@ void UserField::RotateActiveShip()
 /// </summary>
 /// <param name="Coordinates: ">The coordinates of the location to be checked.</param>
 /// <returns>True if the ship is located in the loacation.</returns>
-int UserField::ShipExists(POINT Coordinates)
+int UserField::ShipExists(POINT Coordinates, unsigned const int ShipsToCheck)
 {
-	for (int Arrnum = 0; Arrnum < engine.ShipsDeployed; Arrnum++)
+	for (int Arrnum = 0; Arrnum < ShipsToCheck; Arrnum++)
 		for (int DeckCounter{}; DeckCounter < this->Ships[Arrnum].Size; DeckCounter++)
 			if (this->Ships[Arrnum].Decks[DeckCounter].Position.x == Coordinates.x && this->Ships[Arrnum].Decks[DeckCounter].Position.y == Coordinates.y)
 			return Arrnum;
@@ -181,7 +181,7 @@ void UserField::Draw()
 			if (!this->Cells[i][j].MarkedShip)
 			{
 				if (this->Cells[i][j].Missed) TextureID = textureManager.MissedTextureID;
-				TextureID = textureManager.WaterTextureID;
+				else TextureID = textureManager.WaterTextureID;
 
 				this->Cells[i][j].Draw({ this->StartX + i,this->StartY + j }, TextureID);
 			}
@@ -190,7 +190,6 @@ void UserField::Draw()
 	for (int Arrnum = 0; Arrnum < MAX_SHIPS_COUNT; Arrnum++)
 		for (int DeckNum{}; DeckNum < this->Ships[Arrnum].Size; DeckNum++)
 		{
-			if (!this->In_Range(this->Ships[Arrnum].Decks[DeckNum].Position)) return;
 			switch (this->Ships[Arrnum].Decks[DeckNum].integrityStatus)
 			{
 			case Deck::IntegrityStatus::Whole:
@@ -311,6 +310,39 @@ void UserField::CleanShips()
 			this->Ships[i].Decks[j].Open = true;
 		}
 	}
+}
+
+void UserField::SetAimPoint(POINT AimPoint)
+{
+	this->AimPoint = AimPoint;
+}
+
+int UserField::ShootRecieve(const POINT ShootCoordinates)
+{
+	int ShipID = this->ShipExists(ShootCoordinates, MAX_SHIPS_COUNT);
+	if (ShipID >= 0)
+	{
+		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+
+		if (this->Ships[ShipID].Killed)
+			return this->Ships[ShipID].Size;
+		else
+			return Engine::ShootStatus::Damage;
+	}
+	else
+	{
+		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
+		return Engine::ShootStatus::Miss;
+	}
+}
+
+POINT UserField::ShootCreate()
+{
+	return this->AimPoint;
+}
+
+void UserField::ShootAnswer(const int status)
+{
 }
 
 /// <summary>
