@@ -25,6 +25,8 @@ public:
 	GLuint	ShipFrontAfireTextureID;
 	GLuint	ShipMiddleAfireTextureID;
 	GLuint	ShipBackAfireTextureID;
+	GLuint	ShipAfireTextureID;
+	GLuint	ShipAfireAimTextureID;
 
 	GLuint	ShipFrontCrackedTextureID;
 	GLuint	ShipMiddleCrackedTextureID;

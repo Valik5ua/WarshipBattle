@@ -592,24 +592,14 @@ void EnemyField::Draw()
 			break;
 			case Deck::IntegrityStatus::Damaged:
 			{
-				switch (this->Ships[Arrnum].Decks[DeckNum].Type)
-				{
-				case Deck::DeckType::Front:
-					TextureID = textureManager.ShipFrontAfireTextureID;
-					break;
-				case Deck::DeckType::Middle:
-					TextureID = textureManager.ShipMiddleAfireTextureID;
-					break;
-				case Deck::DeckType::Back:
-					TextureID = textureManager.ShipBackAfireTextureID;
-					break;
-				};
-
+				if(this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y].Cell_Aim)
+				TextureID = textureManager.ShipAfireAimTextureID;
+				else TextureID = textureManager.ShipAfireTextureID;
 			}
 			break;
 			case Deck::IntegrityStatus::Killed:
 			{
-				if (this->Ships[Arrnum].Decks[DeckNum].Cell_Aim)
+				if(this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y].Cell_Aim)
 				{
 					switch (this->Ships[Arrnum].Decks[DeckNum].Type)
 					{

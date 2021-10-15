@@ -28,6 +28,8 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Ship front Afire.bmp", this->ShipFrontAfireTextureID);
     LoadTexture((char*)"Textures\\Ship middle Afire.bmp", this->ShipMiddleAfireTextureID);
     LoadTexture((char*)"Textures\\Ship Back Afire.bmp", this->ShipBackAfireTextureID);
+    LoadTexture((char*)"Textures\\Ship Afire.bmp", this->ShipAfireTextureID);
+    LoadTexture((char*)"Textures\\Ship Afire aim.bmp", this->ShipAfireAimTextureID);
 
     LoadTexture((char*)"Textures\\Ship front Cracked.bmp", this->ShipFrontCrackedTextureID);
     LoadTexture((char*)"Textures\\Ship middle Cracked.bmp", this->ShipMiddleCrackedTextureID);
