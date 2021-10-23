@@ -52,6 +52,9 @@ public:
 	GLuint	Btn_LeftTextureID;
 	GLuint	Btn_RightTextureID;
 
+	GLuint	ButtonFieldFireTextureID;
+	GLuint	ButtonFieldDeployTextureID;
+
 	GLuint	Btn_FireTextureID;
 	GLuint	Btn_DeployTextureID;
 
@@ -63,7 +66,33 @@ public:
 	GLuint  Btn_NewGame_PVE;
 	GLuint  Btn_NewGame_PVP;
 
+	GLuint  StatisticFieldTextureID;
+
 	GLuint	WaterTextureID;
 	GLuint	MissedTextureID;
 	GLuint	MissedAimTextureID;
+
+	GLuint  TimeNumber0TextureID;
+	GLuint  TimeNumber1TextureID;
+	GLuint  TimeNumber2TextureID;
+	GLuint  TimeNumber3TextureID;
+	GLuint  TimeNumber4TextureID;
+	GLuint  TimeNumber5TextureID;
+	GLuint  TimeNumber6TextureID;
+	GLuint  TimeNumber7TextureID;
+	GLuint  TimeNumber8TextureID;
+	GLuint  TimeNumber9TextureID;
+	GLuint  TimeColonTextureID;
+
+	GLuint  AliveDeadNumber0TextureID;
+	GLuint  AliveDeadNumber1TextureID;
+	GLuint  AliveDeadNumber2TextureID;
+	GLuint  AliveDeadNumber3TextureID;
+	GLuint  AliveDeadNumber4TextureID;
+	GLuint  AliveDeadNumber5TextureID;
+	GLuint  AliveDeadNumber6TextureID;
+	GLuint  AliveDeadNumber7TextureID;
+	GLuint  AliveDeadNumber8TextureID;
+	GLuint  AliveDeadNumber9TextureID;
+	GLuint  AliveDeadNumber10TextureID;
 };

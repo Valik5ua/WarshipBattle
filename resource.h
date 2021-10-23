@@ -66,11 +66,14 @@ const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3f);
 
 //Field Metrics
 
-const int UserGameFieldW = 10;
-const int UserGameFieldH = 10;
+const unsigned int UserGameFieldW = 10;
+const unsigned int UserGameFieldH = 10;
 
-const int OpponentGameFieldW = 10;
-const int OpponentGameFieldH = 10;
+const unsigned int OpponentGameFieldW = 10;
+const unsigned int OpponentGameFieldH = 10;
 
-const int ButtonFieldW = 4;
-const int ButtonFieldH = 3;
+const unsigned int StatisticFieldW = 4;
+const unsigned int StatisticFieldH = 10;
+
+const unsigned int ButtonFieldW = 4;
+const unsigned int ButtonFieldH = 3;

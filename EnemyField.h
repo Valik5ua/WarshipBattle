@@ -4,8 +4,8 @@
 #include "Engine.h"
 #include <vector>
 
-extern const int OpponentGameFieldW;
-extern const int OpponentGameFieldH;
+extern unsigned const int OpponentGameFieldW;
+extern unsigned const int OpponentGameFieldH;
 
 class EnemyField : public Field
 {
@@ -27,6 +27,8 @@ public:
 	int ShootRecieve(const POINT ShootCoordinates) override;
 	POINT ShootCreate() override;
 	void ShootAnswer(const int status) override;
+
+	void NewGameReset();
 private:
 	void SetShipDeployableStatus(Ship& ship);
 	void DeployEnemyShips();
@@ -44,28 +46,7 @@ private:
 	public:
 		Opponent()
 		{
-			for (int i = 0; i < OpponentGameFieldW; i++)
-				for (int j = 0; j < OpponentGameFieldH; j++)
-				{
-					this->Field[i][j] = -2;
-				}
-
-			AssignShootingPoints(FourDeckShootingPoints, 4);
-			AssignShootingPoints(ThreeDeckShootingPoints, 3);
-			AssignShootingPoints(TwoDeckShootingPoints, 2);
-			AssignShootingPoints(OneDeckShootingPoints, 1);
-
-			this->strategy = this->Strategy::Fourdeckship;
-			this->Ships.push_back(4);
-			this->Ships.push_back(3);
-			this->Ships.push_back(3);
-			this->Ships.push_back(2);
-			this->Ships.push_back(2);
-			this->Ships.push_back(2);
-			this->Ships.push_back(1);
-			this->Ships.push_back(1);
-			this->Ships.push_back(1);
-			this->Ships.push_back(1);
+			this->NewGameReset();
 		}
 		enum Strategy { Damage, OneDeckShip, Twodeckship, Threedeckship, Fourdeckship, Unknown} strategy;
 		std::vector<int> Ships;
@@ -80,8 +61,7 @@ private:
 		void SetDamageAroundDeck(const POINT DamagedDeck);
 		void TurnShipAround(std::vector<POINT> &ship);
 		POINT RandShootingPoint(const std::vector<POINT> vec);
-		void AdjustShootingPoints(std::vector<POINT>& Strategy);
-		int VectorPointExists(std::vector<POINT> vec, POINT point);
+		void NewGameReset();
 	public:
 		std::vector<POINT> FourDeckShootingPoints;
 		std::vector<POINT> ThreeDeckShootingPoints;
@@ -89,6 +69,8 @@ private:
 		std::vector<POINT> OneDeckShootingPoints;
 	private:
 		void AssignShootingPoints(std::vector<POINT>& vec, const size_t size);
+		int VectorPointExists(std::vector<POINT> vec, POINT point);
+		void AdjustShootingPoints(std::vector<POINT>& Strategy);
 
 	} opponent;
 };

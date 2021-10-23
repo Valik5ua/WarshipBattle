@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include <math.h>
 #include <string>
+#include <typeinfo>
 #include "UserField.h"
 #include "EnemyField.h"
 #include "ButtonFieldDeploy.h"
@@ -25,8 +26,13 @@ extern ButtonFieldNewGame buttonFieldNewGame;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :GameStatus(NewGame), fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0), UserTurn(true)
+Engine::Engine() :GameStatus(NewGame),
+fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
+ShipsDeployed(0), UserTurn(true),
+MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
 {
+    std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
+    this->dtn = tp.time_since_epoch();
 #ifdef GAMEMODE_PVE_ONLY
     this->GameMode = this->GAMEMODE::Menu;
 #endif // GAMEMODE_PVE_ONLY
@@ -85,6 +91,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         {
         case TRANSLATEDMSG_NEWGAMEPVE:
         {
+            this->StartNewGame();
             this->GameMode = this->GAMEMODE::PVE;
             this->SetMode(this->GAMESTATUS::Deploying);
         }
@@ -229,7 +236,59 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
     if (!FieldTo->CanFire()) return;
     const short int AnswerStatus = FieldTo->ShootRecieve(FieldFrom->ShootCreate());
     FieldFrom->ShootAnswer(AnswerStatus);
+    if (AnswerStatus > 0)
+    {
+        if (typeid(*FieldFrom) == typeid(EnemyField))
+        {
+            this->PlayerShipsAlive--;
+            if (this->PlayerShipsAlive == 0) this->GameOver(false);
+        }
+        else
+        {
+            this->OpponentShipsAlive--;
+            if (this->OpponentShipsAlive == 0) this->GameOver(true);
+        }
+    }
     if (AnswerStatus == this->ShootStatus::Miss) this->SwitchTurns();
+}
+
+void Engine::IncreaseMatchTime()
+{
+    std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
+    std::chrono::system_clock::duration dtn = tp.time_since_epoch();
+    if (dtn.count() * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den >
+        this->dtn.count() * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den)
+    {
+        this->dtn = dtn;
+        if (this->GameStatus == this->GAMESTATUS::MainGame)
+            if (++this->MatchTimeSec == 6000) this->MatchTimeSec = 0;
+    }
+}
+
+void Engine::StartNewGame()
+{
+    enemyField.NewGameReset();
+    this->MatchTimeSec = 0;
+    this->ShipsDeployed = 0;
+    this->PlayerShipsAlive = 10;
+    this->OpponentShipsAlive = 10;
+    this->UserTurn = true;
+}
+
+void Engine::GameOver(bool UserWon)
+{
+    this->SetMode(this->GAMESTATUS::NewGame);
+    switch (UserWon)
+    {
+    case true:
+    {
+    }
+    break;
+    case false:
+    {
+    }
+    break;
+    }
 }
 
 /// <summary>
@@ -242,6 +301,11 @@ void Engine::SetMode(GAMESTATUS GameStatus)
     this->ShipsDeployed = 0;
     switch (GameStatus)
     {
+    case GAMESTATUS::NewGame:
+    {
+        this->GameMode = this->GAMEMODE::Menu;
+    }
+    break;
     case GAMESTATUS::Deploying:
     {
         userField.CleanShips();
@@ -257,6 +321,7 @@ void Engine::SetMode(GAMESTATUS GameStatus)
         enemyField.CreateShips(GameStatus);
         userField.SetAimPoint(enemyField.RandomSelect());
     }
+    break;
     }
 }
 

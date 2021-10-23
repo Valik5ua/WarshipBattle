@@ -46,17 +46,10 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Single Ship Deployable.bmp", this->SingleShipDeployableTextureID);
     LoadTexture((char*)"Textures\\Single Ship Undeployable.bmp", this->SingleShipUndeployableTextureID);
 
-    LoadTexture((char*)"Textures\\BTN_ROTATE.bmp", this->Btn_RotateTextureID);
-    LoadTexture((char*)"Textures\\BTN_RANDOMAIM.bmp", this->Btn_RandomAimTextureID);
     LoadTexture((char*)"Textures\\WaterAim.bmp", this->WaterAimTextureID);
 
-    LoadTexture((char*)"Textures\\BTN_DOWN.bmp", this->Btn_DownTextureID);
-    LoadTexture((char*)"Textures\\BTN_UP.bmp", this->Btn_UpTextureID);
-    LoadTexture((char*)"Textures\\BTN_LEFT.bmp", this->Btn_LeftTextureID);
-    LoadTexture((char*)"Textures\\BTN_RIGHT.bmp", this->Btn_RightTextureID);
-
-    LoadTexture((char*)"Textures\\BTN_FIRE.bmp", this->Btn_FireTextureID);
-    LoadTexture((char*)"Textures\\BTN_DEPLOY.bmp", this->Btn_DeployTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldFire.bmp", this->ButtonFieldFireTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldDeploy.bmp", this->ButtonFieldDeployTextureID);
 
     LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
     LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
@@ -66,9 +59,35 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\New Game PVE.bmp", this->Btn_NewGame_PVE);
     LoadTexture((char*)"Textures\\New Game PVP.bmp", this->Btn_NewGame_PVP);
 
+    LoadTexture((char*)"Textures\\StatisticField.bmp", this->StatisticFieldTextureID);
+
     LoadTexture((char*)"Textures\\sea.bmp", this->WaterTextureID);
     LoadTexture((char*)"Textures\\Rocket Missed.bmp", this->MissedTextureID);
     LoadTexture((char*)"Textures\\Rocket Missed Aim.bmp", this->MissedAimTextureID);
+
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number0.bmp", this->TimeNumber0TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number1.bmp", this->TimeNumber1TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number2.bmp", this->TimeNumber2TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number3.bmp", this->TimeNumber3TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number4.bmp", this->TimeNumber4TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number5.bmp", this->TimeNumber5TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number6.bmp", this->TimeNumber6TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number7.bmp", this->TimeNumber7TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number8.bmp", this->TimeNumber8TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\Number9.bmp", this->TimeNumber9TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\TimeTextures\\colon.bmp", this->TimeColonTextureID);
+   
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber0.bmp", this->AliveDeadNumber0TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber1.bmp", this->AliveDeadNumber1TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber2.bmp", this->AliveDeadNumber2TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber3.bmp", this->AliveDeadNumber3TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber4.bmp", this->AliveDeadNumber4TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber5.bmp", this->AliveDeadNumber5TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber6.bmp", this->AliveDeadNumber6TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber7.bmp", this->AliveDeadNumber7TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber8.bmp", this->AliveDeadNumber8TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber9.bmp", this->AliveDeadNumber9TextureID);
+    LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber10.bmp", this->AliveDeadNumber10TextureID);
 }
 
 /// <summary>
