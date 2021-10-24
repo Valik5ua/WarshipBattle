@@ -77,3 +77,9 @@ const unsigned int StatisticFieldH = 10;
 
 const unsigned int ButtonFieldW = 4;
 const unsigned int ButtonFieldH = 3;
+
+const unsigned int ClueFieldW = 16;
+const unsigned int ClueFieldH = 3;
+
+const unsigned int StatusFieldW = 5;
+const unsigned int StatusFieldH = 3;

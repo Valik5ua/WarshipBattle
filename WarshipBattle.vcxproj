@@ -164,6 +164,7 @@
     <ClCompile Include="ButtonFieldFire.cpp" />
     <ClCompile Include="ButtonFieldNewGame.cpp" />
     <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="ClueField.cpp" />
     <ClCompile Include="EnemyField.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Field.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Ship.cpp" />
     <ClCompile Include="StatisticField.cpp" />
+    <ClCompile Include="StatusField.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="UserField.cpp" />
   </ItemGroup>
@@ -180,6 +182,7 @@
     <ClInclude Include="ButtonFieldFire.h" />
     <ClInclude Include="ButtonFieldNewGame.h" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="ClueField.h" />
     <ClInclude Include="Deck.h" />
     <ClInclude Include="EnemyField.h" />
     <ClInclude Include="Engine.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StatisticField.h" />
+    <ClInclude Include="StatusField.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="UserField.h" />
   </ItemGroup>

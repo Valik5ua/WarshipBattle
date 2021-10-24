@@ -50,6 +50,11 @@ void TextureManager::LoadAllTextures()
 
     LoadTexture((char*)"Textures\\ButtonFieldFire.bmp", this->ButtonFieldFireTextureID);
     LoadTexture((char*)"Textures\\ButtonFieldDeploy.bmp", this->ButtonFieldDeployTextureID);
+    LoadTexture((char*)"Textures\\ClueField.bmp", this->ClueFieldTextureID);
+
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StausFieldTopPVE.bmp", this->StatusFieldTopPVETextureID);
+    
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomYourTurn.bmp", this->StatusFieldBottomYourTurnTextureID);
 
     LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
     LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);

@@ -8,7 +8,7 @@ class Field
 {
 public:
 	Field();
-	Field(int StartX, int StartY)
+	Field(const unsigned int StartX, const unsigned int StartY)
 	{
 		this->StartX = StartX;
 		this->StartY = StartY;

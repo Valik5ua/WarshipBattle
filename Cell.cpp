@@ -38,4 +38,5 @@ void Cell::Draw(POINT Coordinates, GLuint TextureID, bool Rotated)
 	glTexCoord2d(1.f, 1.f); glVertex2f(1.f + Coordinates.x, 1.f + Coordinates.y);
 	glTexCoord2d(0, 1.f); glVertex2f(Coordinates.x, 1.f + Coordinates.y);
 	glEnd();
+	glDisable(GL_TEXTURE_2D);
 }

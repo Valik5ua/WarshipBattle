@@ -8,6 +8,9 @@
 #include "ButtonFieldConnect.h"
 #include "ButtonFieldNewGame.h"
 #include "TextureManager.h"
+#include "StatisticField.h"
+#include "StatusField.h"
+#include "ClueField.h"
 
 // Windows globals
 
@@ -29,6 +32,9 @@ ButtonFieldNewGame buttonFieldNewGame(3, 1);
 UserField userField(3,5);
 EnemyField enemyField(19, 5);
 TextureManager textureManager;
+StatisticField statisticField(14,5);
+StatusField statusField(8, 1);
+ClueField clueField(13, 1);
 
 //Windows prototypes
 
@@ -128,6 +134,7 @@ int WINAPI WinMain(
 		if (TimeToRedraw)
 		{
 			engine.Event(MSG_VOID);
+			engine.IncreaseMatchTime();
 			DrawScene();
 			TimeToRedraw = false;
 		}
@@ -161,6 +168,7 @@ LONG WINAPI MainWndProc(
 			break;
 		case MENU_GAME_PVE:
 		{
+			engine.StartNewGame();
 			engine.GameMode = engine.GAMEMODE::PVE;
 			engine.SetMode(engine.GAMESTATUS::Deploying);
 		}
@@ -227,7 +235,6 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	default:
-		//engine.Event(MSG_VOID);
 		lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
 		break;
 	}
@@ -322,6 +329,10 @@ GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	userField.Draw();
+	enemyField.Draw();
+	clueField.Draw();
+	statisticField.Draw();
+	statusField.Draw();
 	switch (engine.GameStatus)
 	{
 	case Engine::GAMESTATUS::NewGame:
@@ -338,10 +349,8 @@ GLvoid DrawScene(GLvoid)
 	{
 		buttonFieldFire.Draw();
 	}
-		break;
-
+	break;
 	}
-	enemyField.Draw();
 
 	SWAPBUFFERS;
 }

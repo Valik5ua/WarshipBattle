@@ -54,6 +54,10 @@ public:
 
 	GLuint	ButtonFieldFireTextureID;
 	GLuint	ButtonFieldDeployTextureID;
+	GLuint	ClueFieldTextureID;
+
+	GLuint	StatusFieldTopPVETextureID;
+	GLuint	StatusFieldBottomYourTurnTextureID;
 
 	GLuint	Btn_FireTextureID;
 	GLuint	Btn_DeployTextureID;

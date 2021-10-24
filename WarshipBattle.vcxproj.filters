@@ -57,6 +57,12 @@
     <ClCompile Include="StatisticField.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClueField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -105,6 +111,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StatisticField.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClueField.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
