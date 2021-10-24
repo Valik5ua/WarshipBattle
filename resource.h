@@ -54,15 +54,13 @@
 
 // Program Metrics
 
-const float MinSizeFactor = 30;
-
 const float OpenGLWidth = 32.0;
 const float OpenGLHeight = 16.0;
 
 const float AspectRatio = OpenGLWidth / OpenGLHeight;
 
-const float MinimalWidth = OpenGLWidth * MinSizeFactor;
-const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3f);
+const float MinimalHeight = 625;
+const float MinimalWidth = MinimalHeight * 2;
 
 //Field Metrics
 

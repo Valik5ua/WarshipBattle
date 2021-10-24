@@ -52,7 +52,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\ButtonFieldDeploy.bmp", this->ButtonFieldDeployTextureID);
 
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldNewGame.bmp", this->ClueFieldNewGameTextureID);
-    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldDeploying.bmp", this->ClueFieldDeployingTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldDeploy.bmp", this->ClueFieldDeployingTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldMainGame.bmp", this->ClueFieldMainGameTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldYouWon.bmp", this->ClueFieldYouWonTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldYouLost.bmp", this->ClueFieldYouLostTextureID);
