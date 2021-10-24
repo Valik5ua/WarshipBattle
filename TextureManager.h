@@ -54,7 +54,12 @@ public:
 
 	GLuint	ButtonFieldFireTextureID;
 	GLuint	ButtonFieldDeployTextureID;
-	GLuint	ClueFieldTextureID;
+
+	GLuint	ClueFieldNewGameTextureID;
+	GLuint	ClueFieldDeployingTextureID;
+	GLuint	ClueFieldMainGameTextureID;
+	GLuint	ClueFieldYouWonTextureID;
+	GLuint	ClueFieldYouLostTextureID;
 
 	GLuint	StatusFieldTopPVETextureID;
 	GLuint	StatusFieldTopMainMenuTextureID;

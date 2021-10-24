@@ -26,7 +26,7 @@ extern ButtonFieldNewGame buttonFieldNewGame;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :GameStatus(NewGame),
+Engine::Engine() :GameStatus(GAMESTATUS::NewGame), lastGameResults(LastGameResults::N_A),
 fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
 ShipsDeployed(0), UserTurn(true),
 MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
@@ -282,10 +282,12 @@ void Engine::GameOver(bool UserWon)
     {
     case true:
     {
+        this->lastGameResults = Engine::LastGameResults::UserWon;
     }
     break;
     case false:
     {
+        this->lastGameResults = Engine::LastGameResults::OpponentWon;
     }
     break;
     }

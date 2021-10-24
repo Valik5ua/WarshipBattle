@@ -32,6 +32,7 @@ public:
 	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
 	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip	} shootStatus;
+	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	int ShipsDeployed;
 public:
 	void SetMode(GAMESTATUS GameStatus);

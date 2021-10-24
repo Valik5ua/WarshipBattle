@@ -506,7 +506,7 @@ POINT EnemyField::RandomSelect()
 {
 	int RandX = rand() % 10;
 	int RandY = rand() % 10;
-	while (this->Cells[RandX][RandY].MarkedShip || this->Cells[RandX][RandY].Missed)
+	while ((this->Cells[RandX][RandY].MarkedShip && this->Cells[RandX][RandY].Open) || this->Cells[RandX][RandY].Missed)
 	{
 		RandX = rand() % 10;
 		RandY = rand() % 10;
