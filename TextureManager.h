@@ -57,7 +57,12 @@ public:
 	GLuint	ClueFieldTextureID;
 
 	GLuint	StatusFieldTopPVETextureID;
+	GLuint	StatusFieldTopMainMenuTextureID;
+
 	GLuint	StatusFieldBottomYourTurnTextureID;
+	GLuint	StatusFieldBottomChooseGameTextureID;
+	GLuint	StatusFieldBottomDeployShipsTextureID;
+	GLuint	StatusFieldBottomOpponentTurnTextureID;
 
 	GLuint	Btn_FireTextureID;
 	GLuint	Btn_DeployTextureID;
