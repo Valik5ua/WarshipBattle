@@ -60,89 +60,16 @@ bool ButtonFieldDeploy::Click(POINT& coordinates)
 /// </summary>
 void ButtonFieldDeploy::Draw()
 {
-	for (int i = 0; i < ButtonFieldW; i++)
-		for (int j = 0; j < ButtonFieldH; j++)
-		{
-			if (this->Cells[i][j].ButtonID == BF_MOVE_UP && this->Cells[i + 1][j].ButtonID == BF_MOVE_UP)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_UpTextureID);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureManager.ButtonFieldDeployTextureID);
 
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 1.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 1.98f, j + this->StartY + 0.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_MOVE_DOWN && this->Cells[i + 1][j].ButtonID == BF_MOVE_DOWN)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_DownTextureID);
-
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 1.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 1.98f, j + this->StartY + 0.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_MOVE_LEFT && this->Cells[i][j + 1].ButtonID == BF_MOVE_LEFT)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_LeftTextureID);
-
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 1.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 1.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_MOVE_RIGHT && this->Cells[i][j + 1].ButtonID == BF_MOVE_RIGHT)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_RightTextureID);
-
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 1.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 1.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_ROTATE)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_RotateTextureID);
-
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 0.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_DEPLOY && this->Cells[i][j + 1].ButtonID == BF_DEPLOY && this->Cells[i][j + 2].ButtonID == BF_DEPLOY)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_DeployTextureID);
-
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 0.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 0.98f, j + this->StartY + 2.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 2.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-				return;
-			}
-		}
+	glBegin(GL_QUADS);
+	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY);
+	glTexCoord2d(1, 0); glVertex2f(this->StartX + 4, this->StartY);
+	glTexCoord2d(1, 1); glVertex2f(this->StartX + 4, this->StartY + 3);
+	glTexCoord2d(0, 1); glVertex2f(this->StartX, this->StartY + 3);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 }
 
 /// <summary>

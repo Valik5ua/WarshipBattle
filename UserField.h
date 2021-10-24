@@ -1,8 +1,8 @@
 #pragma once
 #include "Field.h"
 
-extern const int UserGameFieldW;
-extern const int UserGameFieldH;
+extern unsigned const int UserGameFieldW;
+extern unsigned const int UserGameFieldH;
 
 class UserField : public Field
 {

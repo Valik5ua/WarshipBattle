@@ -8,6 +8,10 @@
 #include "ButtonFieldConnect.h"
 #include "ButtonFieldNewGame.h"
 #include "TextureManager.h"
+#include "StatisticField.h"
+#include "StatusField.h"
+#include "ClueField.h"
+#include "resource1.h"
 
 // Windows globals
 
@@ -15,6 +19,7 @@ CHAR   WindowClassName[] = { "Windows OpenGL" };
 HWND   hwnd{};
 HDC    hDC{};
 HGLRC  hRC{};
+HINSTANCE hInst{};
 
 // Custom globals
 
@@ -29,11 +34,15 @@ ButtonFieldNewGame buttonFieldNewGame(3, 1);
 UserField userField(3,5);
 EnemyField enemyField(19, 5);
 TextureManager textureManager;
+StatisticField statisticField(14,5);
+StatusField statusField(8, 1);
+ClueField clueField(13, 1);
 
 //Windows prototypes
 
 LONG WINAPI MainWndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL B_SetupPixelFormat(HDC);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 //OpenGL defines 
 
@@ -63,6 +72,8 @@ int WINAPI WinMain(
 	_In_ LPSTR lpCmdLine,
 	_In_ int nShowCmd)
 {
+	hInst = hInstance;
+
 	MSG        msg;
 	WNDCLASS   wndclass;
 
@@ -72,7 +83,7 @@ int WINAPI WinMain(
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
 	wndclass.hInstance = hInstance;
-	wndclass.hIcon = LoadIconA(hInstance, WindowClassName);
+	wndclass.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wndclass.lpszMenuName = (LPCWSTR)WindowClassName;
@@ -128,6 +139,7 @@ int WINAPI WinMain(
 		if (TimeToRedraw)
 		{
 			engine.Event(MSG_VOID);
+			engine.IncreaseMatchTime();
 			DrawScene();
 			TimeToRedraw = false;
 		}
@@ -156,11 +168,17 @@ LONG WINAPI MainWndProc(
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+		case MENU_HELP_ABOUT:
+		{
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, About);
+		}
+		break;
 		case MENU_GAME_EXIT:
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL);
 			break;
 		case MENU_GAME_PVE:
 		{
+			engine.StartNewGame();
 			engine.GameMode = engine.GAMEMODE::PVE;
 			engine.SetMode(engine.GAMESTATUS::Deploying);
 		}
@@ -227,7 +245,6 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	default:
-		//engine.Event(MSG_VOID);
 		lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
 		break;
 	}
@@ -272,6 +289,25 @@ BOOL B_SetupPixelFormat(HDC hdc)
 	}
 
 	return TRUE;
+}
+
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
 
 /// <summary>
@@ -322,6 +358,10 @@ GLvoid DrawScene(GLvoid)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 	userField.Draw();
+	enemyField.Draw();
+	clueField.Draw();
+	statisticField.Draw();
+	statusField.Draw();
 	switch (engine.GameStatus)
 	{
 	case Engine::GAMESTATUS::NewGame:
@@ -338,10 +378,8 @@ GLvoid DrawScene(GLvoid)
 	{
 		buttonFieldFire.Draw();
 	}
-		break;
-
+	break;
 	}
-	enemyField.Draw();
 
 	SWAPBUFFERS;
 }

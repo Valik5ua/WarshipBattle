@@ -6,7 +6,7 @@ class Ship
 {
 public:
 	Ship(const POINT Position, const size_t Size);
-	Ship() { this->Size = 0; }
+	Ship() :Killed(false), Deployed(false), Rotated(false), Deployable(false) { this->Size = 0; }
 public:
 	void SetDamageToDeck(POINT CoordinatesOfDeck);
 public:

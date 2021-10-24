@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include "Field.h"
 #include "Ship.h"
 
@@ -8,18 +9,30 @@ public:
 	Engine();
 	void ConvertPixelsToGL(POINT* Pixels);
 	void SetWindowGLParam(int Width, int Height);
-	float GetOffsetW() { return fOffsetW; }
-	float GetOffsetH() { return fOffsetH; }
+
+	float GetOffsetW() { return this->fOffsetW; }
+	float GetOffsetH() { return this->fOffsetH; }
+
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
 	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
-	bool GetTurn() { return this->UserTurn; }
 	void Shoot(Field* FieldFrom, Field* FieldTo);
 
+	void IncreaseMatchTime();
+
+	void StartNewGame();
+	void GameOver(bool UserWon);
+
+	bool GetTurn() { return this->UserTurn; }
+
+	int GetMatchTime() { return this->MatchTimeSec; }
+	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
+	int GetOpponentShipsAlive() { return this->OpponentShipsAlive; }
 public:
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
 	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
 	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip	} shootStatus;
+	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	int ShipsDeployed;
 public:
 	void SetMode(GAMESTATUS GameStatus);
@@ -33,6 +46,12 @@ private:
 	float fCurrentWidth;
 
 	float fGLUnitSize;
+
+	unsigned int MatchTimeSec;
+	unsigned int PlayerShipsAlive;
+	unsigned int OpponentShipsAlive;
+
+	std::chrono::system_clock::duration dtn;
 
 private:
 	struct MessageParam

@@ -10,6 +10,7 @@
 //Bottom level Menu For Help
 
 #define MENU_HELP_ABOUT			101
+#define ABOUTBOX				102
 
 //Untranslated Messages For Engine::Event()
 
@@ -54,23 +55,30 @@
 
 // Program Metrics
 
-const float MinSizeFactor = 30;
-
 const float OpenGLWidth = 32.0;
 const float OpenGLHeight = 16.0;
 
 const float AspectRatio = OpenGLWidth / OpenGLHeight;
 
-const float MinimalWidth = OpenGLWidth * MinSizeFactor;
-const float MinimalHeight = OpenGLHeight * (MinSizeFactor + 3.3f);
+const float MinimalHeight = 625;
+const float MinimalWidth = MinimalHeight * 2;
 
 //Field Metrics
 
-const int UserGameFieldW = 10;
-const int UserGameFieldH = 10;
+const unsigned int UserGameFieldW = 10;
+const unsigned int UserGameFieldH = 10;
 
-const int OpponentGameFieldW = 10;
-const int OpponentGameFieldH = 10;
+const unsigned int OpponentGameFieldW = 10;
+const unsigned int OpponentGameFieldH = 10;
 
-const int ButtonFieldW = 4;
-const int ButtonFieldH = 3;
+const unsigned int StatisticFieldW = 4;
+const unsigned int StatisticFieldH = 10;
+
+const unsigned int ButtonFieldW = 4;
+const unsigned int ButtonFieldH = 3;
+
+const unsigned int ClueFieldW = 16;
+const unsigned int ClueFieldH = 3;
+
+const unsigned int StatusFieldW = 5;
+const unsigned int StatusFieldH = 3;

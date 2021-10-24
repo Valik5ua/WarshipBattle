@@ -40,47 +40,36 @@ bool ButtonFieldNewGame::Click(POINT& coordinates)
 /// </summary>
 void ButtonFieldNewGame::Draw()
 {
-	for (int i = 0; i < ButtonFieldW; i++)
-		for (int j = 0; j < ButtonFieldH; j++)
-		{
-			if (this->Cells[i][j].ButtonID == MSG_VOID && this->Cells[i + 1][j].ButtonID == MSG_VOID && this->Cells[i + 2][j].ButtonID == MSG_VOID && this->Cells[i + 3][j].ButtonID == MSG_VOID)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Label_NewGame);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureManager.Label_NewGame);
 
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 3.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 3.98f, j + this->StartY + 0.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_NEWGAME_PVE && this->Cells[i + 1][j].ButtonID == BF_NEWGAME_PVE && this->Cells[i + 2][j].ButtonID == BF_NEWGAME_PVE && this->Cells[i + 3][j].ButtonID == BF_NEWGAME_PVE)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_NewGame_PVE);
+	glBegin(GL_QUADS);
+	glTexCoord2d(0, 0); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 1);
+	glTexCoord2d(1, 0); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY - 1);
+	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY);
+	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 3.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 3.98f, j + this->StartY + 0.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-			if (this->Cells[i][j].ButtonID == BF_NEWGAME_PVP && this->Cells[i + 1][j].ButtonID == BF_NEWGAME_PVP && this->Cells[i + 2][j].ButtonID == BF_NEWGAME_PVP && this->Cells[i + 3][j].ButtonID == BF_NEWGAME_PVP)
-			{
-				glEnable(GL_TEXTURE_2D);
-				glBindTexture(GL_TEXTURE_2D, textureManager.Btn_NewGame_PVP);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_NewGame_PVP);
 
-				glBegin(GL_QUADS);
-				glTexCoord2d(0, 0); glVertex2f(i + this->StartX, j + this->StartY);
-				glTexCoord2d(1, 0); glVertex2f(i + this->StartX + 3.98f, j + this->StartY);
-				glTexCoord2d(1, 1); glVertex2f(i + this->StartX + 3.98f, j + this->StartY + 0.98f);
-				glTexCoord2d(0, 1); glVertex2f(i + this->StartX, j + this->StartY + 0.98f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
-			}
-		}
+	glBegin(GL_QUADS);
+	glTexCoord2d(0, 0); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 2);
+	glTexCoord2d(1, 0); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY - 2);
+	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY-1);
+	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY-1);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_NewGame_PVE);
+
+	glBegin(GL_QUADS);
+	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY);
+	glTexCoord2d(1, 0); glVertex2f(this->StartX + 3.98f, this->StartY);
+	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, this->StartY + 1);
+	glTexCoord2d(0, 1); glVertex2f(this->StartX, this->StartY + 1);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
 }
