@@ -189,12 +189,20 @@
     <ClInclude Include="Field.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="StatisticField.h" />
     <ClInclude Include="StatusField.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="UserField.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DialogBox.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="bitmap2.bmp" />
+    <Image Include="WarshipBattleICON.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

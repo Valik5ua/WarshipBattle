@@ -10,6 +10,7 @@
 //Bottom level Menu For Help
 
 #define MENU_HELP_ABOUT			101
+#define ABOUTBOX				102
 
 //Untranslated Messages For Engine::Event()
 
