@@ -1,13 +1,14 @@
 #include "Engine.h"
-#include <math.h>
 #include <string>
 #include <typeinfo>
+#include <math.h>
 #include "UserField.h"
 #include "EnemyField.h"
 #include "ButtonFieldDeploy.h"
 #include "ButtonFieldFire.h"
 #include "ButtonFieldConnect.h"
 #include "ButtonFieldNewGame.h"
+#include "textureManager.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -19,6 +20,7 @@ extern ButtonFieldDeploy buttonFieldDeploy;
 extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 extern ButtonFieldNewGame buttonFieldNewGame;
+extern TextureManager textureManager;
 
 // define while only PVE game is avaliable
 #define GAMEMODE_PVE_ONLY
@@ -28,7 +30,7 @@ extern ButtonFieldNewGame buttonFieldNewGame;
 /// </summary>
 Engine::Engine() :GameStatus(GAMESTATUS::NewGame), lastGameResults(LastGameResults::N_A),
 fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
-ShipsDeployed(0), UserTurn(true),
+ShipsDeployed(0), UserTurn(true), Animation(false), FrameCount(0),
 MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
 {
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
@@ -149,57 +151,63 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
         break;
         case GAMESTATUS::MainGame:
         {
-            switch (this->UserTurn)
+            if (!this->Animation)
             {
-            case true:
-            {
-                switch (TranslatedMSG)
+                switch (this->UserTurn)
                 {
-                case TRANSLATEDMSG_RANDOMAIM:
+                case true:
                 {
-                    userField.SetAimPoint(enemyField.RandomSelect());
+                    switch (TranslatedMSG)
+                    {
+                    case TRANSLATEDMSG_RANDOMAIM:
+                    {
+                        userField.SetAimPoint(enemyField.RandomSelect());
+                    }
+                    break;
+                    case TRANSLATEDMSG_AIM:
+                    {
+                        userField.SetAimPoint(enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y));
+                    }
+                    break;
+                    case TRANSLATEDMSG_MOVE_LEFT:
+                    {
+                        userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_LEFT));
+                    }
+                    break;
+                    case TRANSLATEDMSG_MOVE_RIGHT:
+                    {
+                        userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_RIGHT));
+                    }
+                    break;
+                    case TRANSLATEDMSG_MOVE_DOWN:
+                    {
+                        userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_DOWN));
+                    }
+                    break;
+                    case TRANSLATEDMSG_MOVE_UP:
+                    {
+                        userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_UP));
+                    }
+                    break;
+                    case TRANSLATEDMSG_FIRE:
+                    {
+                        this->Shoot(&userField, &enemyField);
+                    }
+                    break;
+                    }
                 }
                 break;
-                case TRANSLATEDMSG_AIM:
+                case false:
                 {
-                    userField.SetAimPoint(enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y));
-                }
-                break;
-                case TRANSLATEDMSG_MOVE_LEFT:
-                {
-                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_LEFT));
-                }
-                break;
-                case TRANSLATEDMSG_MOVE_RIGHT:
-                {
-                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_RIGHT));
-                }
-                break;
-                case TRANSLATEDMSG_MOVE_DOWN:
-                {
-                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_DOWN));
-                }
-                break;
-                case TRANSLATEDMSG_MOVE_UP:
-                {
-                    userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_UP));
-                }
-                break;
-                case TRANSLATEDMSG_FIRE:
-                {
-                    this->Shoot(&userField, &enemyField);
+                    this->Shoot(&enemyField, &userField);
                 }
                 break;
                 }
             }
-            break;
-            case false:
+            else
             {
-                this->Shoot(&enemyField, &userField);
-            }
-            break;
-            }
 
+            }
         }
         break;
         default:
@@ -234,7 +242,12 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 {
     if (!FieldTo->CanFire()) return;
-    const short int AnswerStatus = FieldTo->ShootRecieve(FieldFrom->ShootCreate());
+
+    POINT Aimpoint = FieldFrom->ShootCreate();
+
+    this->StartAnimation(FieldTo, Aimpoint);
+
+    const short int AnswerStatus = FieldTo->ShootRecieve(Aimpoint);
     FieldFrom->ShootAnswer(AnswerStatus);
     if (AnswerStatus > 0)
     {
@@ -485,3 +498,64 @@ void Engine::SwitchTurns()
 {
     this->UserTurn = !this->UserTurn;
 }
+
+void Engine::StartAnimation(Field* field, POINT ShootingPoint)
+{
+    this->Animation = true;
+    this->ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
+    if (typeid(*field) == typeid(UserField))
+    {
+        this->UserShot = false;
+        this->ShootingAngle = -0.3 + (ShootingPoint.y * 0.06);
+        ShootPoint.y += 0.5;
+        for (int i = 0; i < 30; i++)
+        {
+            CannonBallPositionsX[i] = 28.5 - ((28.5 - ShootPoint.x) / (float)30) * i;
+            CannonBallPositionsY[i] = ((ShootPoint.y - 10) / (float)(ShootPoint.x - 28.5)) 
+                * (CannonBallPositionsX[i] - 28.5) + 10;
+        }
+    }
+    else
+    {
+        this->UserShot = true;
+        this->ShootingAngle = 3.44 - (ShootingPoint.y * 0.06);
+        ShootPoint.x += 1;
+        ShootPoint.y += 0.5;
+        for (int i = 0; i < 30; i++)
+        {
+            CannonBallPositionsX[i] = 3.5 + ((ShootPoint.x - 3.5) / (float)30) * i;
+            CannonBallPositionsY[i] = ((ShootPoint.y - 10) / (float)(ShootPoint.x - 3.5))
+                * (CannonBallPositionsX[i] - 3.5) + 10;
+        }
+    }
+}
+
+void Engine::DrawAnimation()
+{
+    const unsigned int num_segments = 360;
+    float theta = 0;
+    float angleincrease = 1;
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureManager.CannonBallTextureID);
+
+    glBegin(GL_TRIANGLE_FAN);
+    for (int i = theta; i < num_segments; i++)
+    {
+        float x = (float)16 / (float)128 * cosf(theta); //calculate current x in the segment
+        float y = (float)16 / (float)128 * sinf(theta); //calculate current y in the segment
+
+        glTexCoord2d(.5 + cosf(theta) / 2, .5 + sinf(theta) / 2); glVertex2f(this->CannonBallPositionsX[FrameCount] + x, this->CannonBallPositionsY[FrameCount] + y);
+
+        theta += angleincrease;
+    }
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+    if (++this->FrameCount == 30)
+    {
+        Animation = false;
+        this->FrameCount = 0;
+    }
+}
+

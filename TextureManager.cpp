@@ -102,6 +102,11 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber8.bmp", this->AliveDeadNumber8TextureID);
     LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber9.bmp", this->AliveDeadNumber9TextureID);
     LoadTexture((char*)"Textures\\SymbolTextures\\AliveDeadTextures\\BigNumber10.bmp", this->AliveDeadNumber10TextureID);
+    
+    LoadTexture((char*)"Textures\\Cannon.bmp", this->CannonTextureID);
+    LoadTexture((char*)"Textures\\CannonBackround.bmp", this->CannonBackroundTextureID);
+
+    LoadTexture((char*)"Textures\\CanonBall.bmp", this->CannonBallTextureID);
 }
 
 /// <summary>

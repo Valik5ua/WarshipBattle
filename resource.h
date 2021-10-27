@@ -82,3 +82,6 @@ const unsigned int ClueFieldH = 3;
 
 const unsigned int StatusFieldW = 5;
 const unsigned int StatusFieldH = 3;
+
+const unsigned int CannonFieldW = 2;
+const unsigned int CannonFieldH = 2;

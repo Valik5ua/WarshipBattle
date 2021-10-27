@@ -10,6 +10,7 @@
 #include "TextureManager.h"
 #include "StatisticField.h"
 #include "StatusField.h"
+#include "CannonField.h"
 #include "ClueField.h"
 #include "resource1.h"
 
@@ -37,6 +38,8 @@ TextureManager textureManager;
 StatisticField statisticField(14,5);
 StatusField statusField(8, 1);
 ClueField clueField(13, 1);
+CannonField UserCannonField(1, 9,3.14);
+CannonField OpponentCannonField(29, 9,0);
 
 //Windows prototypes
 
@@ -379,6 +382,25 @@ GLvoid DrawScene(GLvoid)
 		buttonFieldFire.Draw();
 	}
 	break;
+	}
+	if (engine.Animation)
+	{
+		if (engine.UserShot)
+		{
+			UserCannonField.Draw(engine.ShootingAngle);
+			OpponentCannonField.Draw();
+		}
+		else
+		{
+			OpponentCannonField.Draw(engine.ShootingAngle);
+			UserCannonField.Draw();
+		}
+		engine.DrawAnimation();
+	}
+	else
+	{
+		UserCannonField.Draw();
+		OpponentCannonField.Draw();
 	}
 
 	SWAPBUFFERS;

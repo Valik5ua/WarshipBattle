@@ -109,4 +109,9 @@ public:
 	GLuint  AliveDeadNumber8TextureID;
 	GLuint  AliveDeadNumber9TextureID;
 	GLuint  AliveDeadNumber10TextureID;
+
+	GLuint CannonBackroundTextureID;
+	GLuint CannonTextureID;
+
+	GLuint CannonBallTextureID;
 };

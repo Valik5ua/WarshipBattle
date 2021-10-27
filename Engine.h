@@ -27,16 +27,29 @@ public:
 	int GetMatchTime() { return this->MatchTimeSec; }
 	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
 	int GetOpponentShipsAlive() { return this->OpponentShipsAlive; }
+	void DrawAnimation();
 public:
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
 	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
-	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip	} shootStatus;
+	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip } shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	int ShipsDeployed;
+	bool Animation;
+	bool UserShot;
+	float ShootingAngle;
 public:
 	void SetMode(GAMESTATUS GameStatus);
 private:
+	struct FPOINT
+	{
+		float x;
+		float y;
+	};
+
+	unsigned int FrameCount;
+	FPOINT ShootPoint;
+
 	bool UserTurn;
 
 	float fOffsetH;
@@ -51,6 +64,9 @@ private:
 	unsigned int PlayerShipsAlive;
 	unsigned int OpponentShipsAlive;
 
+	double CannonBallPositionsX[30];
+	double CannonBallPositionsY[30];
+
 	std::chrono::system_clock::duration dtn;
 
 private:
@@ -62,9 +78,9 @@ private:
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 	void SwitchTurns();
+	void StartAnimation(Field* field, POINT ShootingPoint);
 private:
 	//Fully translated messages for Engine::Event
-
 
 	//Messages when GAMESTATUS::Connecting is the current mode
 #define TRANSLATEDMSG_CONNECT			10001

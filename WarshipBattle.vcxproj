@@ -163,6 +163,7 @@
     <ClCompile Include="ButtonFieldDeploy.cpp" />
     <ClCompile Include="ButtonFieldFire.cpp" />
     <ClCompile Include="ButtonFieldNewGame.cpp" />
+    <ClCompile Include="CannonField.cpp" />
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="ClueField.cpp" />
     <ClCompile Include="EnemyField.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="ButtonFieldDeploy.h" />
     <ClInclude Include="ButtonFieldFire.h" />
     <ClInclude Include="ButtonFieldNewGame.h" />
+    <ClInclude Include="CannonField.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="ClueField.h" />
     <ClInclude Include="Deck.h" />
