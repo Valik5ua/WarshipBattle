@@ -507,7 +507,7 @@ void Engine::StartAnimation(Field* field, POINT ShootingPoint)
     {
         this->UserShot = false;
         this->ShootingAngle = -0.3 + (ShootingPoint.y * 0.06);
-        ShootPoint.y += 0.5;
+        ShootPoint.y += 0.3;
         for (int i = 0; i < 30; i++)
         {
             CannonBallPositionsX[i] = 28.5 - ((28.5 - ShootPoint.x) / (float)30) * i;
@@ -519,8 +519,8 @@ void Engine::StartAnimation(Field* field, POINT ShootingPoint)
     {
         this->UserShot = true;
         this->ShootingAngle = 3.44 - (ShootingPoint.y * 0.06);
-        ShootPoint.x += 1;
-        ShootPoint.y += 0.5;
+        ShootPoint.x += 0.5;
+        ShootPoint.y += 0.3;
         for (int i = 0; i < 30; i++)
         {
             CannonBallPositionsX[i] = 3.5 + ((ShootPoint.x - 3.5) / (float)30) * i;
@@ -537,18 +537,51 @@ void Engine::DrawAnimation()
     float angleincrease = 1;
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, textureManager.CannonBallTextureID);
+    glBindTexture(GL_TEXTURE_2D, textureManager.RocketBodyTextureID);
 
-    glBegin(GL_TRIANGLE_FAN);
-    for (int i = theta; i < num_segments; i++)
-    {
-        float x = (float)16 / (float)128 * cosf(theta); //calculate current x in the segment
-        float y = (float)16 / (float)128 * sinf(theta); //calculate current y in the segment
+    glBegin(GL_QUADS);
 
-        glTexCoord2d(.5 + cosf(theta) / 2, .5 + sinf(theta) / 2); glVertex2f(this->CannonBallPositionsX[FrameCount] + x, this->CannonBallPositionsY[FrameCount] + y);
+    glTexCoord2d(0, 0); glVertex2f(this->CannonBallPositionsX[FrameCount], this->CannonBallPositionsY[FrameCount]);
+    glTexCoord2d(1.f, 0); glVertex2f(0.7f + this->CannonBallPositionsX[FrameCount], this->CannonBallPositionsY[FrameCount]);
+    glTexCoord2d(1.f, 1.f); glVertex2f(0.7f + this->CannonBallPositionsX[FrameCount], 0.3f + this->CannonBallPositionsY[FrameCount]);
+    glTexCoord2d(0, 1.f); glVertex2f(this->CannonBallPositionsX[FrameCount], 0.3f + this->CannonBallPositionsY[FrameCount]);
+    
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
 
-        theta += angleincrease;
-    }
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureManager.RocketTopTextureID);
+
+    glBegin(GL_TRIANGLES);
+
+    glTexCoord2d(0, 0); glVertex2f(this->CannonBallPositionsX[FrameCount]+0.7f, this->CannonBallPositionsY[FrameCount]);
+    glTexCoord2d(1.f, 0.5f); glVertex2f(this->CannonBallPositionsX[FrameCount]+1, this->CannonBallPositionsY[FrameCount]+0.15f);
+    glTexCoord2d(0, 1.f); glVertex2f(this->CannonBallPositionsX[FrameCount]+0.7f, this->CannonBallPositionsY[FrameCount]+0.3f);
+
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureManager.RocketFinTopTextureID);
+
+    glBegin(GL_TRIANGLES);
+
+    glTexCoord2d(0, 0); glVertex2f(this->CannonBallPositionsX[FrameCount], this->CannonBallPositionsY[FrameCount]+0.3f);
+    glTexCoord2d(1.f, 0); glVertex2f(this->CannonBallPositionsX[FrameCount] + 0.36f, this->CannonBallPositionsY[FrameCount] + 0.3f);
+    glTexCoord2d(0, 1.f); glVertex2f(this->CannonBallPositionsX[FrameCount], this->CannonBallPositionsY[FrameCount] + 0.39f);
+
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureManager.RocketFinBottomTextureID);
+
+    glBegin(GL_TRIANGLES);
+
+    glTexCoord2d(0, 0); glVertex2f(this->CannonBallPositionsX[FrameCount], this->CannonBallPositionsY[FrameCount]-0.093f);
+    glTexCoord2d(1.f, 1.f); glVertex2f(this->CannonBallPositionsX[FrameCount] + 0.36f, this->CannonBallPositionsY[FrameCount]);
+    glTexCoord2d(0, 1.f); glVertex2f(this->CannonBallPositionsX[FrameCount], this->CannonBallPositionsY[FrameCount]);
+
     glEnd();
     glDisable(GL_TEXTURE_2D);
 

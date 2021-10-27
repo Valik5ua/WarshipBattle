@@ -114,4 +114,9 @@ public:
 	GLuint CannonTextureID;
 
 	GLuint CannonBallTextureID;
+
+	GLuint RocketBodyTextureID;
+	GLuint RocketTopTextureID;
+	GLuint RocketFinTopTextureID;
+	GLuint RocketFinBottomTextureID;
 };
