@@ -14,6 +14,7 @@ extern const float OpenGLHeight;
 extern const float OpenGLWidth;
 extern const float AspectRatio;
 
+extern Engine engine;
 extern UserField userField;
 extern EnemyField enemyField;
 extern ButtonFieldDeploy buttonFieldDeploy;
@@ -22,22 +23,16 @@ extern ButtonFieldConnect buttonFieldConnect;
 extern ButtonFieldNewGame buttonFieldNewGame;
 extern TextureManager textureManager;
 
-// define while only PVE game is avaliable
-#define GAMEMODE_PVE_ONLY
-
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
 Engine::Engine() :GameStatus(GAMESTATUS::NewGame), lastGameResults(LastGameResults::N_A),
 fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
-ShipsDeployed(0), UserTurn(true), Animation(false), FrameCount(0),
+ShipsDeployed(0), UserTurn(true), Animation(false),
 MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
 {
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
     this->dtn = tp.time_since_epoch();
-#ifdef GAMEMODE_PVE_ONLY
-    this->GameMode = this->GAMEMODE::Menu;
-#endif // GAMEMODE_PVE_ONLY
 }
 
 /// <summary>
@@ -502,55 +497,67 @@ void Engine::SwitchTurns()
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 {
     this->Animation = true;
-    this->ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
+    this->Rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
     if (typeid(*field) == typeid(UserField))
     {
         this->UserShot = false;
         this->ShootingAngle = -0.3 + (ShootingPoint.y * 0.06);
-        ShootPoint.y += 0.3;
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < this->Rocket.FramesToDraw; i++)
         {
-            CannonBallPositionsX[i] = 28.5 - ((28.5 - ShootPoint.x) / (float)30) * i;
-            CannonBallPositionsY[i] = ((ShootPoint.y - 10) / (float)(ShootPoint.x - 28.5)) 
-                * (CannonBallPositionsX[i] - 28.5) + 10;
+            this->Rocket.Position[i].x = 28.5 - ((28.5 - this->Rocket.ShootPoint.x) / (float)this->Rocket.FramesToDraw) * i;
+            this->Rocket.Position[i].y = ((this->Rocket.ShootPoint.y - 10) / (float)(this->Rocket.ShootPoint.x - 28.5))
+                * (this->Rocket.Position[i].x - 28.5) + 10;
         }
     }
     else
     {
         this->UserShot = true;
         this->ShootingAngle = 3.44 - (ShootingPoint.y * 0.06);
-        ShootPoint.x += 0.5;
-        ShootPoint.y += 0.3;
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < this->Rocket.FramesToDraw; i++)
         {
-            CannonBallPositionsX[i] = 3.5 + ((ShootPoint.x - 3.5) / (float)30) * i;
-            CannonBallPositionsY[i] = ((ShootPoint.y - 10) / (float)(ShootPoint.x - 3.5))
-                * (CannonBallPositionsX[i] - 3.5) + 10;
+            this->Rocket.Position[i].x = 3.5 + ((this->Rocket.ShootPoint.x - 3.5) / (float)this->Rocket.FramesToDraw) * i;
+            this->Rocket.Position[i].y = ((this->Rocket.ShootPoint.y - 10) / (float)(this->Rocket.ShootPoint.x - 3.5))
+                * (this->Rocket.Position[i].x - 3.5) + 10;
         }
     }
 }
 
-void Engine::DrawAnimation()
+void Engine::AnimationRocket::Draw()
 {
     const unsigned int num_segments = 360;
     float theta = 0;
     float angleincrease = 1;
 
-    glPushMatrix();
-    glTranslatef(this->CannonBallPositionsX[FrameCount] + 0.5f, this->CannonBallPositionsY[FrameCount] + 0.27f, 0); //Set middle
+    if (this->FrameCount < this->FramesToDraw - 1)
+    {
+        this->FrameCount++;
+        if (engine.UserShot)
+        {
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, textureManager.WaterTextureID);
+            glBegin(GL_QUADS);
 
-    switch (this->UserShot)
-    {
-    case true:
-    {
+            glTexCoord2d(0, 0); glVertex2f(this->ShootPoint.x, this->ShootPoint.y);
+            glTexCoord2d(1.f, 0); glVertex2f(this->ShootPoint.x + 1, this->ShootPoint.y);
+            glTexCoord2d(1.f, 1.f); glVertex2f(this->ShootPoint.x + 1, this->ShootPoint.y + 1);
+            glTexCoord2d(0, 1.f); glVertex2f(this->ShootPoint.x, this->ShootPoint.y + 1);
+
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+        }
+
+        glPushMatrix();
+        glTranslatef(this->Position[this->FrameCount].x + 0.5f, this->Position[this->FrameCount].y + 0.5f, 0); //Set middle
+
+        if (!engine.UserShot) glRotatef(180, 0, 0, 1.0f);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, textureManager.RocketBodyTextureID);
         glBegin(GL_QUADS);
 
-        glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.27f);
-        glTexCoord2d(1.f, 0); glVertex2f(0.2f, -0.27f);
-        glTexCoord2d(1.f, 1.f); glVertex2f(0.2f, 0.03f);
-        glTexCoord2d(0, 1.f); glVertex2f(-0.5f, 0.03f);
+        glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.17f);
+        glTexCoord2d(1.f, 0); glVertex2f(0.2f, -0.17f);
+        glTexCoord2d(1.f, 1.f); glVertex2f(0.2f, 0.17f);
+        glTexCoord2d(0, 1.f); glVertex2f(-0.5f, 0.17f);
 
         glEnd();
         glDisable(GL_TEXTURE_2D);
@@ -560,9 +567,9 @@ void Engine::DrawAnimation()
 
         glBegin(GL_TRIANGLES);
 
-        glTexCoord2d(0, 0); glVertex2f(0.2f, -0.27f);
-        glTexCoord2d(1.f, 0.5f); glVertex2f(0.5f, -0.12f);
-        glTexCoord2d(0, 1.f); glVertex2f(0.2f, 0.03f);
+        glTexCoord2d(0, 0); glVertex2f(0.2f, -0.17f);
+        glTexCoord2d(1.f, 0.5f); glVertex2f(0.5f, 0.0f);
+        glTexCoord2d(0, 1.f); glVertex2f(0.2f, 0.17f);
         glEnd();
 
         glDisable(GL_TEXTURE_2D);
@@ -572,9 +579,9 @@ void Engine::DrawAnimation()
 
         glBegin(GL_TRIANGLES);
 
-        glTexCoord2d(0, 0); glVertex2f(-0.5f, 0.03f);
-        glTexCoord2d(1.f, 0); glVertex2f(-0.14f, 0.03f);
-        glTexCoord2d(0, 1.f); glVertex2f(-0.5, 0.12f);
+        glTexCoord2d(0, 0); glVertex2f(-0.5f, 0.17f);
+        glTexCoord2d(1.f, 0); glVertex2f(-0.14f, 0.17f);
+        glTexCoord2d(0, 1.f); glVertex2f(-0.5, 0.26f);
 
         glEnd();
         glDisable(GL_TEXTURE_2D);
@@ -584,74 +591,39 @@ void Engine::DrawAnimation()
 
         glBegin(GL_TRIANGLES);
 
-        glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.363f);
-        glTexCoord2d(1.f, 1.f); glVertex2f(0.16f, -0.27f);
-        glTexCoord2d(0, 1.f); glVertex2f(-0.5f, -0.27f);
+        glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.17f);
+        glTexCoord2d(1.f, 1.f); glVertex2f(0.16f, -0.17f);
+        glTexCoord2d(0, 1.f); glVertex2f(-0.5f, -0.26f);
 
         glEnd();
         glDisable(GL_TEXTURE_2D);
-    }
-    break;
-    case false:
-    {
-        glRotatef(180, 0, 0, 1);
 
+        glPopMatrix();
+    }
+    else
+    {
+        glPushMatrix();
+        glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y + 0.5f, 0);
+        glScaled((this->FrameCount - this->FramesToDraw+1) / (float)10, (this->FrameCount - this->FramesToDraw+1) / (float)10, 1);
+        
         glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, textureManager.RocketBodyTextureID);
+        glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);
         glBegin(GL_QUADS);
 
-        glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.27f);
-        glTexCoord2d(1.f, 0); glVertex2f(0.2f, -0.27f);
-        glTexCoord2d(1.f, 1.f); glVertex2f(0.2f, 0.03f);
-        glTexCoord2d(0, 1.f); glVertex2f(-0.5f, 0.03f);
+        glTexCoord2d(0, 0); glVertex2f(-0.5f, - 0.5f);
+        glTexCoord2d(1.f, 0); glVertex2f(0.5f, - 0.5f);
+        glTexCoord2d(1.f, 1.f); glVertex2f(0.5f, 0.5f);
+        glTexCoord2d(0, 1.f); glVertex2f(-0.5f,  0.5f);
 
         glEnd();
         glDisable(GL_TEXTURE_2D);
+        
+        glPopMatrix();
 
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, textureManager.RocketTopTextureID);
-
-        glBegin(GL_TRIANGLES);
-
-        glTexCoord2d(0, 0); glVertex2f(0.2f, -0.27f);
-        glTexCoord2d(1.f, 0.5f); glVertex2f(0.5f, -0.12f);
-        glTexCoord2d(0, 1.f); glVertex2f(0.2f, 0.03f);
-        glEnd();
-
-        glDisable(GL_TEXTURE_2D);
-
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, textureManager.RocketFinTopTextureID);
-
-        glBegin(GL_TRIANGLES);
-
-        glTexCoord2d(0, 0); glVertex2f(-0.5f, 0.03f);
-        glTexCoord2d(1.f, 0); glVertex2f(-0.14f, 0.03f);
-        glTexCoord2d(0, 1.f); glVertex2f(-0.5, 0.12f);
-
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
-
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, textureManager.RocketFinBottomTextureID);
-
-        glBegin(GL_TRIANGLES);
-
-        glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.363f);
-        glTexCoord2d(1.f, 1.f); glVertex2f(0.16f, -0.27f);
-        glTexCoord2d(0, 1.f); glVertex2f(-0.5f, -0.27f);
-
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
-    }
-    break;
-    }
-    glPopMatrix();
-
-    if (++this->FrameCount == 30)
-    {
-        Animation = false;
-        this->FrameCount = 0;
+        if (++this->FrameCount == this->FramesToDraw + 5)
+        {
+            engine.Animation = false;
+            this->FrameCount = 0;
+        }
     }
 }
-

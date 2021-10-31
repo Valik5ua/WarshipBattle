@@ -395,7 +395,7 @@ GLvoid DrawScene(GLvoid)
 			OpponentCannonField.Draw(engine.ShootingAngle);
 			UserCannonField.Draw();
 		}
-		engine.DrawAnimation();
+		engine.Rocket.Draw();
 	}
 	else
 	{

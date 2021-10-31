@@ -106,7 +106,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Cannon.bmp", this->CannonTextureID);
     LoadTexture((char*)"Textures\\CannonBackround.bmp", this->CannonBackroundTextureID);
 
-    LoadTexture((char*)"Textures\\CanonBall.bmp", this->CannonBallTextureID);
+    LoadTexture((char*)"Textures\\Explosion.bmp", this->ExplosionTextureID);
 
     LoadTexture((char*)"Textures\\Rocket Body.bmp", this->RocketBodyTextureID);
     LoadTexture((char*)"Textures\\Rocket top.bmp", this->RocketTopTextureID);
