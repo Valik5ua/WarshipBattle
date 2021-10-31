@@ -2,6 +2,8 @@
 #include "UserField.h"
 #include "TextureManager.h"
 #include "time.h"
+#include "resource.h"
+#include <thread>
 
 #define DEVMODE_OFF 1
 #define DEVMODE_ON  2
@@ -529,6 +531,24 @@ void EnemyField::Deselect()
 	}
 }
 
+void EnemyField::ThreadFunc(const POINT ShootCoordinates)
+{
+	while (engine.Animation)
+	{
+	}
+	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
+	int ShipID = this->ShipExists(ShootCoordinates);
+
+	if (ShipID >= 0)
+		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+	else
+	{
+		engine.SwitchTurns();
+		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
+	}
+	engine.LastShotAccomplished = true;
+}
+
 /// <summary>
 /// Draws the field.
 /// </summary>
@@ -668,20 +688,22 @@ bool EnemyField::CanFire()
 
 int EnemyField::ShootRecieve(const POINT ShootCoordinates)
 {
-	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
+	std::thread th(&EnemyField::ThreadFunc, this, ShootCoordinates);
+	th.detach();
+
 	int ShipID = this->ShipExists(ShootCoordinates);
 	if (ShipID >= 0)
 	{
-		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		Ship TempShip = this->Ships[ShipID];
+		TempShip.SetDamageToDeck(ShootCoordinates);
 
-		if (this->Ships[ShipID].Killed)
-			return this->Ships[ShipID].Size;
+		if (TempShip.Killed)
+			return TempShip.Size;
 		else
 			return Engine::ShootStatus::Damage;
 	}
 	else
 	{
-		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
 		return Engine::ShootStatus::Miss;
 	}
 }

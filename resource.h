@@ -1,4 +1,39 @@
 #pragma once
+#include <Windows.h>
+
+//Positions for all fields
+#define UserFieldPosX			3
+#define UserFieldPosY			5
+#define EnemyFieldPosX			19
+#define EnemyFieldPosY			5
+#define EnemyFieldPosY			5
+#define StatisticFieldPosX		14
+#define StatisticFieldPosY		5
+#define UserCannonFieldFieldPosX		1
+#define UserCannonFieldFieldPosY		9
+#define EnemyCannonFieldFieldPosX		29
+#define EnemyCannonFieldFieldPosY		9
+#define ButtonFieldFirePosX		25
+#define ButtonFieldFirePosY		1
+#define ButtonFieldDeployPosX	3
+#define ButtonFieldDeployPosY	1
+#define ButtonFieldNewGamePosX	3
+#define ButtonFieldNewGamePosY	1
+#define ButtonFieldConnectPosX	3
+#define ButtonFieldConnectPosY	1
+#define ClueFieldPosX			13
+#define ClueFieldPosY			1
+#define StatusFieldPosX			8
+#define StatusFieldPosY			1
+#define ClueFieldMainGamePosX	3
+#define ClueFieldMainGamePosY	1
+#define StatusFieldMainGamePosX	19
+#define StatusFieldMainGamePosY	1
+
+//Recources for dialog box and icon loading
+#define IDD_DIALOG1				101
+#define IDI_ICON1				102
+#define IDB_BITMAP1				103
 
 // Bottom level Menus For New Game
 
@@ -82,3 +117,6 @@ const unsigned int ClueFieldH = 3;
 
 const unsigned int StatusFieldW = 5;
 const unsigned int StatusFieldH = 3;
+
+const unsigned int CannonFieldW = 2;
+const unsigned int CannonFieldH = 2;

@@ -11,6 +11,9 @@ void StatusField::Draw()
 	GLuint TopTextureID = 0;
 	GLuint BottomTextureID = 0;
 
+	this->StartX = StatusFieldPosX;
+	this->StartY = StatusFieldPosY;
+
 	switch (engine.GameStatus)
 	{
 	case Engine::GAMESTATUS::NewGame:
@@ -27,6 +30,9 @@ void StatusField::Draw()
 	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
+		this->StartX = StatusFieldMainGamePosX;
+		this->StartY = StatusFieldMainGamePosY;
+
 		TopTextureID = textureManager.StatusFieldTopPVETextureID;
 		if (engine.GetTurn())
 			BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;

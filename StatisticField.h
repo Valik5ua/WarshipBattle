@@ -1,5 +1,6 @@
 #pragma once
 #include "Field.h"
+#include "resource.h" 
 
 extern unsigned const int StatisticFieldW;
 extern unsigned const int StatisticFieldH;

@@ -3,6 +3,7 @@
 #include "UserField.h"
 #include "EnemyField.h"
 #include "Engine.h"
+#include "resource.h"
 
 extern Engine engine;
 extern UserField userField;

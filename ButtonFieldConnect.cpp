@@ -1,5 +1,6 @@
 #include "ButtonFieldConnect.h"
 #include "TextureManager.h"
+#include "resource.h"
 
 extern TextureManager textureManager;
 

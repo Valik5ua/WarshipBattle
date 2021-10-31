@@ -1,6 +1,7 @@
 #pragma once
 #include "Field.h"
 #include "Cell.h"
+#include "resource.h"
 
 extern unsigned const int ButtonFieldW;
 extern unsigned const int ButtonFieldH;

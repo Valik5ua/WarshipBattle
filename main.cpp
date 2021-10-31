@@ -10,8 +10,9 @@
 #include "TextureManager.h"
 #include "StatisticField.h"
 #include "StatusField.h"
+#include "CannonField.h"
 #include "ClueField.h"
-#include "resource1.h"
+#include "resource.h"
 
 // Windows globals
 
@@ -22,21 +23,22 @@ HGLRC  hRC{};
 HINSTANCE hInst{};
 
 // Custom globals
-
 bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 const float  FrameRate = (float)1000 / 60;
 Engine engine;
-ButtonFieldDeploy buttonFieldDeploy(3, 1);
-ButtonFieldFire buttonFieldFire(3, 1);
-ButtonFieldConnect buttonFieldConnect(3, 1);
-ButtonFieldNewGame buttonFieldNewGame(3, 1);
-UserField userField(3,5);
-EnemyField enemyField(19, 5);
+ButtonFieldDeploy buttonFieldDeploy(ButtonFieldDeployPosX, ButtonFieldDeployPosY);
+ButtonFieldFire buttonFieldFire(ButtonFieldFirePosX, ButtonFieldDeployPosY);
+ButtonFieldConnect buttonFieldConnect(ButtonFieldConnectPosX, ButtonFieldConnectPosY);
+ButtonFieldNewGame buttonFieldNewGame(ButtonFieldNewGamePosX, ButtonFieldNewGamePosY);
+UserField userField(UserFieldPosX,UserFieldPosY);
+EnemyField enemyField(EnemyFieldPosX, EnemyFieldPosY);
 TextureManager textureManager;
-StatisticField statisticField(14,5);
-StatusField statusField(8, 1);
-ClueField clueField(13, 1);
+StatisticField statisticField(StatisticFieldPosX,StatisticFieldPosY);
+StatusField statusField(StatusFieldPosX, StatusFieldPosY);
+ClueField clueField(ClueFieldPosX, ClueFieldPosY);
+CannonField UserCannonField(UserCannonFieldFieldPosX, UserCannonFieldFieldPosY,3.14);
+CannonField OpponentCannonField(EnemyCannonFieldFieldPosX, EnemyCannonFieldFieldPosY,0);
 
 //Windows prototypes
 
@@ -379,6 +381,25 @@ GLvoid DrawScene(GLvoid)
 		buttonFieldFire.Draw();
 	}
 	break;
+	}
+	if (engine.Animation)
+	{
+		if (engine.UserShot)
+		{
+			UserCannonField.Draw(engine.ShootingAngle);
+			OpponentCannonField.Draw();
+		}
+		else
+		{
+			OpponentCannonField.Draw(engine.ShootingAngle);
+			UserCannonField.Draw();
+		}
+		engine.Rocket.Draw();
+	}
+	else
+	{
+		UserCannonField.Draw();
+		OpponentCannonField.Draw();
 	}
 
 	SWAPBUFFERS;
