@@ -23,6 +23,7 @@ public:
 	void GameOver(bool UserWon);
 
 	bool GetTurn() { return this->UserTurn; }
+	void SwitchTurns();
 
 	int GetMatchTime() { return this->MatchTimeSec; }
 	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
@@ -33,6 +34,7 @@ public:
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
 	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip } shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
+	bool LastShotAccomplished;
 	int ShipsDeployed;
 	bool Animation;
 	float ShootingAngle;
@@ -40,7 +42,6 @@ public:
 public:
 	void SetMode(GAMESTATUS GameStatus);
 private:
-	bool LastShotAccomplished;
 	bool UserTurn;
 
 	float fOffsetH;
@@ -82,7 +83,6 @@ private:
 
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
-	void SwitchTurns();
 	void StartAnimation(Field* field, POINT ShootingPoint);
 private:
 	//Fully translated messages for Engine::Event

@@ -1,6 +1,5 @@
 #pragma once
 #include "Cell.h"
-#include "resource.h"
 
 class Deck : public Cell
 {
