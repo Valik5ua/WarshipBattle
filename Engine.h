@@ -40,6 +40,7 @@ public:
 public:
 	void SetMode(GAMESTATUS GameStatus);
 private:
+	bool LastShotAccomplished;
 	bool UserTurn;
 
 	float fOffsetH;

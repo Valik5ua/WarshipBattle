@@ -1,5 +1,10 @@
 #pragma once
 
+//Recources for dialog box and icon loading
+#define IDD_DIALOG1				101
+#define IDI_ICON1				102
+#define IDB_BITMAP1				103
+
 // Bottom level Menus For New Game
 
 #define MENU_GAME_PVP			1

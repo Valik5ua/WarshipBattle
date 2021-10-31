@@ -9,6 +9,7 @@
 #include "ButtonFieldConnect.h"
 #include "ButtonFieldNewGame.h"
 #include "textureManager.h"
+#include <thread>
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -28,7 +29,7 @@ extern TextureManager textureManager;
 /// </summary>
 Engine::Engine() :GameStatus(GAMESTATUS::NewGame), lastGameResults(LastGameResults::N_A),
 fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
-ShipsDeployed(0), UserTurn(true), Animation(false),
+ShipsDeployed(0), UserTurn(true), Animation(false), LastShotAccomplished(true),
 MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
 {
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
@@ -186,7 +187,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
                     break;
                     case TRANSLATEDMSG_FIRE:
                     {
-                        this->Shoot(&userField, &enemyField);
+                        if (this->LastShotAccomplished) this->Shoot(&userField, &enemyField);
                     }
                     break;
                     }
@@ -194,7 +195,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
                 break;
                 case false:
                 {
-                    this->Shoot(&enemyField, &userField);
+                    if(this->LastShotAccomplished) this->Shoot(&enemyField, &userField);
                 }
                 break;
                 }
@@ -238,12 +239,17 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 {
     if (!FieldTo->CanFire()) return;
 
+    this->LastShotAccomplished = false;
+
     POINT Aimpoint = FieldFrom->ShootCreate();
 
     this->StartAnimation(FieldTo, Aimpoint);
 
     const short int AnswerStatus = FieldTo->ShootRecieve(Aimpoint);
     FieldFrom->ShootAnswer(AnswerStatus);
+    
+
+
     if (AnswerStatus > 0)
     {
         if (typeid(*FieldFrom) == typeid(EnemyField))
@@ -524,10 +530,6 @@ void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 
 void Engine::AnimationRocket::Draw()
 {
-    const unsigned int num_segments = 360;
-    float theta = 0;
-    float angleincrease = 1;
-
     if (this->FrameCount < this->FramesToDraw - 1)
     {
         this->FrameCount++;
@@ -592,7 +594,7 @@ void Engine::AnimationRocket::Draw()
         glBegin(GL_TRIANGLES);
 
         glTexCoord2d(0, 0); glVertex2f(-0.5f, -0.17f);
-        glTexCoord2d(1.f, 1.f); glVertex2f(0.16f, -0.17f);
+        glTexCoord2d(1.f, 1.f); glVertex2f(-0.14f, -0.17f);
         glTexCoord2d(0, 1.f); glVertex2f(-0.5f, -0.26f);
 
         glEnd();
@@ -602,7 +604,31 @@ void Engine::AnimationRocket::Draw()
     }
     else
     {
+        const unsigned int num_segments = 360;
+        float theta = 0;
+        float angleincrease = 1;
+
         glPushMatrix();
+        glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y + 0.5f, 0);
+        glScaled((this->FrameCount - this->FramesToDraw + 1) / 3.5f, (this->FrameCount - this->FramesToDraw + 1) / 3.5f, 1);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);
+
+        glBegin(GL_TRIANGLE_FAN);
+        for (int i = theta; i < num_segments; i++)
+        {
+            float x = (float)116 / (float)128 * cosf(theta); //calculate current x in the segment
+            float y = (float)116 / (float)128 * sinf(theta); //calculate current y in the segment
+
+            glTexCoord2d(.5 + cosf(theta) / 2, .5 + sinf(theta) / 2); glVertex2f(x, y);
+
+            theta += angleincrease;
+        }
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glPopMatrix();
+
+        /*glPushMatrix();
         glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y + 0.5f, 0);
         glScaled((this->FrameCount - this->FramesToDraw+1) / (float)10, (this->FrameCount - this->FramesToDraw+1) / (float)10, 1);
         
@@ -618,7 +644,7 @@ void Engine::AnimationRocket::Draw()
         glEnd();
         glDisable(GL_TEXTURE_2D);
         
-        glPopMatrix();
+        glPopMatrix();*/
 
         if (++this->FrameCount == this->FramesToDraw + 5)
         {
