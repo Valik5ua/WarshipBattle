@@ -351,6 +351,7 @@ void UserField::ThreadFunc(const POINT ShootCoordinates)
 	if (ShipID >= 0)
 	{
 		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		if (this->Ships[ShipID].Killed) engine.DecreaseShipsAlive(true);
 	}
 	else
 	{

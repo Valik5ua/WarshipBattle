@@ -464,8 +464,8 @@ void EnemyField::DeployEnemyShips()
 /// </summary>
 void EnemyField::ClearField()
 {
-	for (int i{}; i < 10; i++)
-		for (int j{}; j < 10; j++)
+	for (int i{}; i < OpponentGameFieldW; i++)
+		for (int j{}; j < OpponentGameFieldH; j++)
 		{
 			this->Cells[i][j].Open = false;
 			this->Cells[i][j].MarkedShip = false;
@@ -540,7 +540,10 @@ void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 	int ShipID = this->ShipExists(ShootCoordinates);
 
 	if (ShipID >= 0)
+	{
 		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		if (this->Ships[ShipID].Killed) engine.DecreaseShipsAlive(false);
+	}
 	else
 	{
 		engine.SwitchTurns();
@@ -915,6 +918,13 @@ void EnemyField::ShootAnswer(const int status)
 void EnemyField::NewGameReset()
 {
 	this->opponent.NewGameReset();
+}
+
+void EnemyField::GameOver()
+{
+	for (int i{}; i < OpponentGameFieldW; i++)
+		for (int j{}; j < OpponentGameFieldH; j++)
+			this->Cells[i][j].Open = true;
 }
 
 void EnemyField::Opponent::SetStrategy(Strategy strategy)
