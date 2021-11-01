@@ -1,5 +1,6 @@
 #include "CannonField.h"
 #include "TextureManager.h"
+#include "resource.h"
 #include <math.h>
 
 extern TextureManager textureManager;

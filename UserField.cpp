@@ -1,6 +1,8 @@
 #include "UserField.h"
 #include "Engine.h"
 #include "TextureManager.h"
+#include "resource.h"
+#include <thread>
 
 extern TextureManager textureManager;
 extern Engine engine;
@@ -311,19 +313,22 @@ void UserField::SetAimPoint(POINT AimPoint)
 
 int UserField::ShootRecieve(const POINT ShootCoordinates)
 {
+	std::thread th(&UserField::ThreadFunc, this, ShootCoordinates);
+	th.detach();
+
 	int ShipID = this->ShipExists(ShootCoordinates, MAX_SHIPS_COUNT);
 	if (ShipID >= 0)
 	{
-		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		Ship TempShip = this->Ships[ShipID];
+		TempShip.SetDamageToDeck(ShootCoordinates);
 
-		if (this->Ships[ShipID].Killed)
-			return this->Ships[ShipID].Size;
+		if (TempShip.Killed)
+			return TempShip.Size;
 		else
 			return Engine::ShootStatus::Damage;
 	}
 	else
 	{
-		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
 		return Engine::ShootStatus::Miss;
 	}
 }
@@ -335,6 +340,25 @@ POINT UserField::ShootCreate()
 
 void UserField::ShootAnswer(const int status)
 {
+}
+
+void UserField::ThreadFunc(const POINT ShootCoordinates)
+{
+	while (engine.Animation)
+	{
+	}
+	int ShipID = this->ShipExists(ShootCoordinates, MAX_SHIPS_COUNT);
+	if (ShipID >= 0)
+	{
+		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		if (this->Ships[ShipID].Killed) engine.DecreaseShipsAlive(true);
+	}
+	else
+	{
+		engine.SwitchTurns();
+		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
+	}
+	engine.LastShotAccomplished = true;
 }
 
 /// <summary>

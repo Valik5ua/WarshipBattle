@@ -1,6 +1,6 @@
 #include "ClueField.h"
-#include "resource.h"
 #include "Engine.h"
+#include "resource.h"
 #include "TextureManager.h"
 
 extern TextureManager textureManager;
@@ -15,6 +15,9 @@ ClueField::ClueField(const unsigned int StartX, const unsigned int StartY)
 void ClueField::Draw()
 {
 	GLuint TextureID = 0;
+
+	this->StartX = ClueFieldPosX;
+	this->StartY = ClueFieldPosY;
 
 	switch (engine.GameStatus)
 	{
@@ -48,6 +51,8 @@ void ClueField::Draw()
 	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
+		this->StartX = ClueFieldMainGamePosX;
+		this->StartY = ClueFieldMainGamePosY;
 		TextureID = textureManager.ClueFieldMainGameTextureID;
 	}
 	break;

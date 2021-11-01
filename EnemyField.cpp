@@ -2,6 +2,8 @@
 #include "UserField.h"
 #include "TextureManager.h"
 #include "time.h"
+#include "resource.h"
+#include <thread>
 
 #define DEVMODE_OFF 1
 #define DEVMODE_ON  2
@@ -462,8 +464,8 @@ void EnemyField::DeployEnemyShips()
 /// </summary>
 void EnemyField::ClearField()
 {
-	for (int i{}; i < 10; i++)
-		for (int j{}; j < 10; j++)
+	for (int i{}; i < OpponentGameFieldW; i++)
+		for (int j{}; j < OpponentGameFieldH; j++)
 		{
 			this->Cells[i][j].Open = false;
 			this->Cells[i][j].MarkedShip = false;
@@ -527,6 +529,27 @@ void EnemyField::Deselect()
 			if (this->Cells[i][j].Cell_Aim) { this->Cells[i][j].Cell_Aim = false;}
 		}
 	}
+}
+
+void EnemyField::ThreadFunc(const POINT ShootCoordinates)
+{
+	while (engine.Animation)
+	{
+	}
+	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
+	int ShipID = this->ShipExists(ShootCoordinates);
+
+	if (ShipID >= 0)
+	{
+		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		if (this->Ships[ShipID].Killed) engine.DecreaseShipsAlive(false);
+	}
+	else
+	{
+		engine.SwitchTurns();
+		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
+	}
+	engine.LastShotAccomplished = true;
 }
 
 /// <summary>
@@ -668,20 +691,22 @@ bool EnemyField::CanFire()
 
 int EnemyField::ShootRecieve(const POINT ShootCoordinates)
 {
-	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
+	std::thread th(&EnemyField::ThreadFunc, this, ShootCoordinates);
+	th.detach();
+
 	int ShipID = this->ShipExists(ShootCoordinates);
 	if (ShipID >= 0)
 	{
-		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
+		Ship TempShip = this->Ships[ShipID];
+		TempShip.SetDamageToDeck(ShootCoordinates);
 
-		if (this->Ships[ShipID].Killed)
-			return this->Ships[ShipID].Size;
+		if (TempShip.Killed)
+			return TempShip.Size;
 		else
 			return Engine::ShootStatus::Damage;
 	}
 	else
 	{
-		this->Cells[ShootCoordinates.x][ShootCoordinates.y].Missed = true;
 		return Engine::ShootStatus::Miss;
 	}
 }
@@ -893,6 +918,13 @@ void EnemyField::ShootAnswer(const int status)
 void EnemyField::NewGameReset()
 {
 	this->opponent.NewGameReset();
+}
+
+void EnemyField::GameOver()
+{
+	for (int i{}; i < OpponentGameFieldW; i++)
+		for (int j{}; j < OpponentGameFieldH; j++)
+			this->Cells[i][j].Open = true;
 }
 
 void EnemyField::Opponent::SetStrategy(Strategy strategy)

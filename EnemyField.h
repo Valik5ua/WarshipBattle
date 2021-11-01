@@ -3,6 +3,7 @@
 #include "Cell.h"
 #include "Engine.h"
 #include <vector>
+#include "resource.h"
 
 extern unsigned const int OpponentGameFieldW;
 extern unsigned const int OpponentGameFieldH;
@@ -29,12 +30,14 @@ public:
 	void ShootAnswer(const int status) override;
 
 	void NewGameReset();
+	void GameOver();
 private:
 	void SetShipDeployableStatus(Ship& ship);
 	void DeployEnemyShips();
 	void ClearField();
 	void CleanShips();
 	void Deselect();
+	void ThreadFunc(const POINT ShootCoordinates);
 public:
 	Cell Cells[OpponentGameFieldW][OpponentGameFieldH];
 	Ship Ships[10];
@@ -51,7 +54,7 @@ private:
 		enum Strategy { Damage, OneDeckShip, Twodeckship, Threedeckship, Fourdeckship, Unknown} strategy;
 		std::vector<int> Ships;
 		std::vector<POINT> TargetShip;
-		int Field[UserGameFieldW][UserGameFieldH];
+		int Field[OpponentGameFieldW][OpponentGameFieldH];
 		bool TargetShipKilled;
 		POINT AimPoint;
 	public:

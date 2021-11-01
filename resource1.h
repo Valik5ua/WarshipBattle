@@ -2,9 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by DialogBox.rc
 //
-#define IDD_DIALOG1                     101
-#define IDB_BITMAP1                     107
-#define IDI_ICON1	                    108
+
 
 // Next default values for new objects
 // 

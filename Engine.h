@@ -18,38 +18,31 @@ public:
 	void Shoot(Field* FieldFrom, Field* FieldTo);
 
 	void IncreaseMatchTime();
+	void DecreaseShipsAlive(bool User);
 
 	void StartNewGame();
 	void GameOver(bool UserWon);
 
 	bool GetTurn() { return this->UserTurn; }
+	void SwitchTurns();
 
 	int GetMatchTime() { return this->MatchTimeSec; }
 	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
 	int GetOpponentShipsAlive() { return this->OpponentShipsAlive; }
-	void DrawAnimation();
 public:
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
 	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
 	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip } shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
+	bool LastShotAccomplished;
 	int ShipsDeployed;
 	bool Animation;
-	bool UserShot;
 	float ShootingAngle;
+	bool UserShot;
 public:
 	void SetMode(GAMESTATUS GameStatus);
 private:
-	struct FPOINT
-	{
-		float x;
-		float y;
-	};
-
-	unsigned int FrameCount;
-	FPOINT ShootPoint;
-
 	bool UserTurn;
 
 	float fOffsetH;
@@ -64,11 +57,25 @@ private:
 	unsigned int PlayerShipsAlive;
 	unsigned int OpponentShipsAlive;
 
-	double CannonBallPositionsX[30];
-	double CannonBallPositionsY[30];
-
 	std::chrono::system_clock::duration dtn;
-
+public:
+	class AnimationRocket
+	{
+	private:
+		struct FPOINT
+		{
+			float x;
+			float y;
+		};
+		unsigned int FrameCount;
+	public:
+		static const unsigned int FramesToDraw = 30;
+		FPOINT ShootPoint;
+		FPOINT Position[FramesToDraw];
+	public:
+		AnimationRocket() :FrameCount(0) {}
+		void Draw();
+	} Rocket;
 private:
 	struct MessageParam
 	{
@@ -77,7 +84,6 @@ private:
 
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
-	void SwitchTurns();
 	void StartAnimation(Field* field, POINT ShootingPoint);
 private:
 	//Fully translated messages for Engine::Event

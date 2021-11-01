@@ -1,5 +1,6 @@
 #pragma once
 #include "Field.h"
+#include "resource.h"
 
 extern unsigned const int UserGameFieldW;
 extern unsigned const int UserGameFieldH;
@@ -28,6 +29,7 @@ public:
 	int ShootRecieve(const POINT ShootCoordinates) override;
 	POINT ShootCreate() override;
 	void ShootAnswer(const int status) override;
+	void ThreadFunc(const POINT ShootCoordinates);
 private:
 	bool In_Range(POINT Coordinates);
 public:

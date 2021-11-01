@@ -1,6 +1,10 @@
 #pragma once
 #include "Field.h"
 #include "Cell.h"
+#include "resource.h"
+
+extern const unsigned int ButtonFieldW;
+extern const unsigned int ButtonFieldH;
 
 class ButtonFieldConnect : public Field
 {
