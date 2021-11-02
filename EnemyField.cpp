@@ -533,7 +533,7 @@ void EnemyField::Deselect()
 
 void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 {
-	while (engine.Animation)
+	while (engine.animation != Engine::Animation::None)
 	{
 	}
 	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;

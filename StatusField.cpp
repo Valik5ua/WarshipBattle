@@ -11,9 +11,6 @@ void StatusField::Draw()
 	GLuint TopTextureID = 0;
 	GLuint BottomTextureID = 0;
 
-	this->StartX = StatusFieldPosX;
-	this->StartY = StatusFieldPosY;
-
 	switch (engine.GameStatus)
 	{
 	case Engine::GAMESTATUS::NewGame:
@@ -30,9 +27,6 @@ void StatusField::Draw()
 	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
-		this->StartX = StatusFieldMainGamePosX;
-		this->StartY = StatusFieldMainGamePosY;
-
 		TopTextureID = textureManager.StatusFieldTopPVETextureID;
 		if (engine.GetTurn())
 			BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
@@ -45,10 +39,10 @@ void StatusField::Draw()
 	glBindTexture(GL_TEXTURE_2D, TopTextureID);
 
 	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY + StatusFieldH - 1);
-	glTexCoord2d(1.f, 0); glVertex2f(this->StartX + StatusFieldW, this->StartY + StatusFieldH - 1);
-	glTexCoord2d(1.f, 1.f); glVertex2f(this->StartX + StatusFieldW, this->StartY + StatusFieldH);
-	glTexCoord2d(0, 1.f); glVertex2f(this->StartX,this->StartY + StatusFieldH);
+	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY + StatusFieldH - 1);
+	glTexCoord2d(1.f, 0); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH - 1);
+	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX,this->startY + StatusFieldH);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 
@@ -56,10 +50,10 @@ void StatusField::Draw()
 	glBindTexture(GL_TEXTURE_2D, BottomTextureID);
 
 	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY);
-	glTexCoord2d(1.f, 0); glVertex2f(this->StartX + StatusFieldW, this->StartY);
-	glTexCoord2d(1.f, 1.f); glVertex2f(this->StartX + StatusFieldW, this->StartY + StatusFieldH-1);
-	glTexCoord2d(0, 1.f); glVertex2f(this->StartX, this->StartY + StatusFieldH-1);
+	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY);
+	glTexCoord2d(1.f, 0); glVertex2f(this->startX + StatusFieldW, this->startY);
+	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH-1);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH-1);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }

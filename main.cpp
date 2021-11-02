@@ -183,6 +183,9 @@ LONG WINAPI MainWndProc(
 			engine.StartNewGame();
 			engine.GameMode = engine.GAMEMODE::PVE;
 			engine.SetMode(engine.GAMESTATUS::Deploying);
+
+			clueField.startX = ClueFieldPosX;
+			statusField.startX = StatusFieldPosX;
 		}
 		break;
 		default:
@@ -382,7 +385,16 @@ GLvoid DrawScene(GLvoid)
 	}
 	break;
 	}
-	if (engine.Animation)
+
+	switch (engine.animation)
+	{
+	case Engine::Animation::None:
+	{
+		UserCannonField.Draw();
+		OpponentCannonField.Draw();
+	}
+	break;
+	case Engine::Animation::Rocket:
 	{
 		if (engine.UserShot)
 		{
@@ -394,12 +406,18 @@ GLvoid DrawScene(GLvoid)
 			OpponentCannonField.Draw(engine.ShootingAngle);
 			UserCannonField.Draw();
 		}
-		engine.Rocket.Draw();
+		engine.rocket.Draw();
 	}
-	else
+	break;
+	case Engine::Animation::MainMenu:
 	{
+		engine.menuAnimation.Draw();
 		UserCannonField.Draw();
 		OpponentCannonField.Draw();
+	}
+	break;
+	default:
+		break;
 	}
 
 	SWAPBUFFERS;

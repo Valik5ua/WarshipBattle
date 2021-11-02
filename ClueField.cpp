@@ -6,18 +6,13 @@
 extern TextureManager textureManager;
 extern Engine engine;
 
-ClueField::ClueField(const unsigned int StartX, const unsigned int StartY)
+ClueField::ClueField(const unsigned int StartX, const unsigned int StartY) :startX(StartX), startY(StartY)
 {
-	this->StartX = StartX;
-	this->StartY = StartY;
 }
 
 void ClueField::Draw()
 {
 	GLuint TextureID = 0;
-
-	this->StartX = ClueFieldPosX;
-	this->StartY = ClueFieldPosY;
 
 	switch (engine.GameStatus)
 	{
@@ -51,8 +46,6 @@ void ClueField::Draw()
 	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
-		this->StartX = ClueFieldMainGamePosX;
-		this->StartY = ClueFieldMainGamePosY;
 		TextureID = textureManager.ClueFieldMainGameTextureID;
 	}
 	break;
@@ -62,9 +55,9 @@ void ClueField::Draw()
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY);
-	glTexCoord2d(1.f, 0); glVertex2f(ClueFieldW + this->StartX, this->StartY);
-	glTexCoord2d(1.f, 1.f); glVertex2f(ClueFieldW + this->StartX, ClueFieldH + this->StartY);
-	glTexCoord2d(0, 1.f); glVertex2f(this->StartX, ClueFieldH + this->StartY);
+	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY);
+	glTexCoord2d(1.f, 0); glVertex2f(ClueFieldW + this->startX, this->startY);
+	glTexCoord2d(1.f, 1.f); glVertex2f(ClueFieldW + this->startX, ClueFieldH + this->startY);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX, ClueFieldH + this->startY);
 	glEnd();
 }

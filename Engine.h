@@ -35,9 +35,9 @@ public:
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
 	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip } shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
+	enum Animation { None, Rocket, MainMenu } animation;
 	bool LastShotAccomplished;
 	int ShipsDeployed;
-	bool Animation;
 	float ShootingAngle;
 	bool UserShot;
 public:
@@ -75,7 +75,22 @@ public:
 	public:
 		AnimationRocket() :FrameCount(0) {}
 		void Draw();
-	} Rocket;
+	} rocket;
+
+	class MenuAnimation
+	{
+	private:
+		unsigned int FrameCount;
+	public:
+		//Default direction is to the right
+		bool DefaultDirection;
+		static const unsigned int FramesToDraw = 30;
+		float ClueFieldPositionsX[FramesToDraw];
+		float StatusFieldPositionsX[FramesToDraw];
+	public:
+		MenuAnimation();
+		void Draw();
+	} menuAnimation;
 private:
 	struct MessageParam
 	{

@@ -9,6 +9,8 @@
 #include "ButtonFieldConnect.h"
 #include "ButtonFieldNewGame.h"
 #include "textureManager.h"
+#include "StatusField.h"
+#include "ClueField.h"
 #include "resource.h"
 #include <thread>
 
@@ -24,13 +26,15 @@ extern ButtonFieldFire buttonFieldFire;
 extern ButtonFieldConnect buttonFieldConnect;
 extern ButtonFieldNewGame buttonFieldNewGame;
 extern TextureManager textureManager;
+extern StatusField statusField;
+extern ClueField clueField;
 
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
 Engine::Engine() :GameStatus(GAMESTATUS::NewGame), lastGameResults(LastGameResults::N_A),
 fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
-ShipsDeployed(0), UserTurn(true), Animation(false), LastShotAccomplished(true),
+ShipsDeployed(0), UserTurn(true), animation(Animation::None), LastShotAccomplished(true),
 MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
 {
 	std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
@@ -148,7 +152,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		break;
 		case GAMESTATUS::MainGame:
 		{
-			if (!this->Animation)
+			if (this->animation==Animation::None)
 			{
 				switch (this->UserTurn)
 				{
@@ -200,10 +204,6 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 				}
 				break;
 				}
-			}
-			else
-			{
-
 			}
 		}
 		break;
@@ -288,6 +288,10 @@ void Engine::StartNewGame()
 void Engine::GameOver(bool UserWon)
 {
 	this->SetMode(this->GAMESTATUS::NewGame);
+
+	this->animation = Animation::MainMenu;
+	this->menuAnimation.DefaultDirection = false;
+
 	switch (UserWon)
 	{
 	case true:
@@ -331,6 +335,8 @@ void Engine::SetMode(GAMESTATUS GameStatus)
 	break;
 	case GAMESTATUS::MainGame:
 	{
+		this->animation = Animation::MainMenu;
+		this->menuAnimation.DefaultDirection = true;
 		enemyField.CreateShips(GameStatus);
 		userField.SetAimPoint(enemyField.RandomSelect());
 	}
@@ -499,28 +505,28 @@ void Engine::SwitchTurns()
 
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 {
-	this->Animation = true;
-	this->Rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
+	this->animation = Animation::Rocket;
+	this->rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
 	if (typeid(*field) == typeid(UserField))
 	{
 		this->UserShot = false;
 		this->ShootingAngle = -0.3 + (ShootingPoint.y * 0.06);
-		for (int i = 0; i < this->Rocket.FramesToDraw; i++)
+		for (int i = 0; i < this->rocket.FramesToDraw; i++)
 		{
-			this->Rocket.Position[i].x = 28.5 - ((28.5 - this->Rocket.ShootPoint.x) / (float)this->Rocket.FramesToDraw) * i;
-			this->Rocket.Position[i].y = ((this->Rocket.ShootPoint.y - 10) / (float)(this->Rocket.ShootPoint.x - 28.5))
-				* (this->Rocket.Position[i].x - 28.5) + 10;
+			this->rocket.Position[i].x = 28.5 - ((28.5 - this->rocket.ShootPoint.x) / (float)this->rocket.FramesToDraw) * i;
+			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - 10) / (float)(this->rocket.ShootPoint.x - 28.5))
+				* (this->rocket.Position[i].x - 28.5) + 10;
 		}
 	}
 	else
 	{
 		this->UserShot = true;
 		this->ShootingAngle = 3.44 - (ShootingPoint.y * 0.06);
-		for (int i = 0; i < this->Rocket.FramesToDraw; i++)
+		for (int i = 0; i < this->rocket.FramesToDraw; i++)
 		{
-			this->Rocket.Position[i].x = 3.5 + ((this->Rocket.ShootPoint.x - 3.5) / (float)this->Rocket.FramesToDraw) * i;
-			this->Rocket.Position[i].y = ((this->Rocket.ShootPoint.y - 10) / (float)(this->Rocket.ShootPoint.x - 3.5))
-				* (this->Rocket.Position[i].x - 3.5) + 10;
+			this->rocket.Position[i].x = 3.5 + ((this->rocket.ShootPoint.x - 3.5) / (float)this->rocket.FramesToDraw) * i;
+			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - 10) / (float)(this->rocket.ShootPoint.x - 3.5))
+				* (this->rocket.Position[i].x - 3.5) + 10;
 		}
 	}
 }
@@ -530,20 +536,6 @@ void Engine::AnimationRocket::Draw()
 	if (this->FrameCount < this->FramesToDraw - 1)
 	{
 		this->FrameCount++;
-		/*if (engine.UserShot)
-		{
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, textureManager.WaterTextureID);
-			glBegin(GL_QUADS);
-
-			glTexCoord2d(0, 0); glVertex2f(this->ShootPoint.x, this->ShootPoint.y);
-			glTexCoord2d(1.f, 0); glVertex2f(this->ShootPoint.x + 1, this->ShootPoint.y);
-			glTexCoord2d(1.f, 1.f); glVertex2f(this->ShootPoint.x + 1, this->ShootPoint.y + 1);
-			glTexCoord2d(0, 1.f); glVertex2f(this->ShootPoint.x, this->ShootPoint.y + 1);
-
-			glEnd();
-			glDisable(GL_TEXTURE_2D);
-		}*/
 
 		glPushMatrix();
 		glTranslatef(this->Position[this->FrameCount].x + 0.5f, this->Position[this->FrameCount].y + 0.5f, 0); //Set middle
@@ -627,8 +619,62 @@ void Engine::AnimationRocket::Draw()
 
 		if (++this->FrameCount == this->FramesToDraw + 5)
 		{
-			engine.Animation = false;
+			engine.animation = Animation::None;
 			this->FrameCount = 0;
 		}
+	}
+}
+
+Engine::MenuAnimation::MenuAnimation() :FrameCount(0), DefaultDirection(true)
+{
+	for (int i = 0; i < this->FramesToDraw; i++)
+	{
+		this->StatusFieldPositionsX[i] = StatusFieldPosX + ((StatusFieldMainGamePosX - StatusFieldPosX) / ((float)FramesToDraw - 1)) * i;
+		this->ClueFieldPositionsX[i] = ClueFieldPosX - ((ClueFieldPosX - ClueFieldMainGamePosX) / ((float)FramesToDraw - 1)) * i;
+	}
+}
+
+void Engine::MenuAnimation::Draw()
+{
+	switch(this->DefaultDirection)
+	{
+	case true:
+	{
+		if (this->FrameCount < this->FramesToDraw)
+		{
+			clueField.startX = this->ClueFieldPositionsX[this->FrameCount];
+			statusField.startX = this->StatusFieldPositionsX[this->FrameCount];
+			
+			this->FrameCount++;
+		}
+		else
+		{
+			clueField.startX = ClueFieldMainGamePosX;
+			statusField.startX = StatusFieldMainGamePosX;
+
+			engine.animation = Animation::None;
+			this->FrameCount = 0;
+		}
+	}
+	break;
+	case false:
+	{
+		if (this->FrameCount < this->FramesToDraw)
+		{
+			clueField.startX = this->ClueFieldPositionsX[this->FramesToDraw - this->FrameCount];
+			statusField.startX = this->StatusFieldPositionsX[this->FramesToDraw - this->FrameCount];
+			
+			this->FrameCount++;
+		}
+		else
+		{
+			clueField.startX = ClueFieldPosX;
+			statusField.startX = StatusFieldPosX;
+
+			engine.animation = Animation::None;
+			this->FrameCount = 0;
+		}
+	}
+	break;
 	}
 }

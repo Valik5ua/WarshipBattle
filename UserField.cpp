@@ -344,7 +344,7 @@ void UserField::ShootAnswer(const int status)
 
 void UserField::ThreadFunc(const POINT ShootCoordinates)
 {
-	while (engine.Animation)
+	while (engine.animation != Engine::Animation::None)
 	{
 	}
 	int ShipID = this->ShipExists(ShootCoordinates, MAX_SHIPS_COUNT);
