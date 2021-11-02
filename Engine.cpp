@@ -248,21 +248,6 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 
 	const short int AnswerStatus = FieldTo->ShootRecieve(Aimpoint);
 	FieldFrom->ShootAnswer(AnswerStatus);
-
-	if (AnswerStatus > 0)
-	{
-		if (typeid(*FieldFrom) == typeid(EnemyField))
-		{
-			this->PlayerShipsAlive--;
-			if (this->PlayerShipsAlive == 0) this->GameOver(false);
-		}
-		else
-		{
-			this->OpponentShipsAlive--;
-			if (this->OpponentShipsAlive == 0) this->GameOver(true);
-		}
-	}
-	//if (AnswerStatus == this->ShootStatus::Miss) this->SwitchTurns();
 }
 
 void Engine::IncreaseMatchTime()
@@ -275,6 +260,18 @@ void Engine::IncreaseMatchTime()
 		this->dtn = dtn;
 		if (this->GameStatus == this->GAMESTATUS::MainGame)
 			if (++this->MatchTimeSec == 6000) this->MatchTimeSec = 0;
+	}
+}
+
+void Engine::DecreaseShipsAlive(bool User)
+{
+	if (User)
+	{
+		if (--this->PlayerShipsAlive == 0) this->GameOver(false);
+	}
+	else
+	{
+		if (--this->OpponentShipsAlive == 0) this->GameOver(true);
 	}
 }
 
@@ -301,6 +298,7 @@ void Engine::GameOver(bool UserWon)
 	case false:
 	{
 		this->lastGameResults = Engine::LastGameResults::OpponentWon;
+		enemyField.GameOver();
 	}
 	break;
 	}

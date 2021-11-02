@@ -30,6 +30,7 @@ public:
 	void ShootAnswer(const int status) override;
 
 	void NewGameReset();
+	void GameOver();
 private:
 	void SetShipDeployableStatus(Ship& ship);
 	void DeployEnemyShips();

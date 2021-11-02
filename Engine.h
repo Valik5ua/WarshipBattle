@@ -18,6 +18,7 @@ public:
 	void Shoot(Field* FieldFrom, Field* FieldTo);
 
 	void IncreaseMatchTime();
+	void DecreaseShipsAlive(bool User);
 
 	void StartNewGame();
 	void GameOver(bool UserWon);
