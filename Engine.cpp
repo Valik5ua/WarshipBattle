@@ -506,7 +506,7 @@ void Engine::SwitchTurns()
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 {
 	this->animation = Animation::Rocket;
-	this->rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
+	this->rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y + 0.5f };
 	if (typeid(*field) == typeid(UserField))
 	{
 		this->UserShot = false;
@@ -538,7 +538,7 @@ void Engine::AnimationRocket::Draw()
 		this->FrameCount++;
 
 		glPushMatrix();
-		glTranslatef(this->Position[this->FrameCount].x + 0.5f, this->Position[this->FrameCount].y + 0.5f, 0); //Set middle
+		glTranslatef(this->Position[this->FrameCount].x, this->Position[this->FrameCount].y, 0); //Set middle
 
 		if (!engine.UserShot) glRotatef(180, 0, 0, 1.0f);
 		glEnable(GL_TEXTURE_2D);
@@ -598,7 +598,7 @@ void Engine::AnimationRocket::Draw()
 		float angleincrease = 1;
 
 		glPushMatrix();
-		glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y + 0.5f, 0);
+		glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y, 0);
 		glScaled((this->FrameCount - this->FramesToDraw + 1) / 3.5f, (this->FrameCount - this->FramesToDraw + 1) / 3.5f, 1);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);

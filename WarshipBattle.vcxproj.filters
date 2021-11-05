@@ -125,6 +125,9 @@
     <ClInclude Include="CannonField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DialogBox.rc">
@@ -136,6 +139,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="WarshipBattleICON.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
