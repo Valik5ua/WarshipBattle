@@ -6,13 +6,12 @@
 #define UserFieldPosY			5
 #define EnemyFieldPosX			19
 #define EnemyFieldPosY			5
-#define EnemyFieldPosY			5
 #define StatisticFieldPosX		14
 #define StatisticFieldPosY		5
-#define UserCannonFieldFieldPosX		1
-#define UserCannonFieldFieldPosY		9
-#define EnemyCannonFieldFieldPosX		29
-#define EnemyCannonFieldFieldPosY		9
+#define UserCannonFieldPosX		1
+#define UserCannonFieldPosY		9
+#define EnemyCannonFieldPosX	29
+#define EnemyCannonFieldPosY	9
 #define ButtonFieldFirePosX		25
 #define ButtonFieldFirePosY		1
 #define ButtonFieldDeployPosX	3

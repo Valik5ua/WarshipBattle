@@ -65,7 +65,8 @@ void CannonField::Draw(float angle)
 		float x = (float)116 / (float)128 * cosf(theta); //calculate current x in the segment
 		float y = (float)116 / (float)128 * sinf(theta); //calculate current y in the segment
 
-		glTexCoord2d(.5 + cosf(theta + angle) / 2, .5 + sinf(theta + angle) / 2); glVertex2f(x + this->StartX + 1, y + this->StartY + 1);
+		glTexCoord2d(.5 + cosf(theta + angle) / 2, .5 + sinf(theta + angle) / 2);
+		glVertex2f(x + this->StartX + 1, y + this->StartY + 1);
 
 		theta += angleincrease;
 	}
