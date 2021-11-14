@@ -132,10 +132,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="bitmap2.bmp">
+    <Image Include="WarshipBattleICON.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="WarshipBattleICON.bmp">
+    <Image Include="Icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

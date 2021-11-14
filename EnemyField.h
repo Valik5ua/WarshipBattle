@@ -6,7 +6,7 @@
 #include "resource.h"
 
 extern unsigned const int OpponentGameFieldW;
-extern unsigned const int OpponentGameFieldH;
+extern unsigned const int EnemyGameFieldH;
 
 class EnemyField : public Field
 {
@@ -39,7 +39,7 @@ private:
 	void Deselect();
 	void ThreadFunc(const POINT ShootCoordinates);
 public:
-	Cell Cells[OpponentGameFieldW][OpponentGameFieldH];
+	Cell Cells[OpponentGameFieldW][EnemyGameFieldH];
 	Ship Ships[10];
 private:
 	unsigned int DeployingShipID;
@@ -54,7 +54,7 @@ private:
 		enum Strategy { Damage, OneDeckShip, Twodeckship, Threedeckship, Fourdeckship, Unknown} strategy;
 		std::vector<int> Ships;
 		std::vector<POINT> TargetShip;
-		int Field[OpponentGameFieldW][OpponentGameFieldH];
+		int Field[OpponentGameFieldW][EnemyGameFieldH];
 		bool TargetShipKilled;
 		POINT AimPoint;
 	public:

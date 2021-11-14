@@ -37,8 +37,8 @@ TextureManager textureManager;
 StatisticField statisticField(StatisticFieldPosX,StatisticFieldPosY);
 StatusField statusField(StatusFieldPosX, StatusFieldPosY);
 ClueField clueField(ClueFieldPosX, ClueFieldPosY);
-CannonField UserCannonField(UserCannonFieldFieldPosX, UserCannonFieldFieldPosY,3.14);
-CannonField OpponentCannonField(EnemyCannonFieldFieldPosX, EnemyCannonFieldFieldPosY,0);
+CannonField UserCannonField(UserCannonFieldPosX, UserCannonFieldPosY,3.14);
+CannonField OpponentCannonField(EnemyCannonFieldPosX, EnemyCannonFieldPosY,0);
 
 //Windows prototypes
 
@@ -121,7 +121,6 @@ int WINAPI WinMain(
 	//Create thread to Implement TimerFunc, which tells the program when to redraw the window 
 	TimerFuncHandler = CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)TimerFunc, NULL, NULL, NULL);
 	
-
 	/* animation loop */
 	while (true) {
 

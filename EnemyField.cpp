@@ -5,14 +5,6 @@
 #include "resource.h"
 #include <thread>
 
-#define DEVMODE_OFF 1
-#define DEVMODE_ON  2
-#define DEVMODE     DEVMODE_OFF
-
-#if DEVMODE == DEVMODE_OFF
-#undef DEVMODE
-#endif
-
 extern TextureManager textureManager;
 extern UserField userField;
 extern Engine engine;
@@ -24,7 +16,7 @@ extern Engine engine;
 /// <returns>Wether or not the user has clicked on the Enemyfield.</returns>
 bool EnemyField::Click(POINT& coordinates)
 {
-	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < OpponentGameFieldW + this->StartX && coordinates.y < OpponentGameFieldH + this->StartY)
+	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < OpponentGameFieldW + this->StartX && coordinates.y < EnemyGameFieldH + this->StartY)
 	{
 		coordinates.x -= this->StartX;
 		coordinates.y -= this->StartY;
@@ -37,7 +29,7 @@ POINT EnemyField::MoveSelection(int Direction)
 {
 	for (int x{}; x < OpponentGameFieldW; x++)
 	{
-		for (int y{}; y < OpponentGameFieldH; y++)
+		for (int y{}; y < EnemyGameFieldH; y++)
 		{
 			if (this->Cells[x][y].Cell_Aim)
 			{
@@ -62,7 +54,7 @@ POINT EnemyField::MoveSelection(int Direction)
 				break;
 				case BF_MOVE_UP:
 				{
-					if (y < OpponentGameFieldH - 1)
+					if (y < EnemyGameFieldH - 1)
 					{
 						Return = this->Select(x, y + 1);
 					}
@@ -162,7 +154,6 @@ void EnemyField::CloseNextShip()
 {
 	for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 	{
-		//this->Ships[engine.ShipsDeployed].Decks[i].Open = false;
 		this->Cells[this->Ships[engine.ShipsDeployed].Decks[i].Position.x][i].Open = false;
 	}
 }
@@ -173,7 +164,7 @@ void EnemyField::CloseNextShip()
 void EnemyField::SetShipMarkers()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)
-		for (int j{}; j < OpponentGameFieldH; j++)
+		for (int j{}; j < EnemyGameFieldH; j++)
 			this->Cells[i][j].MarkedShip = false;
 
 	for (int Shipnum{}; Shipnum < MAX_SHIPS_COUNT; Shipnum++)
@@ -188,7 +179,7 @@ void EnemyField::SetShipDeployableStatus(Ship& ship)
 			for (int j = -1; j <= 1; j++)
 			{
 				if (ship.Decks[DeckCounter].Position.x + i >= 0 && ship.Decks[DeckCounter].Position.x + i < OpponentGameFieldW)
-					if (ship.Decks[DeckCounter].Position.y + j >= 0 && ship.Decks[DeckCounter].Position.y + j < OpponentGameFieldH)
+					if (ship.Decks[DeckCounter].Position.y + j >= 0 && ship.Decks[DeckCounter].Position.y + j < EnemyGameFieldH)
 						if (this->ShipExists({ ship.Decks[DeckCounter].Position.x + i, ship.Decks[DeckCounter].Position.y + j }) >= 0)
 						{
 							ship.Deployable = false;
@@ -317,7 +308,7 @@ void EnemyField::DeployEnemyShips()
 				if (!this->Ships[i].Deployable)
 				{
 					PrevShipSet = false;
-					for (int ShipPos = 0; ShipPos <= OpponentGameFieldH - this->Ships[i].Size; ShipPos++)
+					for (int ShipPos = 0; ShipPos <= EnemyGameFieldH - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 						{
@@ -346,7 +337,7 @@ void EnemyField::DeployEnemyShips()
 				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 				{
 					this->Ships[i].Decks[DeckNum].Position.x = EdgePosShift + DeckNum;
-					this->Ships[i].Decks[DeckNum].Position.y = OpponentGameFieldH - 1;
+					this->Ships[i].Decks[DeckNum].Position.y = EnemyGameFieldH - 1;
 				}
 				this->SetShipDeployableStatus(this->Ships[i]);
 				if (!this->Ships[i].Deployable)
@@ -357,7 +348,7 @@ void EnemyField::DeployEnemyShips()
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 						{
 							this->Ships[i].Decks[DeckNum].Position.x = ShipPos + DeckNum;
-							this->Ships[i].Decks[DeckNum].Position.y = OpponentGameFieldH - 1;
+							this->Ships[i].Decks[DeckNum].Position.y = EnemyGameFieldH - 1;
 						}
 						this->SetShipDeployableStatus(this->Ships[i]);
 						if (this->Ships[i].Deployable)
@@ -387,7 +378,7 @@ void EnemyField::DeployEnemyShips()
 				if (!this->Ships[i].Deployable)
 				{
 					PrevShipSet = false;
-					for (int ShipPos = 0; ShipPos <= OpponentGameFieldH - this->Ships[i].Size; ShipPos++)
+					for (int ShipPos = 0; ShipPos <= EnemyGameFieldH - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 						{
@@ -422,7 +413,7 @@ void EnemyField::DeployEnemyShips()
 			{
 				do
 				{
-					POINT RandPoint = { rand() % (OpponentGameFieldW - this->Ships[i].Size + 1) ,(rand() % (OpponentGameFieldH - 2)) + 1 };
+					POINT RandPoint = { rand() % (OpponentGameFieldW - this->Ships[i].Size + 1) ,(rand() % (EnemyGameFieldH - 2)) + 1 };
 					for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 					{
 						this->Ships[i].Decks[DeckNum].Position.x = RandPoint.x + DeckNum;
@@ -436,7 +427,7 @@ void EnemyField::DeployEnemyShips()
 			{
 				do
 				{
-					POINT RandPoint = { (rand() % (OpponentGameFieldW - 2)) + 1 ,rand() % (OpponentGameFieldH - this->Ships[i].Size + 1) };
+					POINT RandPoint = { (rand() % (OpponentGameFieldW - 2)) + 1 ,rand() % (EnemyGameFieldH - this->Ships[i].Size + 1) };
 					for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 					{
 						this->Ships[i].Decks[DeckNum].Position.x = RandPoint.x;
@@ -450,10 +441,10 @@ void EnemyField::DeployEnemyShips()
 		}
 		break;
 		}
-#ifndef DEVMODE
+
 		for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 			this->Cells[this->Ships[i].Decks[DeckNum].Position.x][this->Ships[i].Decks[DeckNum].Position.y].Open = false;
-#endif // !DEVMODE
+
 	}
 	SetShipMarkers();
 	this->DeployingShipID = 10;
@@ -465,7 +456,7 @@ void EnemyField::DeployEnemyShips()
 void EnemyField::ClearField()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)
-		for (int j{}; j < OpponentGameFieldH; j++)
+		for (int j{}; j < EnemyGameFieldH; j++)
 		{
 			this->Cells[i][j].Open = false;
 			this->Cells[i][j].MarkedShip = false;
@@ -524,7 +515,7 @@ void EnemyField::Deselect()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)
 	{
-		for (int j{}; j < OpponentGameFieldH; j++)
+		for (int j{}; j < EnemyGameFieldH; j++)
 		{
 			if (this->Cells[i][j].Cell_Aim) { this->Cells[i][j].Cell_Aim = false;}
 		}
@@ -535,6 +526,7 @@ void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 {
 	while (engine.animation != Engine::Animation::None)
 	{
+		Sleep(1);
 	}
 	this->Cells[ShootCoordinates.x][ShootCoordinates.y].Open = true;
 	int ShipID = this->ShipExists(ShootCoordinates);
@@ -560,7 +552,7 @@ void EnemyField::Draw()
 	GLuint TextureID{};
 	for (int i{}; i < OpponentGameFieldW; i++)
 	{
-		for (int j{}; j < OpponentGameFieldH; j++)
+		for (int j{}; j < EnemyGameFieldH; j++)
 		{
 			switch (this->Cells[i][j].Open)
 			{
@@ -678,7 +670,7 @@ void EnemyField::Draw()
 bool EnemyField::CanFire()
 {
 	for (int i = 0; i < OpponentGameFieldW; i++)
-		for (int j = 0; j < OpponentGameFieldH; j++)
+		for (int j = 0; j < EnemyGameFieldH; j++)
 		{
 			if (this->Cells[i][j].Cell_Aim)
 			{
@@ -923,7 +915,7 @@ void EnemyField::NewGameReset()
 void EnemyField::GameOver()
 {
 	for (int i{}; i < OpponentGameFieldW; i++)
-		for (int j{}; j < OpponentGameFieldH; j++)
+		for (int j{}; j < EnemyGameFieldH; j++)
 			this->Cells[i][j].Open = true;
 }
 
@@ -969,7 +961,7 @@ void EnemyField::Opponent::SetStrategy(Strategy strategy)
 bool EnemyField::Opponent::In_Range(POINT Coordinates)
 {
 	if (Coordinates.x >= 0 && Coordinates.x < OpponentGameFieldW)
-		if (Coordinates.y >= 0 && Coordinates.y < OpponentGameFieldH)
+		if (Coordinates.y >= 0 && Coordinates.y < EnemyGameFieldH)
 			return true;
 	return false;
 }
@@ -1012,7 +1004,7 @@ POINT EnemyField::Opponent::RandShootingPoint(std::vector<POINT> vec)
 void EnemyField::Opponent::NewGameReset()
 {
 	for (int i = 0; i < OpponentGameFieldW; i++)
-		for (int j = 0; j < OpponentGameFieldH; j++)
+		for (int j = 0; j < EnemyGameFieldH; j++)
 		{
 			this->Field[i][j] = -2;
 		}
@@ -1063,7 +1055,7 @@ void EnemyField::Opponent::AdjustShootingPoints(std::vector<POINT>& Strategy)
 {
 	int VectorElementPos = -1;
 	for (int i = 0; i < OpponentGameFieldW; i++)
-		for (int j = 0; j < OpponentGameFieldH; j++)
+		for (int j = 0; j < EnemyGameFieldH; j++)
 		{
 			if (this->Field[i][j] == Engine::ShootStatus::Damage)
 			{

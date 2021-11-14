@@ -506,27 +506,33 @@ void Engine::SwitchTurns()
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 {
 	this->animation = Animation::Rocket;
-	this->rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y };
+	this->rocket.ShootPoint = { (float)field->StartX + ShootingPoint.x, (float)field->StartY + ShootingPoint.y + 0.5f };
 	if (typeid(*field) == typeid(UserField))
 	{
 		this->UserShot = false;
-		this->ShootingAngle = -0.3 + (ShootingPoint.y * 0.06);
+		float TempX = this->rocket.ShootPoint.x - EnemyCannonFieldPosX;
+		float TempY = ShootingPoint.y - ((EnemyGameFieldH - 1) / (float)2);
+		float Res = TempY / TempX;
+		this->ShootingAngle = 0 - atan(Res);
 		for (int i = 0; i < this->rocket.FramesToDraw; i++)
 		{
-			this->rocket.Position[i].x = 28.5 - ((28.5 - this->rocket.ShootPoint.x) / (float)this->rocket.FramesToDraw) * i;
-			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - 10) / (float)(this->rocket.ShootPoint.x - 28.5))
-				* (this->rocket.Position[i].x - 28.5) + 10;
+			this->rocket.Position[i].x = (EnemyCannonFieldPosX + 1) - (((EnemyCannonFieldPosX + 1) - this->rocket.ShootPoint.x) / (float)this->rocket.FramesToDraw) * (i + 1);
+			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - (EnemyCannonFieldPosY + 1)) / (float)(this->rocket.ShootPoint.x - (EnemyCannonFieldPosX + 1)))
+				* (this->rocket.Position[i].x - (EnemyCannonFieldPosX + 1)) + (EnemyCannonFieldPosY + 1);
 		}
 	}
 	else
 	{
 		this->UserShot = true;
-		this->ShootingAngle = 3.44 - (ShootingPoint.y * 0.06);
+		float TempX = this->rocket.ShootPoint.x - (UserCannonFieldPosX + 2);
+		float TempY = ShootingPoint.y - ((UserGameFieldH - 1) / (float)2);
+		float Res = TempY / TempX;
+		this->ShootingAngle = 3.14 - atan(Res);
 		for (int i = 0; i < this->rocket.FramesToDraw; i++)
 		{
-			this->rocket.Position[i].x = 3.5 + ((this->rocket.ShootPoint.x - 3.5) / (float)this->rocket.FramesToDraw) * i;
-			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - 10) / (float)(this->rocket.ShootPoint.x - 3.5))
-				* (this->rocket.Position[i].x - 3.5) + 10;
+			this->rocket.Position[i].x = (UserCannonFieldPosX + 1) + ((this->rocket.ShootPoint.x - (UserCannonFieldPosX + 1)) / (float)this->rocket.FramesToDraw) * (i + 1);
+			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - (UserCannonFieldPosY + 1)) / (float)(this->rocket.ShootPoint.x - (UserCannonFieldPosX + 1)))
+				* (this->rocket.Position[i].x - (UserCannonFieldPosX + 1)) + (UserCannonFieldPosY + 1);
 		}
 	}
 }
@@ -537,10 +543,69 @@ void Engine::AnimationRocket::Draw()
 	{
 		this->FrameCount++;
 
-		glPushMatrix();
-		glTranslatef(this->Position[this->FrameCount].x + 0.5f, this->Position[this->FrameCount].y + 0.5f, 0); //Set middle
+		if (this->FrameCount < 3)
+		{
+			const unsigned int num_segments = 360;
+			float theta = 0;
+			float angleincrease = 1;
 
-		if (!engine.UserShot) glRotatef(180, 0, 0, 1.0f);
+			glPushMatrix();
+			glTranslatef(this->Position[1].x, this->Position[1].y, 0);
+			glScaled((this->FrameCount / 2), this->FrameCount / 2, 1);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);
+
+			glBegin(GL_TRIANGLE_FAN);
+			for (int i = theta; i < num_segments; i++)
+			{
+				float x = (float)116 / (float)128 * cosf(theta); //calculate current x in the segment
+				float y = (float)116 / (float)128 * sinf(theta); //calculate current y in the segment
+
+				glTexCoord2d(.5 + cosf(theta) / 2, .5 + sinf(theta) / 2); glVertex2f(x, y);
+
+				theta += angleincrease;
+			}
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
+			glPopMatrix();
+		}
+
+		glPushMatrix();
+		glTranslatef(this->Position[this->FrameCount].x, this->Position[this->FrameCount].y, 0); //Set middle
+		
+		float TempAngle = 180 - engine.ShootingAngle * 180 / 3.14;
+		glRotatef(TempAngle, 0, 0, 1.0f);
+
+		const unsigned int num_segments = 360;
+		float theta = 0;
+		const float angleincrease = 1;
+
+
+			glPushMatrix();
+
+			glTranslatef(-0.5f, 0, 0);
+
+			if (this->FrameCount % 2 == 0)
+				glScaled(.18f, .18f, 1);
+			else
+				glScaled(.3f, .3f, 1);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);
+
+			glBegin(GL_TRIANGLE_FAN);
+			for (int i = theta; i < num_segments; i++)
+			{
+				float x = (float)116 / (float)128 * cosf(theta); //calculate current x in the segment
+				float y = (float)116 / (float)128 * sinf(theta); //calculate current y in the segment
+
+				glTexCoord2d(.5 + cosf(theta) / 2, .5 + sinf(theta) / 2); glVertex2f(x, y);
+
+				theta += angleincrease;
+			}
+			glEnd();
+			glDisable(GL_TEXTURE_2D);
+			glPopMatrix();
+		
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureManager.RocketBodyTextureID);
 		glBegin(GL_QUADS);
@@ -598,7 +663,7 @@ void Engine::AnimationRocket::Draw()
 		float angleincrease = 1;
 
 		glPushMatrix();
-		glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y + 0.5f, 0);
+		glTranslatef(this->ShootPoint.x + 0.5f, this->ShootPoint.y, 0);
 		glScaled((this->FrameCount - this->FramesToDraw + 1) / 3.5f, (this->FrameCount - this->FramesToDraw + 1) / 3.5f, 1);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);

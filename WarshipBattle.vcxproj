@@ -91,6 +91,7 @@
       <AdditionalIncludeDirectories>$(SoulutionDir)OpenGl\FreeGLUT\include;$(SoulutionDir)OpenGl\Glew\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,6 +113,7 @@
       <AdditionalIncludeDirectories>$(SoulutionDir)OpenGl\FreeGLUT\include;$(SoulutionDir)OpenGl\Glew\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -202,7 +204,7 @@
     <ResourceCompile Include="DialogBox.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="bitmap2.bmp" />
+    <Image Include="Icon.ico" />
     <Image Include="WarshipBattleICON.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
