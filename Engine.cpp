@@ -511,28 +511,28 @@ void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 	{
 		this->UserShot = false;
 		float TempX = this->rocket.ShootPoint.x - EnemyCannonFieldPosX;
-		float TempY = ShootingPoint.y - 4.5;
+		float TempY = ShootingPoint.y - ((EnemyGameFieldH - 1) / (float)2);
 		float Res = TempY / TempX;
 		this->ShootingAngle = 0 - atan(Res);
 		for (int i = 0; i < this->rocket.FramesToDraw; i++)
 		{
-			this->rocket.Position[i].x = 30 - ((30 - this->rocket.ShootPoint.x) / (float)this->rocket.FramesToDraw) * (i + 1);
-			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - 10) / (float)(this->rocket.ShootPoint.x - 30))
-				* (this->rocket.Position[i].x - 30) + 10;
+			this->rocket.Position[i].x = (EnemyCannonFieldPosX + 1) - (((EnemyCannonFieldPosX + 1) - this->rocket.ShootPoint.x) / (float)this->rocket.FramesToDraw) * (i + 1);
+			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - (EnemyCannonFieldPosY + 1)) / (float)(this->rocket.ShootPoint.x - (EnemyCannonFieldPosX + 1)))
+				* (this->rocket.Position[i].x - (EnemyCannonFieldPosX + 1)) + (EnemyCannonFieldPosY + 1);
 		}
 	}
 	else
 	{
 		this->UserShot = true;
 		float TempX = this->rocket.ShootPoint.x - (UserCannonFieldPosX + 2);
-		float TempY = ShootingPoint.y - 4.5;
+		float TempY = ShootingPoint.y - ((UserGameFieldH - 1) / (float)2);
 		float Res = TempY / TempX;
 		this->ShootingAngle = 3.14 - atan(Res);
 		for (int i = 0; i < this->rocket.FramesToDraw; i++)
 		{
-			this->rocket.Position[i].x = 2 + ((this->rocket.ShootPoint.x - 2) / (float)this->rocket.FramesToDraw) * (i + 1);
-			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - 10) / (float)(this->rocket.ShootPoint.x - 2))
-				* (this->rocket.Position[i].x - 2) + 10;
+			this->rocket.Position[i].x = (UserCannonFieldPosX + 1) + ((this->rocket.ShootPoint.x - (UserCannonFieldPosX + 1)) / (float)this->rocket.FramesToDraw) * (i + 1);
+			this->rocket.Position[i].y = ((this->rocket.ShootPoint.y - (UserCannonFieldPosY + 1)) / (float)(this->rocket.ShootPoint.x - (UserCannonFieldPosX + 1)))
+				* (this->rocket.Position[i].x - (UserCannonFieldPosX + 1)) + (UserCannonFieldPosY + 1);
 		}
 	}
 }
