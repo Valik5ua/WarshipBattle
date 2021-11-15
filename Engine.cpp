@@ -238,7 +238,15 @@ void Engine::MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip)
 
 void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 {
-	if (!FieldTo->CanFire()) return;
+	if (!FieldTo->CanFire())
+	{
+		PlaySound(NULL, NULL, NULL);
+		PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		return;
+	}
+
+	PlaySound(NULL, 0, 0);
+	PlaySound(L"Sounds\\Shoot.wav", NULL, SND_ASYNC | SND_NOSTOP);
 
 	this->LastShotAccomplished = false;
 
@@ -267,11 +275,23 @@ void Engine::DecreaseShipsAlive(bool User)
 {
 	if (User)
 	{
-		if (--this->PlayerShipsAlive == 0) this->GameOver(false);
+		if (--this->PlayerShipsAlive == 0)
+		{
+			this->GameOver(false);
+			Sleep(2000);
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Win.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 	}
 	else
 	{
-		if (--this->OpponentShipsAlive == 0) this->GameOver(true);
+		if (--this->OpponentShipsAlive == 0)
+		{
+			this->GameOver(true);
+			Sleep(2000);
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Lose.mp3", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 	}
 }
 
@@ -580,7 +600,6 @@ void Engine::AnimationRocket::Draw()
 		float theta = 0;
 		const float angleincrease = 1;
 
-
 			glPushMatrix();
 
 			glTranslatef(-0.5f, 0, 0);
@@ -658,6 +677,7 @@ void Engine::AnimationRocket::Draw()
 	}
 	else
 	{
+
 		const unsigned int num_segments = 360;
 		float theta = 0;
 		float angleincrease = 1;

@@ -489,6 +489,9 @@ void EnemyField::CleanShips()
 /// <param name="CellY: ">The Y position of the cell to be selected.</param>
 POINT EnemyField::Select(const size_t CellX, const size_t CellY)
 {
+	PlaySound(NULL, NULL, NULL);
+	PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+
 	POINT Return = { CellX,CellY };
 	this->Deselect();
 	this->Cells[CellX][CellY].Cell_Aim = true;
@@ -534,7 +537,18 @@ void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 	if (ShipID >= 0)
 	{
 		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
-		if (this->Ships[ShipID].Killed) engine.DecreaseShipsAlive(false);
+		if (this->Ships[ShipID].Killed)
+		{
+			engine.DecreaseShipsAlive(false);
+			
+			PlaySound(NULL, 0, 0);
+			PlaySound(L"Sounds\\Kill.wav", NULL, SND_SYNC | SND_NOSTOP);
+		}
+		else
+		{
+			PlaySound(NULL, 0, 0);
+			PlaySound(L"Sounds\\Damage.wav", NULL, SND_SYNC | SND_NOSTOP);
+		}
 	}
 	else
 	{
