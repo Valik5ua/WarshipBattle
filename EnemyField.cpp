@@ -626,9 +626,27 @@ void EnemyField::Draw()
 			break;
 			case Deck::IntegrityStatus::Damaged:
 			{
-				if(this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y].Cell_Aim)
-				TextureID = textureManager.ShipAfireAimTextureID;
-				else TextureID = textureManager.ShipAfireTextureID;
+				if (engine.GameStatus == Engine::GAMESTATUS::NewGame)
+				{
+					switch (this->Ships[Arrnum].Decks[DeckNum].Type)
+					{
+					case Deck::DeckType::Front:
+						TextureID = textureManager.ShipFrontAfireTextureID;
+						break;
+					case Deck::DeckType::Middle:
+						TextureID = textureManager.ShipMiddleAfireTextureID;
+						break;
+					case Deck::DeckType::Back:
+						TextureID = textureManager.ShipBackAfireTextureID;
+						break;
+					};
+				}
+				else
+				{
+					if (this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y].Cell_Aim)
+						TextureID = textureManager.ShipAfireAimTextureID;
+					else TextureID = textureManager.ShipAfireTextureID;
+				}
 			}
 			break;
 			case Deck::IntegrityStatus::Killed:
@@ -675,11 +693,23 @@ void EnemyField::Draw()
 				.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
 			, TextureID);
 
-			if (this->Ships[Arrnum].Rotated && (this->Ships[Arrnum].Killed || !this->Ships[Arrnum].Decks[DeckNum].integrityStatus == Deck::IntegrityStatus::Damaged))
+			if (engine.GameStatus == Engine::GAMESTATUS::NewGame)
 			{
-				this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
-					.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
-				, TextureID, true);
+				if (this->Ships[Arrnum].Rotated)
+				{
+					this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
+						.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
+					, TextureID, true);
+				}
+			}
+			else
+			{
+				if (this->Ships[Arrnum].Rotated && (this->Ships[Arrnum].Killed || !this->Ships[Arrnum].Decks[DeckNum].integrityStatus == Deck::IntegrityStatus::Damaged))
+				{
+					this->Cells[this->Ships[Arrnum].Decks[DeckNum].Position.x][this->Ships[Arrnum].Decks[DeckNum].Position.y]
+						.Draw({ this->Ships[Arrnum].Decks[DeckNum].Position.x + this->StartX,this->Ships[Arrnum].Decks[DeckNum].Position.y + this->StartY }
+					, TextureID, true);
+				}
 			}
 		}
 }
@@ -726,15 +756,52 @@ POINT EnemyField::ShootCreate()
 	{
 	case this->opponent.Strategy::Damage:
 	{
-		POINT points[4] = {
-			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
-			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y + 1},
-			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
-			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y - 1},
-			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x + 1,
-			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y},
-			{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x - 1,
-			this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y} };
+		//POINT points[4] = {
+		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
+		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y + 1},
+		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
+		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y - 1},
+		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x + 1,
+		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y},
+		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x - 1,
+		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y} };
+
+
+
+		POINT points[4]{};
+		unsigned int StartNum = rand() % 4;
+
+		for (int i = 0; i < 4; i++)
+		{
+			switch (StartNum)
+			{
+			case 0:
+			{
+				points[i] = { this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
+					this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y + 1 };
+			}
+			break;
+			case 1:
+			{
+				points[i] = { this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
+					this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y - 1};
+			}
+			break;
+			case 2:
+			{
+				points[i] = { this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x + 1,
+					this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y };
+			}
+			break;
+			case 3:
+			{
+				points[i]= { this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x - 1,
+					this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y};
+			}
+			break;
+			}
+			if (++StartNum == 4) StartNum = 0;
+		}
 
 		for (int i = 0; i < 4; i++)
 		{
