@@ -395,8 +395,11 @@ void UserField::ThreadFunc(const POINT ShootCoordinates)
 		{
 			engine.DecreaseShipsAlive(true);
 
-			PlaySound(NULL, 0, 0);
-			PlaySound(L"Sounds\\Kill.wav", NULL, SND_SYNC | SND_NOSTOP);
+			if (engine.GetPlayerShipsAlive() > 0)
+			{
+				PlaySound(NULL, 0, 0);
+				PlaySound(L"Sounds\\Kill.wav", NULL, SND_SYNC | SND_NOSTOP);
+			}
 		}
 		else
 		{

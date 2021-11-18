@@ -278,9 +278,9 @@ void Engine::DecreaseShipsAlive(bool User)
 		if (--this->PlayerShipsAlive == 0)
 		{
 			this->GameOver(false);
-			Sleep(2000);
+			Sleep(1000);
 			PlaySound(NULL, NULL, NULL);
-			PlaySound(L"Sounds\\Win.wav", NULL, SND_ASYNC | SND_NOSTOP);
+			PlaySound(L"Sounds\\Lose.wav", NULL, SND_ASYNC | SND_NOSTOP);
 		}
 	}
 	else
@@ -288,9 +288,9 @@ void Engine::DecreaseShipsAlive(bool User)
 		if (--this->OpponentShipsAlive == 0)
 		{
 			this->GameOver(true);
-			Sleep(2000);
+			Sleep(1000);
 			PlaySound(NULL, NULL, NULL);
-			PlaySound(L"Sounds\\Lose.mp3", NULL, SND_ASYNC | SND_NOSTOP);
+			PlaySound(L"Sounds\\Win.wav", NULL, SND_ASYNC | SND_NOSTOP);
 		}
 	}
 }
