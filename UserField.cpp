@@ -52,23 +52,59 @@ void UserField::MoveActiveShip(int Direction)
 	{
 	case BF_MOVE_LEFT:
 		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x - 1,this->Ships[engine.ShipsDeployed].Decks[0].Position.y }))
+		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.x -= 1;
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
+		else
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 		break;
 	case BF_MOVE_RIGHT:
 		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size - 1].Position.x + 1,this->Ships[engine.ShipsDeployed].Decks[0].Position.y }))
+		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.x += 1;
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
+		else
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 		break;
 	case BF_MOVE_UP:
 		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x,this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size-1].Position.y + 1 }))
+		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.y += 1;
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
+		else
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 		break;
 	case BF_MOVE_DOWN:
 		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x,this->Ships[engine.ShipsDeployed].Decks[0].Position.y - 1 }))
+		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.y -= 1;
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
+		else
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 		break;
 	}
 	this->SetShipMarkers();
@@ -77,6 +113,9 @@ void UserField::MoveActiveShip(int Direction)
 
 void UserField::RotateActiveShip()
 {
+	PlaySound(NULL, NULL, NULL);
+	PlaySound(L"Sounds\\Rotate.wav", NULL, SND_ASYNC | SND_NOSTOP);
+
 	Ship TempShip(this->Ships[engine.ShipsDeployed]);
 	TempShip.Rotated = !TempShip.Rotated;
 
@@ -352,7 +391,21 @@ void UserField::ThreadFunc(const POINT ShootCoordinates)
 	if (ShipID >= 0)
 	{
 		this->Ships[ShipID].SetDamageToDeck(ShootCoordinates);
-		if (this->Ships[ShipID].Killed) engine.DecreaseShipsAlive(true);
+		if (this->Ships[ShipID].Killed)
+		{
+			engine.DecreaseShipsAlive(true);
+
+			if (engine.GetPlayerShipsAlive() > 0)
+			{
+				PlaySound(NULL, 0, 0);
+				PlaySound(L"Sounds\\Kill.wav", NULL, SND_SYNC | SND_NOSTOP);
+			}
+		}
+		else
+		{
+			PlaySound(NULL, 0, 0);
+			PlaySound(L"Sounds\\Damage.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		}
 	}
 	else
 	{

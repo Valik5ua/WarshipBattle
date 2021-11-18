@@ -78,8 +78,18 @@ void ButtonFieldDeploy::Draw()
 /// </summary>
 void ButtonFieldDeploy::Deploy()
 {
-	if (userField.Ships[engine.ShipsDeployed].Deployable) userField.Ships[engine.ShipsDeployed].Deployed = true;
-	else return;
+	if (userField.Ships[engine.ShipsDeployed].Deployable)
+	{
+		PlaySound(NULL, NULL, NULL);
+		PlaySound(L"Sounds\\Deploy.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		userField.Ships[engine.ShipsDeployed].Deployed = true;
+	}
+	else
+	{
+		PlaySound(NULL, NULL, NULL);
+		PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		return;
+	}
 	engine.ShipsDeployed++;
 	if (engine.ShipsDeployed == 10) { engine.SetMode(Engine::GAMESTATUS::MainGame); return; }
 	enemyField.CloseNextShip();
