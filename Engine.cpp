@@ -241,12 +241,12 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 	if (!FieldTo->CanFire())
 	{
 		PlaySound(NULL, NULL, NULL);
-		PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		return;
 	}
 
 	PlaySound(NULL, 0, 0);
-	PlaySound(L"Sounds\\Shoot.wav", NULL, SND_ASYNC | SND_NOSTOP);
+	PlaySound(MAKEINTRESOURCE(S_WAVE_SHOOT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 
 	this->LastShotAccomplished = false;
 
@@ -278,9 +278,9 @@ void Engine::DecreaseShipsAlive(bool User)
 		if (--this->PlayerShipsAlive == 0)
 		{
 			this->GameOver(false);
-			Sleep(1000);
+			Sleep(600);
 			PlaySound(NULL, NULL, NULL);
-			PlaySound(L"Sounds\\Lose.wav", NULL, SND_ASYNC | SND_NOSTOP);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_LOSE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		}
 	}
 	else
@@ -288,9 +288,9 @@ void Engine::DecreaseShipsAlive(bool User)
 		if (--this->OpponentShipsAlive == 0)
 		{
 			this->GameOver(true);
-			Sleep(1000);
+			Sleep(600);
 			PlaySound(NULL, NULL, NULL);
-			PlaySound(L"Sounds\\Win.wav", NULL, SND_ASYNC | SND_NOSTOP);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_WIN), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		}
 	}
 }

@@ -490,7 +490,7 @@ void EnemyField::CleanShips()
 POINT EnemyField::Select(const size_t CellX, const size_t CellY)
 {
 	PlaySound(NULL, NULL, NULL);
-	PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+	PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 
 	POINT Return = { CellX,CellY };
 	this->Deselect();
@@ -544,13 +544,13 @@ void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 			if (engine.GetOpponentShipsAlive() > 0)
 			{
 				PlaySound(NULL, 0, 0);
-				PlaySound(L"Sounds\\Kill.wav", NULL, SND_SYNC | SND_NOSTOP);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_KILL), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC | SND_NOSTOP);
 			}
 		}
 		else
 		{
 			PlaySound(NULL, 0, 0);
-			PlaySound(L"Sounds\\Damage.wav", NULL, SND_SYNC | SND_NOSTOP);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_DAMAGE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		}
 	}
 	else

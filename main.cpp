@@ -27,13 +27,17 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 const float  FrameRate = (float)1000 / 60;
 Engine engine;
+
 ButtonFieldDeploy buttonFieldDeploy(ButtonFieldDeployPosX, ButtonFieldDeployPosY);
 ButtonFieldFire buttonFieldFire(ButtonFieldFirePosX, ButtonFieldDeployPosY);
 ButtonFieldConnect buttonFieldConnect(ButtonFieldConnectPosX, ButtonFieldConnectPosY);
 ButtonFieldNewGame buttonFieldNewGame(ButtonFieldNewGamePosX, ButtonFieldNewGamePosY);
+
 UserField userField(UserFieldPosX,UserFieldPosY);
 EnemyField enemyField(EnemyFieldPosX, EnemyFieldPosY);
+
 TextureManager textureManager;
+
 StatisticField statisticField(StatisticFieldPosX,StatisticFieldPosY);
 StatusField statusField(StatusFieldPosX, StatusFieldPosY);
 ClueField clueField(ClueFieldPosX, ClueFieldPosY);

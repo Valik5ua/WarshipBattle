@@ -201,11 +201,22 @@
     <ClInclude Include="UserField.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DialogBox.rc" />
+    <ResourceCompile Include="WarshipBattle.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icon.ico" />
     <Image Include="WarshipBattleICON.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sounds\Click.wav" />
+    <Media Include="Sounds\Damage.wav" />
+    <Media Include="Sounds\Deploy.wav" />
+    <Media Include="Sounds\Error.wav" />
+    <Media Include="Sounds\Kill.wav" />
+    <Media Include="Sounds\Lose.wav" />
+    <Media Include="Sounds\Rotate.wav" />
+    <Media Include="Sounds\Shoot.wav" />
+    <Media Include="Sounds\Win.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

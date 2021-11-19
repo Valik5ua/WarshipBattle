@@ -81,13 +81,13 @@ void ButtonFieldDeploy::Deploy()
 	if (userField.Ships[engine.ShipsDeployed].Deployable)
 	{
 		PlaySound(NULL, NULL, NULL);
-		PlaySound(L"Sounds\\Deploy.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_DEPLOY), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		userField.Ships[engine.ShipsDeployed].Deployed = true;
 	}
 	else
 	{
 		PlaySound(NULL, NULL, NULL);
-		PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
 		return;
 	}
 	engine.ShipsDeployed++;
