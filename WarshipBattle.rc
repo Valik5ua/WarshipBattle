@@ -114,6 +114,21 @@ END
 
 IDB_BITMAP1             BITMAP                  "WarshipBattleICON.bmp"
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// WAVE
+//
+
+S_WAVE_CLICK                WAVE                    "Sounds\\Click.wav"
+S_WAVE_ERROR                WAVE                    "Sounds\\Error.wav"
+S_WAVE_DAMAGE               WAVE                    "Sounds\\Damage.wav"
+S_WAVE_DEPLOY               WAVE                    "Sounds\\Deploy.wav"
+S_WAVE_KILL                 WAVE                    "Sounds\\Kill.wav"
+S_WAVE_LOSE				    WAVE                    "Sounds\\Lose.wav"
+S_WAVE_WIN				    WAVE                    "Sounds\\Win.wav"
+S_WAVE_ROTATE			    WAVE                    "Sounds\\Rotate.wav"
+S_WAVE_SHOOT                WAVE                    "Sounds\\Shoot.wav"                  
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -128,3 +143,4 @@ IDB_BITMAP1             BITMAP                  "WarshipBattleICON.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

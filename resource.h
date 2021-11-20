@@ -28,11 +28,24 @@
 #define ClueFieldMainGamePosY	1
 #define StatusFieldMainGamePosX	19
 #define StatusFieldMainGamePosY	1
+#define SoundButtonPosX			14
+#define SoundButtonPosY			15
 
-//Recources for dialog box and icon loading
+//Defines for icon, and dialogbox.
 #define IDD_DIALOG1				101
 #define IDI_ICON1				102
 #define IDB_BITMAP1				103
+
+//Defines for sounds loaded into Warship Battle.exe
+#define S_WAVE_CLICK			1001
+#define S_WAVE_ERROR			1002
+#define S_WAVE_DAMAGE			1003
+#define S_WAVE_DEPLOY			1004
+#define S_WAVE_KILL				1005
+#define S_WAVE_LOSE				1006
+#define S_WAVE_WIN				1007
+#define S_WAVE_ROTATE			1008
+#define S_WAVE_SHOOT			1009
 
 // Bottom level Menus For New Game
 
@@ -102,7 +115,7 @@ const float MinimalWidth = MinimalHeight * 2;
 const unsigned int UserGameFieldW = 10;
 const unsigned int UserGameFieldH = 10;
 
-const unsigned int OpponentGameFieldW = 10;
+const unsigned int EnemyGameFieldW = 10;
 const unsigned int EnemyGameFieldH = 10;
 
 const unsigned int StatisticFieldW = 4;
@@ -119,3 +132,6 @@ const unsigned int StatusFieldH = 3;
 
 const unsigned int CannonFieldW = 2;
 const unsigned int CannonFieldH = 2;
+
+const unsigned int SoundButtonW = 4;
+const unsigned int SoundButtonH = 1;

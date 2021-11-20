@@ -13,6 +13,7 @@
 #include "ClueField.h"
 #include "resource.h"
 #include <thread>
+#include "SoundButton.h"
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -28,6 +29,7 @@ extern ButtonFieldNewGame buttonFieldNewGame;
 extern TextureManager textureManager;
 extern StatusField statusField;
 extern ClueField clueField;
+extern SoundButton soundButton;
 
 /// <summary>
 /// Default constructor for engine class.
@@ -85,6 +87,23 @@ void Engine::SetWindowGLParam(int Width, int Height)
 bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 {
 	int TranslatedMSG = TranslateMSG(Coordinates, MSG, key);
+
+	if (TranslatedMSG == TRANSLATEDMSG_SOUNDBUTTONCLICK)
+	{
+		switch (soundButton.State)
+		{
+		case SoundButton::STATE::On:
+		{
+			soundButton.State = SoundButton::STATE::Off;
+		}
+		break;
+		case SoundButton::STATE::Off:
+		{
+			soundButton.State = SoundButton::STATE::On;
+		}
+		break;
+		}
+	}
 
 	switch (this->GameMode)
 	{
@@ -240,13 +259,19 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 {
 	if (!FieldTo->CanFire())
 	{
-		PlaySound(NULL, NULL, NULL);
-		PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
 		return;
 	}
 
-	PlaySound(NULL, 0, 0);
-	PlaySound(L"Sounds\\Shoot.wav", NULL, SND_ASYNC | SND_NOSTOP);
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, 0, 0);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_SHOOT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
 
 	this->LastShotAccomplished = false;
 
@@ -278,9 +303,13 @@ void Engine::DecreaseShipsAlive(bool User)
 		if (--this->PlayerShipsAlive == 0)
 		{
 			this->GameOver(false);
-			Sleep(1000);
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(L"Sounds\\Lose.wav", NULL, SND_ASYNC | SND_NOSTOP);
+			Sleep(600);
+
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_LOSE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 	}
 	else
@@ -288,9 +317,13 @@ void Engine::DecreaseShipsAlive(bool User)
 		if (--this->OpponentShipsAlive == 0)
 		{
 			this->GameOver(true);
-			Sleep(1000);
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(L"Sounds\\Win.wav", NULL, SND_ASYNC | SND_NOSTOP);
+			Sleep(600);
+
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_WIN), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 	}
 }
@@ -373,6 +406,13 @@ void Engine::SetMode(GAMESTATUS GameStatus)
 /// <returns></returns>
 int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Key)
 {
+	if (MSG == MSG_LBTTNDOWN)
+	{
+		if (soundButton.Click(Coordinates))
+		{
+			return TRANSLATEDMSG_SOUNDBUTTONCLICK;
+		}
+	}
 	switch (this->GameStatus)
 	{
 	case GAMESTATUS::NewGame:

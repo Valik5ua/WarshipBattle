@@ -3,11 +3,13 @@
 #include "TextureManager.h"
 #include "time.h"
 #include "resource.h"
+#include "SoundButton.h"
 #include <thread>
 
 extern TextureManager textureManager;
 extern UserField userField;
 extern Engine engine;
+extern SoundButton soundButton;
 
 /// <summary>
 /// Changes OpenGL coordinates to EnemyField coordinates.
@@ -16,7 +18,7 @@ extern Engine engine;
 /// <returns>Wether or not the user has clicked on the Enemyfield.</returns>
 bool EnemyField::Click(POINT& coordinates)
 {
-	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < OpponentGameFieldW + this->StartX && coordinates.y < EnemyGameFieldH + this->StartY)
+	if (coordinates.x >= this->StartX && coordinates.y >= this->StartY && coordinates.x < EnemyGameFieldW + this->StartX && coordinates.y < EnemyGameFieldH + this->StartY)
 	{
 		coordinates.x -= this->StartX;
 		coordinates.y -= this->StartY;
@@ -27,7 +29,7 @@ bool EnemyField::Click(POINT& coordinates)
 
 POINT EnemyField::MoveSelection(int Direction)
 {
-	for (int x{}; x < OpponentGameFieldW; x++)
+	for (int x{}; x < EnemyGameFieldW; x++)
 	{
 		for (int y{}; y < EnemyGameFieldH; y++)
 		{
@@ -46,7 +48,7 @@ POINT EnemyField::MoveSelection(int Direction)
 				break;
 				case BF_MOVE_RIGHT:
 				{
-					if (x < OpponentGameFieldW - 1)
+					if (x < EnemyGameFieldW - 1)
 					{
 						Return = this->Select(x + 1, y);
 					}
@@ -163,7 +165,7 @@ void EnemyField::CloseNextShip()
 /// </summary>
 void EnemyField::SetShipMarkers()
 {
-	for (int i{}; i < OpponentGameFieldW; i++)
+	for (int i{}; i < EnemyGameFieldW; i++)
 		for (int j{}; j < EnemyGameFieldH; j++)
 			this->Cells[i][j].MarkedShip = false;
 
@@ -178,7 +180,7 @@ void EnemyField::SetShipDeployableStatus(Ship& ship)
 		for (int i = -1; i <= 1; i++)
 			for (int j = -1; j <= 1; j++)
 			{
-				if (ship.Decks[DeckCounter].Position.x + i >= 0 && ship.Decks[DeckCounter].Position.x + i < OpponentGameFieldW)
+				if (ship.Decks[DeckCounter].Position.x + i >= 0 && ship.Decks[DeckCounter].Position.x + i < EnemyGameFieldW)
 					if (ship.Decks[DeckCounter].Position.y + j >= 0 && ship.Decks[DeckCounter].Position.y + j < EnemyGameFieldH)
 						if (this->ShipExists({ ship.Decks[DeckCounter].Position.x + i, ship.Decks[DeckCounter].Position.y + j }) >= 0)
 						{
@@ -273,7 +275,7 @@ void EnemyField::DeployEnemyShips()
 				if (!this->Ships[i].Deployable)
 				{
 					PrevShipSet = false;
-					for (int ShipPos = 0; ShipPos <= OpponentGameFieldW - this->Ships[i].Size; ShipPos++)
+					for (int ShipPos = 0; ShipPos <= EnemyGameFieldW - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 						{
@@ -343,7 +345,7 @@ void EnemyField::DeployEnemyShips()
 				if (!this->Ships[i].Deployable)
 				{
 					PrevShipSet = false;
-					for (int ShipPos = 0; ShipPos <= OpponentGameFieldW - this->Ships[i].Size; ShipPos++)
+					for (int ShipPos = 0; ShipPos <= EnemyGameFieldW - this->Ships[i].Size; ShipPos++)
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 						{
@@ -371,7 +373,7 @@ void EnemyField::DeployEnemyShips()
 				this->Ships[i].Rotated = false;
 				for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 				{
-					this->Ships[i].Decks[DeckNum].Position.x = OpponentGameFieldW - 1;
+					this->Ships[i].Decks[DeckNum].Position.x = EnemyGameFieldW - 1;
 					this->Ships[i].Decks[DeckNum].Position.y = EdgePosShift + DeckNum;
 				}
 				this->SetShipDeployableStatus(this->Ships[i]);
@@ -382,7 +384,7 @@ void EnemyField::DeployEnemyShips()
 					{
 						for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 						{
-							this->Ships[i].Decks[DeckNum].Position.x = OpponentGameFieldW - 1;
+							this->Ships[i].Decks[DeckNum].Position.x = EnemyGameFieldW - 1;
 							this->Ships[i].Decks[DeckNum].Position.y = ShipPos + DeckNum;
 						}
 						this->SetShipDeployableStatus(this->Ships[i]);
@@ -413,7 +415,7 @@ void EnemyField::DeployEnemyShips()
 			{
 				do
 				{
-					POINT RandPoint = { rand() % (OpponentGameFieldW - this->Ships[i].Size + 1) ,(rand() % (EnemyGameFieldH - 2)) + 1 };
+					POINT RandPoint = { rand() % (EnemyGameFieldW - this->Ships[i].Size + 1) ,(rand() % (EnemyGameFieldH - 2)) + 1 };
 					for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 					{
 						this->Ships[i].Decks[DeckNum].Position.x = RandPoint.x + DeckNum;
@@ -427,7 +429,7 @@ void EnemyField::DeployEnemyShips()
 			{
 				do
 				{
-					POINT RandPoint = { (rand() % (OpponentGameFieldW - 2)) + 1 ,rand() % (EnemyGameFieldH - this->Ships[i].Size + 1) };
+					POINT RandPoint = { (rand() % (EnemyGameFieldW - 2)) + 1 ,rand() % (EnemyGameFieldH - this->Ships[i].Size + 1) };
 					for (int DeckNum = 0; DeckNum < this->Ships[i].Size; DeckNum++)
 					{
 						this->Ships[i].Decks[DeckNum].Position.x = RandPoint.x;
@@ -455,7 +457,7 @@ void EnemyField::DeployEnemyShips()
 /// </summary>
 void EnemyField::ClearField()
 {
-	for (int i{}; i < OpponentGameFieldW; i++)
+	for (int i{}; i < EnemyGameFieldW; i++)
 		for (int j{}; j < EnemyGameFieldH; j++)
 		{
 			this->Cells[i][j].Open = false;
@@ -489,8 +491,11 @@ void EnemyField::CleanShips()
 /// <param name="CellY: ">The Y position of the cell to be selected.</param>
 POINT EnemyField::Select(const size_t CellX, const size_t CellY)
 {
-	PlaySound(NULL, NULL, NULL);
-	PlaySound(L"Sounds\\Click.wav", NULL, SND_ASYNC | SND_NOSTOP);
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, NULL, NULL);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
 
 	POINT Return = { CellX,CellY };
 	this->Deselect();
@@ -516,7 +521,7 @@ POINT EnemyField::RandomSelect()
 /// </summary>
 void EnemyField::Deselect()
 {
-	for (int i{}; i < OpponentGameFieldW; i++)
+	for (int i{}; i < EnemyGameFieldW; i++)
 	{
 		for (int j{}; j < EnemyGameFieldH; j++)
 		{
@@ -543,14 +548,20 @@ void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 			
 			if (engine.GetOpponentShipsAlive() > 0)
 			{
-				PlaySound(NULL, 0, 0);
-				PlaySound(L"Sounds\\Kill.wav", NULL, SND_SYNC | SND_NOSTOP);
+				if (soundButton.State == SoundButton::STATE::On)
+				{
+					PlaySound(NULL, 0, 0);
+					PlaySound(MAKEINTRESOURCE(S_WAVE_KILL), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC | SND_NOSTOP);
+				}
 			}
 		}
 		else
 		{
-			PlaySound(NULL, 0, 0);
-			PlaySound(L"Sounds\\Damage.wav", NULL, SND_SYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, 0, 0);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_DAMAGE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 	}
 	else
@@ -567,7 +578,7 @@ void EnemyField::ThreadFunc(const POINT ShootCoordinates)
 void EnemyField::Draw()
 {
 	GLuint TextureID{};
-	for (int i{}; i < OpponentGameFieldW; i++)
+	for (int i{}; i < EnemyGameFieldW; i++)
 	{
 		for (int j{}; j < EnemyGameFieldH; j++)
 		{
@@ -716,7 +727,7 @@ void EnemyField::Draw()
 
 bool EnemyField::CanFire()
 {
-	for (int i = 0; i < OpponentGameFieldW; i++)
+	for (int i = 0; i < EnemyGameFieldW; i++)
 		for (int j = 0; j < EnemyGameFieldH; j++)
 		{
 			if (this->Cells[i][j].Cell_Aim)
@@ -998,7 +1009,7 @@ void EnemyField::NewGameReset()
 
 void EnemyField::GameOver()
 {
-	for (int i{}; i < OpponentGameFieldW; i++)
+	for (int i{}; i < EnemyGameFieldW; i++)
 		for (int j{}; j < EnemyGameFieldH; j++)
 			this->Cells[i][j].Open = true;
 }
@@ -1044,7 +1055,7 @@ void EnemyField::Opponent::SetStrategy(Strategy strategy)
 
 bool EnemyField::Opponent::In_Range(POINT Coordinates)
 {
-	if (Coordinates.x >= 0 && Coordinates.x < OpponentGameFieldW)
+	if (Coordinates.x >= 0 && Coordinates.x < EnemyGameFieldW)
 		if (Coordinates.y >= 0 && Coordinates.y < EnemyGameFieldH)
 			return true;
 	return false;
@@ -1087,7 +1098,7 @@ POINT EnemyField::Opponent::RandShootingPoint(std::vector<POINT> vec)
 
 void EnemyField::Opponent::NewGameReset()
 {
-	for (int i = 0; i < OpponentGameFieldW; i++)
+	for (int i = 0; i < EnemyGameFieldW; i++)
 		for (int j = 0; j < EnemyGameFieldH; j++)
 		{
 			this->Field[i][j] = -2;
@@ -1138,7 +1149,7 @@ int EnemyField::Opponent::VectorPointExists(std::vector<POINT> vec, POINT point)
 void EnemyField::Opponent::AdjustShootingPoints(std::vector<POINT>& Strategy)
 {
 	int VectorElementPos = -1;
-	for (int i = 0; i < OpponentGameFieldW; i++)
+	for (int i = 0; i < EnemyGameFieldW; i++)
 		for (int j = 0; j < EnemyGameFieldH; j++)
 		{
 			if (this->Field[i][j] == Engine::ShootStatus::Damage)

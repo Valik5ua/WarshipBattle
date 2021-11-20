@@ -119,4 +119,7 @@ public:
 	GLuint RocketTopTextureID;
 	GLuint RocketFinTopTextureID;
 	GLuint RocketFinBottomTextureID;
+
+	GLuint SoundOnTextureID;
+	GLuint SoundOffTextureID;
 };
