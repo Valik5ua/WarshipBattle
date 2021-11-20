@@ -13,6 +13,7 @@
 #include "CannonField.h"
 #include "ClueField.h"
 #include "resource.h"
+#include "SoundButton.h"
 
 // Windows globals
 
@@ -27,18 +28,24 @@ bool   TimeToRedraw{};
 HANDLE TimerFuncHandler{};
 const float  FrameRate = (float)1000 / 60;
 Engine engine;
+
 ButtonFieldDeploy buttonFieldDeploy(ButtonFieldDeployPosX, ButtonFieldDeployPosY);
 ButtonFieldFire buttonFieldFire(ButtonFieldFirePosX, ButtonFieldDeployPosY);
 ButtonFieldConnect buttonFieldConnect(ButtonFieldConnectPosX, ButtonFieldConnectPosY);
 ButtonFieldNewGame buttonFieldNewGame(ButtonFieldNewGamePosX, ButtonFieldNewGamePosY);
+
 UserField userField(UserFieldPosX,UserFieldPosY);
 EnemyField enemyField(EnemyFieldPosX, EnemyFieldPosY);
+
 TextureManager textureManager;
+
 StatisticField statisticField(StatisticFieldPosX,StatisticFieldPosY);
 StatusField statusField(StatusFieldPosX, StatusFieldPosY);
 ClueField clueField(ClueFieldPosX, ClueFieldPosY);
 CannonField UserCannonField(UserCannonFieldPosX, UserCannonFieldPosY,3.14);
 CannonField OpponentCannonField(EnemyCannonFieldPosX, EnemyCannonFieldPosY,0);
+
+SoundButton	soundButton(SoundButtonPosX, SoundButtonPosY);
 
 //Windows prototypes
 
@@ -366,6 +373,7 @@ GLvoid DrawScene(GLvoid)
 	clueField.Draw();
 	statisticField.Draw();
 	statusField.Draw();
+	soundButton.Draw();
 	switch (engine.GameStatus)
 	{
 	case Engine::GAMESTATUS::NewGame:

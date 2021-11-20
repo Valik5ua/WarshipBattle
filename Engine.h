@@ -3,6 +3,9 @@
 #include "Field.h"
 #include "Ship.h"
 
+/// <summary>
+/// Game engine.
+/// </summary>
 class Engine
 {
 public:
@@ -130,4 +133,7 @@ private:
 	//Messages when GAMESTATUS::NewGame is the current GAMESTATUS
 #define TRANSLATEDMSG_NEWGAMEPVE		13001
 #define TRANSLATEDMSG_NEWGAMEPVP		13002
+
+	//Messages when the GAMESTATUS and GAMEMODE are not taken into account
+#define TRANSLATEDMSG_SOUNDBUTTONCLICK	14001
 };

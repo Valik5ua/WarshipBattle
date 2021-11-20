@@ -4,11 +4,13 @@
 #include "EnemyField.h"
 #include "Engine.h"
 #include "resource.h"
+#include "SoundButton.h"
 
 extern Engine engine;
 extern UserField userField;
 extern EnemyField enemyField;
 extern TextureManager textureManager;
+extern SoundButton soundButton;
 
 /// <summary>
 /// Default constructor for the ButtonFieldDeploy class.
@@ -80,14 +82,20 @@ void ButtonFieldDeploy::Deploy()
 {
 	if (userField.Ships[engine.ShipsDeployed].Deployable)
 	{
-		PlaySound(NULL, NULL, NULL);
-		PlaySound(L"Sounds\\Deploy.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_DEPLOY), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
 		userField.Ships[engine.ShipsDeployed].Deployed = true;
 	}
 	else
 	{
-		PlaySound(NULL, NULL, NULL);
-		PlaySound(L"Sounds\\Undeployable.wav", NULL, SND_ASYNC | SND_NOSTOP);
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
 		return;
 	}
 	engine.ShipsDeployed++;
