@@ -1,11 +1,13 @@
 #include "UserField.h"
 #include "Engine.h"
 #include "TextureManager.h"
+#include "SoundButton.h"
 #include "resource.h"
 #include <thread>
 
 extern TextureManager textureManager;
 extern Engine engine;
+extern SoundButton soundButton;
 
 /// <summary>
 /// Changes OpenGL coordinates to UserField coordinates.
@@ -55,13 +57,19 @@ void UserField::MoveActiveShip(int Direction)
 		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.x -= 1;
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		else
 		{
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		break;
 	case BF_MOVE_RIGHT:
@@ -69,27 +77,39 @@ void UserField::MoveActiveShip(int Direction)
 		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.x += 1;
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		else
 		{
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		break;
 	case BF_MOVE_UP:
-		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x,this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size-1].Position.y + 1 }))
+		if (this->In_Range({ this->Ships[engine.ShipsDeployed].Decks[0].Position.x,this->Ships[engine.ShipsDeployed].Decks[this->Ships[engine.ShipsDeployed].Size - 1].Position.y + 1 }))
 		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.y += 1;
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE| SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		else
 		{
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		break;
 	case BF_MOVE_DOWN:
@@ -97,13 +117,19 @@ void UserField::MoveActiveShip(int Direction)
 		{
 			for (int i{}; i < this->Ships[engine.ShipsDeployed].Size; i++)
 				this->Ships[engine.ShipsDeployed].Decks[i].Position.y -= 1;
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_CLICK), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		else
 		{
-			PlaySound(NULL, NULL, NULL);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, NULL, NULL);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 		break;
 	}
@@ -113,8 +139,11 @@ void UserField::MoveActiveShip(int Direction)
 
 void UserField::RotateActiveShip()
 {
-	PlaySound(NULL, NULL, NULL);
-	PlaySound(MAKEINTRESOURCE(S_WAVE_ROTATE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, NULL, NULL);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_ROTATE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
 
 	Ship TempShip(this->Ships[engine.ShipsDeployed]);
 	TempShip.Rotated = !TempShip.Rotated;
@@ -397,14 +426,20 @@ void UserField::ThreadFunc(const POINT ShootCoordinates)
 
 			if (engine.GetPlayerShipsAlive() > 0)
 			{
-				PlaySound(NULL, 0, 0);
-				PlaySound(MAKEINTRESOURCE(S_WAVE_KILL), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC | SND_NOSTOP);
+				if (soundButton.State == SoundButton::STATE::On)
+				{
+					PlaySound(NULL, 0, 0);
+					PlaySound(MAKEINTRESOURCE(S_WAVE_KILL), GetModuleHandle(NULL), SND_RESOURCE | SND_SYNC | SND_NOSTOP);
+				}
 			}
 		}
 		else
 		{
-			PlaySound(NULL, 0, 0);
-			PlaySound(MAKEINTRESOURCE(S_WAVE_DAMAGE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			if (soundButton.State == SoundButton::STATE::On)
+			{
+				PlaySound(NULL, 0, 0);
+				PlaySound(MAKEINTRESOURCE(S_WAVE_DAMAGE), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+			}
 		}
 	}
 	else

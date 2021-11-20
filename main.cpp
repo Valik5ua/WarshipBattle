@@ -13,6 +13,7 @@
 #include "CannonField.h"
 #include "ClueField.h"
 #include "resource.h"
+#include "SoundButton.h"
 
 // Windows globals
 
@@ -43,6 +44,8 @@ StatusField statusField(StatusFieldPosX, StatusFieldPosY);
 ClueField clueField(ClueFieldPosX, ClueFieldPosY);
 CannonField UserCannonField(UserCannonFieldPosX, UserCannonFieldPosY,3.14);
 CannonField OpponentCannonField(EnemyCannonFieldPosX, EnemyCannonFieldPosY,0);
+
+SoundButton	soundButton(SoundButtonPosX, SoundButtonPosY);
 
 //Windows prototypes
 
@@ -370,6 +373,7 @@ GLvoid DrawScene(GLvoid)
 	clueField.Draw();
 	statisticField.Draw();
 	statusField.Draw();
+	soundButton.Draw();
 	switch (engine.GameStatus)
 	{
 	case Engine::GAMESTATUS::NewGame:

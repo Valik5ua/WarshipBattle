@@ -112,6 +112,9 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Rocket top.bmp", this->RocketTopTextureID);
     LoadTexture((char*)"Textures\\Rocket Fin Bottom.bmp", this->RocketFinBottomTextureID);
     LoadTexture((char*)"Textures\\Rocket Fin Top.bmp", this->RocketFinTopTextureID);
+
+    LoadTexture((char*)"Textures\\Sound_On.bmp", this->SoundOnTextureID);
+    LoadTexture((char*)"Textures\\Sound_Off.bmp", this->SoundOffTextureID);
 }
 
 /// <summary>

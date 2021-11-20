@@ -28,6 +28,8 @@
 #define ClueFieldMainGamePosY	1
 #define StatusFieldMainGamePosX	19
 #define StatusFieldMainGamePosY	1
+#define SoundButtonPosX			14
+#define SoundButtonPosY			15
 
 //Defines for icon, and dialogbox.
 #define IDD_DIALOG1				101
@@ -113,7 +115,7 @@ const float MinimalWidth = MinimalHeight * 2;
 const unsigned int UserGameFieldW = 10;
 const unsigned int UserGameFieldH = 10;
 
-const unsigned int OpponentGameFieldW = 10;
+const unsigned int EnemyGameFieldW = 10;
 const unsigned int EnemyGameFieldH = 10;
 
 const unsigned int StatisticFieldW = 4;
@@ -130,3 +132,6 @@ const unsigned int StatusFieldH = 3;
 
 const unsigned int CannonFieldW = 2;
 const unsigned int CannonFieldH = 2;
+
+const unsigned int SoundButtonW = 4;
+const unsigned int SoundButtonH = 1;
