@@ -103,7 +103,7 @@ int WINAPI WinMain(
 
 	/* Create the frame */
 	hwnd = CreateWindow((LPCWSTR)WindowClassName,
-		L"Warships Battle",
+		L"Warship Battle",
 		WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -194,6 +194,16 @@ LONG WINAPI MainWndProc(
 			statusField.startX = StatusFieldPosX;
 		}
 		break;
+		case MENU_GAME_PVP:
+		{
+			engine.StartNewGame();
+			engine.GameMode = Engine::GAMEMODE::PVP;
+			engine.SetMode(Engine::GAMESTATUS::Connecting);
+
+			clueField.startX = ClueFieldPosX;
+			statusField.startX = StatusFieldPosX;
+		}
+		break;
 		default:
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
@@ -231,22 +241,26 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	case WM_CLOSE:
-		if (hRC)
-			wglDeleteContext(hRC);
-		if (hDC)
-			ReleaseDC(hWnd, hDC);
-		hRC = 0;
-		hDC = 0;
-		DestroyWindow(hWnd);
-		break;
+		if (MessageBox(hWnd, L"Do you really want to quit Warship Battle?", L"Exit?", MB_ICONWARNING | MB_YESNO) == IDYES)
+		{
+			if (hRC)
+				wglDeleteContext(hRC);
+			if (hDC)
+				ReleaseDC(hWnd, hDC);
+			hRC = 0;
+			hDC = 0;
+			DestroyWindow(hWnd);
+		}
+			break;
 
 	case WM_DESTROY:
-		if (hRC)
-			wglDeleteContext(hRC);
-		if (hDC)
-			ReleaseDC(hWnd, hDC);
-		CloseHandle(TimerFuncHandler);
-		PostQuitMessage(0);
+
+			if (hRC)
+				wglDeleteContext(hRC);
+			if (hDC)
+				ReleaseDC(hWnd, hDC);
+			CloseHandle(TimerFuncHandler);
+			PostQuitMessage(0);
 		break;
 	case WM_GETMINMAXINFO:
 	{
@@ -389,6 +403,11 @@ GLvoid DrawScene(GLvoid)
 	case Engine::GAMESTATUS::MainGame:
 	{
 		buttonFieldFire.Draw();
+	}
+	break;
+	case Engine::GAMESTATUS::Connecting:
+	{
+		buttonFieldConnect.Draw();
 	}
 	break;
 	}

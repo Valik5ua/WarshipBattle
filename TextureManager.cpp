@@ -51,6 +51,12 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\ButtonFieldFire.bmp", this->ButtonFieldFireTextureID);
     LoadTexture((char*)"Textures\\ButtonFieldDeploy.bmp", this->ButtonFieldDeployTextureID);
 
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_AutoManual.bmp", this->ButtonFieldConnect_AutoManualTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_A_Connection.bmp", this->ButtonFieldConnect_A_ConnectionTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ServerClient.bmp", this->ButtonFieldConnect_M_ServerClientTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ClientConnection.bmp", this->ButtonFieldConnect_M_ClientConnectionTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ServerConnection.bmp", this->ButtonFieldConnect_M_ServerConnectionTextureID);
+
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldNewGame.bmp", this->ClueFieldNewGameTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldDeploy.bmp", this->ClueFieldDeployingTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldMainGame.bmp", this->ClueFieldMainGameTextureID);
@@ -64,10 +70,6 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseGame.bmp", this->StatusFieldBottomChooseGameTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomDeployShips.bmp", this->StatusFieldBottomDeployShipsTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomOpponentTurn.bmp", this->StatusFieldBottomOpponentTurnTextureID);
-
-    LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
-    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
-    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
     
     LoadTexture((char*)"Textures\\New Game Label.bmp", this->Label_NewGame);
     LoadTexture((char*)"Textures\\New Game PVE.bmp", this->Btn_NewGame_PVE);

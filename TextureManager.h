@@ -55,6 +55,12 @@ public:
 	GLuint	ButtonFieldFireTextureID;
 	GLuint	ButtonFieldDeployTextureID;
 
+	GLuint	ButtonFieldConnect_AutoManualTextureID;
+	GLuint	ButtonFieldConnect_A_ConnectionTextureID;
+	GLuint	ButtonFieldConnect_M_ServerClientTextureID;
+	GLuint	ButtonFieldConnect_M_ClientConnectionTextureID;
+	GLuint	ButtonFieldConnect_M_ServerConnectionTextureID;
+
 	GLuint	ClueFieldNewGameTextureID;
 	GLuint	ClueFieldDeployingTextureID;
 	GLuint	ClueFieldMainGameTextureID;
