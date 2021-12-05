@@ -43,10 +43,41 @@ void ClueField::Draw()
 		TextureID = textureManager.ClueFieldDeployingTextureID;
 	}
 	break;
-	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
 		TextureID = textureManager.ClueFieldMainGameTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::Connecting:
+	{
+		switch (engine.ConnectionStatus)
+		{
+		case Engine::CONNECTIONSTATUS::ChoosingConnectionType:
+		{
+			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::ChoosingConnectionSide:
+		{
+			TextureID = textureManager.ClueFieldChooseConnSideTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::ServerConnection:
+		{
+			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::ClientConnection:
+		{
+			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::AutoConnection:
+		{
+			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		}
+		break;
+		}
 	}
 	break;
 	}

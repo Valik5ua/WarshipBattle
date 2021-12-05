@@ -42,35 +42,13 @@ bool ButtonFieldNewGame::Click(POINT& coordinates)
 void ButtonFieldNewGame::Draw()
 {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureManager.Label_NewGame);
-
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 1);
-	glTexCoord2d(1, 0); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY - 1);
-	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY);
-	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY);
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_NewGame_PVP);
-
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 2);
-	glTexCoord2d(1, 0); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY - 2);
-	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY-1);
-	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY-1);
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_NewGame_PVE);
+	glBindTexture(GL_TEXTURE_2D, textureManager.ButtonFieldNewGameTextureID);
 
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY);
 	glTexCoord2d(1, 0); glVertex2f(this->StartX + 3.98f, this->StartY);
-	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, this->StartY + 1);
-	glTexCoord2d(0, 1); glVertex2f(this->StartX, this->StartY + 1);
+	glTexCoord2d(1, 1); glVertex2f(this->StartX + 3.98f, ButtonFieldH + this->StartY);
+	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }
