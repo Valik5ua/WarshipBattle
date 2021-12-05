@@ -28,9 +28,40 @@ void StatusField::Draw()
 	case Engine::GAMESTATUS::MainGame:
 	{
 		TopTextureID = textureManager.StatusFieldTopPVETextureID;
-		if (engine.GetTurn())
-			BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
+		if (engine.GetTurn()) BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
 		else BottomTextureID = textureManager.StatusFieldBottomOpponentTurnTextureID;
+	}
+	case Engine::GAMESTATUS::Connecting:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		switch (engine.ConnectionStatus)
+		{
+		case Engine::CONNECTIONSTATUS::ChoosingConnectionType:
+		{
+			BottomTextureID = textureManager.StatusFieldBottomChooseConnTypeTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::ChoosingConnectionSide:
+		{
+			BottomTextureID = textureManager.StatusFieldBottomChooseConnSideTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::ServerConnection:
+		{
+			BottomTextureID = textureManager.StatusFieldBottomWaitingConnectionTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::ClientConnection:
+		{
+			BottomTextureID = textureManager.StatusFieldBottomInputIPTextureID;
+		}
+		break;
+		case Engine::CONNECTIONSTATUS::AutoConnection:
+		{
+			BottomTextureID = textureManager.StatusFieldBottomSearchingConnectionTextureID;
+		}
+		break;
+		}
 	}
 	break;
 	}
@@ -52,8 +83,8 @@ void StatusField::Draw()
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY);
 	glTexCoord2d(1.f, 0); glVertex2f(this->startX + StatusFieldW, this->startY);
-	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH-1);
-	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH-1);
+	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH - 1);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH - 1);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }

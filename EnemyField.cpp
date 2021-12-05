@@ -767,18 +767,6 @@ POINT EnemyField::ShootCreate()
 	{
 	case this->opponent.Strategy::Damage:
 	{
-		//POINT points[4] = {
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y + 1},
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y - 1},
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x + 1,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y},
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x - 1,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y} };
-
-
-
 		POINT points[4]{};
 		unsigned int StartNum = rand() % 4;
 
@@ -1088,7 +1076,56 @@ void EnemyField::Opponent::SetDamageAroundShip(std::vector<POINT> KilledShip)
 
 POINT EnemyField::Opponent::RandShootingPoint(std::vector<POINT> vec)
 {
-	if (vec.empty()) return { -1,-1 };
+	if (vec.empty())
+	{
+		switch (this->Ships[0])
+		{
+		case 2:
+		{
+			this->strategy = this->Strategy::OneDeckShip;
+
+			do
+			{
+				std::vector<int>::iterator It = this->Ships.begin();
+				this->Ships.erase(It);
+			} while (this->Ships[0] == 2);
+
+			this->AdjustShootingPoints(this->OneDeckShootingPoints);
+			vec = this->OneDeckShootingPoints;
+		}
+		break;
+		case 3:
+		{
+			this->strategy = this->Strategy::Twodeckship;
+
+			do
+			{
+				std::vector<int>::iterator It = this->Ships.begin();
+				this->Ships.erase(It);
+			} while (this->Ships[0] == 3);
+
+			this->AdjustShootingPoints(this->TwoDeckShootingPoints);
+			vec = this->TwoDeckShootingPoints;
+		}
+		break;
+		case 4:
+		{
+			this->strategy = this->Strategy::Threedeckship;
+
+			do
+			{
+				std::vector<int>::iterator It = this->Ships.begin();
+				this->Ships.erase(It);
+			} while (this->Ships[0] == 4);
+
+			this->AdjustShootingPoints(this->ThreeDeckShootingPoints);
+			vec = this->ThreeDeckShootingPoints;
+		}
+		break;
+		default:
+			return { -1,-1 };
+		}
+	}
 	time_t Time;
 	srand((unsigned)time(&Time));
 

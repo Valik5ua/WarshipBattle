@@ -54,13 +54,23 @@ public:
 
 	GLuint	ButtonFieldFireTextureID;
 	GLuint	ButtonFieldDeployTextureID;
+	GLuint	ButtonFieldNewGameTextureID;
 
+	GLuint	ButtonFieldConnect_AutoManualTextureID;
+	GLuint	ButtonFieldConnect_A_ConnectionTextureID;
+	GLuint	ButtonFieldConnect_M_ServerClientTextureID;
+	GLuint	ButtonFieldConnect_M_ClientConnectionTextureID;
+	GLuint	ButtonFieldConnect_M_ServerConnectionTextureID;
+
+	GLuint	ClueFieldChooseConnTypeTextureID;
+	GLuint	ClueFieldChooseConnSideTextureID;
 	GLuint	ClueFieldNewGameTextureID;
 	GLuint	ClueFieldDeployingTextureID;
 	GLuint	ClueFieldMainGameTextureID;
 	GLuint	ClueFieldYouWonTextureID;
 	GLuint	ClueFieldYouLostTextureID;
 
+	GLuint	StatusFieldTopPVPTextureID;
 	GLuint	StatusFieldTopPVETextureID;
 	GLuint	StatusFieldTopMainMenuTextureID;
 
@@ -68,6 +78,11 @@ public:
 	GLuint	StatusFieldBottomChooseGameTextureID;
 	GLuint	StatusFieldBottomDeployShipsTextureID;
 	GLuint	StatusFieldBottomOpponentTurnTextureID;
+	GLuint	StatusFieldBottomInputIPTextureID;
+	GLuint	StatusFieldBottomSearchingConnectionTextureID;
+	GLuint	StatusFieldBottomWaitingConnectionTextureID;
+	GLuint	StatusFieldBottomChooseConnTypeTextureID;
+	GLuint	StatusFieldBottomChooseConnSideTextureID;
 
 	GLuint	Btn_FireTextureID;
 	GLuint	Btn_DeployTextureID;
@@ -75,10 +90,6 @@ public:
 	GLuint  Btn_DisconnectTextureID;
 	GLuint  Btn_ConnectTextureID;
 	GLuint  Btn_CancelTextureID;
-
-	GLuint  Label_NewGame;
-	GLuint  Btn_NewGame_PVE;
-	GLuint  Btn_NewGame_PVP;
 
 	GLuint  StatisticFieldTextureID;
 

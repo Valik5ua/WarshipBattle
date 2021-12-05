@@ -50,28 +50,35 @@ void TextureManager::LoadAllTextures()
 
     LoadTexture((char*)"Textures\\ButtonFieldFire.bmp", this->ButtonFieldFireTextureID);
     LoadTexture((char*)"Textures\\ButtonFieldDeploy.bmp", this->ButtonFieldDeployTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldNewGame.bmp", this->ButtonFieldNewGameTextureID);
+
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_AutoManual.bmp", this->ButtonFieldConnect_AutoManualTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_A_Connection.bmp", this->ButtonFieldConnect_A_ConnectionTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ServerClient.bmp", this->ButtonFieldConnect_M_ServerClientTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ClientConnection.bmp", this->ButtonFieldConnect_M_ClientConnectionTextureID);
+    LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ServerConnection.bmp", this->ButtonFieldConnect_M_ServerConnectionTextureID);
 
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldNewGame.bmp", this->ClueFieldNewGameTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldChooseConnType.bmp", this->ClueFieldChooseConnTypeTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldChooseConnSide.bmp", this->ClueFieldChooseConnSideTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldDeploy.bmp", this->ClueFieldDeployingTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldMainGame.bmp", this->ClueFieldMainGameTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldYouWon.bmp", this->ClueFieldYouWonTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldYouLost.bmp", this->ClueFieldYouLostTextureID);
 
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopPVE.bmp", this->StatusFieldTopPVETextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopPVP.bmp", this->StatusFieldTopPVPTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopMainMenu.bmp", this->StatusFieldTopMainMenuTextureID);
     
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomYourTurn.bmp", this->StatusFieldBottomYourTurnTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseGame.bmp", this->StatusFieldBottomChooseGameTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomDeployShips.bmp", this->StatusFieldBottomDeployShipsTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomOpponentTurn.bmp", this->StatusFieldBottomOpponentTurnTextureID);
-
-    LoadTexture((char*)"Textures\\BTN_DISCONNECT.bmp", this->Btn_DisconnectTextureID);
-    LoadTexture((char*)"Textures\\BTN_CONNECT.bmp", this->Btn_ConnectTextureID);
-    LoadTexture((char*)"Textures\\BTN_CANCEL.bmp", this->Btn_CancelTextureID);
-    
-    LoadTexture((char*)"Textures\\New Game Label.bmp", this->Label_NewGame);
-    LoadTexture((char*)"Textures\\New Game PVE.bmp", this->Btn_NewGame_PVE);
-    LoadTexture((char*)"Textures\\New Game PVP.bmp", this->Btn_NewGame_PVP);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomInputIP.bmp", this->StatusFieldBottomInputIPTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomSearchingConnection.bmp", this->StatusFieldBottomSearchingConnectionTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomWaitingConnection.bmp", this->StatusFieldBottomWaitingConnectionTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseConnType.bmp", this->StatusFieldBottomChooseConnTypeTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseConnSide.bmp", this->StatusFieldBottomChooseConnSideTextureID);
 
     LoadTexture((char*)"Textures\\StatisticField.bmp", this->StatisticFieldTextureID);
 
