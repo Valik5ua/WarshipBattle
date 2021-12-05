@@ -26,16 +26,27 @@ public:
 	void StartNewGame();
 	void GameOver(bool UserWon);
 
+	/// <summary>
+	/// A function that returns whose turn it is to shoot.
+	/// </summary>
+	/// <returns>Wether or not the current turn is the user's.</returns>
 	bool GetTurn() { return this->UserTurn; }
+
 	void SwitchTurns();
 
 	int GetMatchTime() { return this->MatchTimeSec; }
 	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
 	int GetOpponentShipsAlive() { return this->OpponentShipsAlive; }
 public:
+
+	/// <summary>
+	/// An enumerator dedicated to keeping the game's current mode.
+	/// </summary>
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
+
 	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
 	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
+	enum CONNECTIONSTATUS { ChoosingConnectionType, ChoosingConnectionSide, ServerConnection, ClientConnection, AutoConnection } ConnectionStatus;
 	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip } shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	enum Animation { None, Rocket, MainMenu } animation;
@@ -107,33 +118,42 @@ private:
 	//Fully translated messages for Engine::Event
 
 	//Messages when GAMESTATUS::Connecting is the current mode
-#define TRANSLATEDMSG_CONNECT			10001
-#define TRANSLATEDMSG_DISCONNECT		10002
+#define TRANSLATEDMSG_CONNECT				10001
+#define TRANSLATEDMSG_DISCONNECT			10002
 
 	//Messages when GAMESTATUS::Deploying is the current mode
-#define TRANSLATEDMSG_SELECTSHIP		11001
-#define TRANSLATEDMSG_MOVESHIPL			11002
-#define TRANSLATEDMSG_MOVESHIPR			11003
-#define TRANSLATEDMSG_MOVESHIPUP		11004
-#define TRANSLATEDMSG_MOVESHIPDOWN		11005
+#define TRANSLATEDMSG_SELECTSHIP			11001
+#define TRANSLATEDMSG_MOVESHIPL				11002
+#define TRANSLATEDMSG_MOVESHIPR				11003
+#define TRANSLATEDMSG_MOVESHIPUP			11004
+#define TRANSLATEDMSG_MOVESHIPDOWN			11005
 
-#define TRANSLATEDMSG_DEPLOY			11101
-#define TRANSLATEDMSG_ROTATE			11102
+#define TRANSLATEDMSG_DEPLOY				11101
+#define TRANSLATEDMSG_ROTATE				11102
 
 	//Messages when GAMESTATUS::MainGame is the current mode
-#define TRANSLATEDMSG_AIM				12001
-#define TRANSLATEDMSG_FIRE				12002
-#define	TRANSLATEDMSG_RANDOMAIM			12003
+#define TRANSLATEDMSG_AIM					12001
+#define TRANSLATEDMSG_FIRE					12002
+#define	TRANSLATEDMSG_RANDOMAIM				12003
 
-#define TRANSLATEDMSG_MOVE_LEFT			12101
-#define TRANSLATEDMSG_MOVE_RIGHT		12102
-#define TRANSLATEDMSG_MOVE_UP			12103
-#define TRANSLATEDMSG_MOVE_DOWN			12104
+#define TRANSLATEDMSG_MOVE_LEFT				12101
+#define TRANSLATEDMSG_MOVE_RIGHT			12102
+#define TRANSLATEDMSG_MOVE_UP				12103
+#define TRANSLATEDMSG_MOVE_DOWN				12104
 
 	//Messages when GAMESTATUS::NewGame is the current GAMESTATUS
-#define TRANSLATEDMSG_NEWGAMEPVE		13001
-#define TRANSLATEDMSG_NEWGAMEPVP		13002
+#define TRANSLATEDMSG_NEWGAMEPVE			13001
+#define TRANSLATEDMSG_NEWGAMEPVP			13002
+
+	//Messages when GAMESTATUS::Connecting is the current GAMESTATUS
+#define	TRANSLATEDMSG_CONNECTION_CANCEL		15000
+#define	TRANSLATEDMSG_CONNECTION_AUTO		15001
+#define	TRANSLATEDMSG_CONNECTION_MANUAL		15002
+#define	TRANSLATEDMSG_CONNECTION_SERVER		15003
+#define	TRANSLATEDMSG_CONNECTION_CLIENT		15004
+#define	TRANSLATEDMSG_CONNECTION_INPUTIP	15011
+#define	TRANSLATEDMSG_CONNECTION_SHOWIP		15012
 
 	//Messages when the GAMESTATUS and GAMEMODE are not taken into account
-#define TRANSLATEDMSG_SOUNDBUTTONCLICK	14001
+#define TRANSLATEDMSG_SOUNDBUTTONCLICK		16001
 };
