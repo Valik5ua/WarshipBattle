@@ -472,16 +472,8 @@ void EnemyField::ClearField()
 /// </summary>
 void EnemyField::CleanShips()
 {
-	for (int i{}; i < 10; i++)
-	{
-		this->Ships[i].Killed = false;
-		for (int j{}; j < Ships[i].Size; j++)
-		{
-			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
-			this->Ships[i].Decks[j].Position = { -1,-1 };
-			this->Ships[i].Decks[j].Open = true;
-		}
-	}
+	for (int i{}; i < MAX_SHIPS_COUNT; i++)
+		this->Ships[i].Size = 0;
 }
 
 /// <summary>
@@ -992,6 +984,8 @@ void EnemyField::ShootAnswer(const int status)
 
 void EnemyField::NewGameReset()
 {
+	this->CleanShips();
+	this->ClearField();
 	this->opponent.NewGameReset();
 }
 

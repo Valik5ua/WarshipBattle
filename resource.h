@@ -49,8 +49,9 @@
 
 // Bottom level Menus For New Game
 
-#define MENU_GAME_PVP			1
-#define MENU_GAME_PVE			2
+#define MENU_GAME_MAINMENU		1
+#define MENU_GAME_PVP			2
+#define MENU_GAME_PVE			3
 
 #define MENU_GAME_EXIT			11
 

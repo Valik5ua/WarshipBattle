@@ -1,6 +1,6 @@
+#include "Engine.h"
 #include "WindowsX.h"
 #include "Menu.h"
-#include "Engine.h"
 #include "UserField.h"
 #include "EnemyField.h"
 #include "ButtonFieldDeploy.h"
@@ -184,6 +184,16 @@ LONG WINAPI MainWndProc(
 		case MENU_GAME_EXIT:
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL);
 			break;
+		case MENU_GAME_MAINMENU:
+		{
+			engine.StartNewGame();
+			engine.GameMode = engine.GAMEMODE::Menu;
+			engine.SetMode(engine.GAMESTATUS::NewGame);
+
+			clueField.startX = ClueFieldPosX;
+			statusField.startX = StatusFieldPosX;
+		}
+		break;
 		case MENU_GAME_PVE:
 		{
 			engine.StartNewGame();
@@ -388,30 +398,63 @@ GLvoid DrawScene(GLvoid)
 	statisticField.Draw();
 	statusField.Draw();
 	soundButton.Draw();
-	switch (engine.GameStatus)
-	{
-	case Engine::GAMESTATUS::NewGame:
-	{
-		buttonFieldNewGame.Draw();
-	}
-	break;
-	case Engine::GAMESTATUS::Deploying:
-	{
-		buttonFieldDeploy.Draw();
-	}
-	break;
-	case Engine::GAMESTATUS::MainGame:
-	{
-		buttonFieldFire.Draw();
-	}
-	break;
-	case Engine::GAMESTATUS::Connecting:
-	{
-		buttonFieldConnect.Draw();
-	}
-	break;
-	}
 
+	switch (engine.GameMode)
+	{
+	case Engine::GAMEMODE::Menu:
+	{
+		switch (engine.GameStatus)
+		{
+		case Engine::GAMESTATUS::NewGame:
+		{
+			buttonFieldNewGame.Draw();
+		}
+		break;
+		default:
+		{
+			buttonFieldConnect.Draw();
+		}
+		}
+	}
+	break;
+	case Engine::GAMEMODE::PVE:
+	{
+		switch (engine.GameStatus)
+		{
+		case Engine::GAMESTATUS::Deploying:
+		{
+			buttonFieldDeploy.Draw();
+		}
+		break;
+		case Engine::GAMESTATUS::MainGame:
+		{
+			buttonFieldFire.Draw();
+		}
+		break;
+		}
+	}
+	break;
+	case Engine::GAMEMODE::PVP:
+	{
+		switch (engine.GameStatus)
+		{
+		case Engine::GAMESTATUS::Deploying:
+		{
+			buttonFieldDeploy.Draw();
+		}
+		break;
+		case Engine::GAMESTATUS::MainGame:
+		{
+			buttonFieldFire.Draw();
+		}
+		break;
+		}
+	}
+	break;
+	default:
+		break;
+	}
+	
 	switch (engine.animation)
 	{
 	case Engine::Animation::None:

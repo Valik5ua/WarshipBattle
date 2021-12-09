@@ -1,7 +1,7 @@
+#include "Engine.h"
 #include "StatusField.h"
 #include "TextureManager.h"
 #include "resource.h"
-#include "Engine.h"
 
 extern TextureManager textureManager;
 extern Engine engine;
@@ -31,37 +31,34 @@ void StatusField::Draw()
 		if (engine.GetTurn()) BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
 		else BottomTextureID = textureManager.StatusFieldBottomOpponentTurnTextureID;
 	}
-	case Engine::GAMESTATUS::Connecting:
+	case Engine::GAMESTATUS::ChoosingConnectionMode:
 	{
 		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
-		switch (engine.ConnectionStatus)
-		{
-		case Engine::CONNECTIONSTATUS::ChoosingConnectionType:
-		{
-			BottomTextureID = textureManager.StatusFieldBottomChooseConnTypeTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::ChoosingConnectionSide:
-		{
-			BottomTextureID = textureManager.StatusFieldBottomChooseConnSideTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::ServerConnection:
-		{
-			BottomTextureID = textureManager.StatusFieldBottomWaitingConnectionTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::ClientConnection:
-		{
-			BottomTextureID = textureManager.StatusFieldBottomInputIPTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::AutoConnection:
-		{
-			BottomTextureID = textureManager.StatusFieldBottomSearchingConnectionTextureID;
-		}
-		break;
-		}
+		BottomTextureID = textureManager.StatusFieldBottomChooseConnTypeTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ChoosingConnectionSide:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomChooseConnSideTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ServerConnection:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomWaitingConnectionTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ClientConnection:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomInputIPTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::AutoConnection:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomSearchingConnectionTextureID;
 	}
 	break;
 	}

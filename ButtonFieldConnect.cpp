@@ -1,7 +1,7 @@
+#include "Engine.h"
 #include "ButtonFieldConnect.h"
 #include "TextureManager.h"
 #include "resource.h"
-#include "Engine.h"
 
 extern TextureManager textureManager;
 extern Engine engine;
@@ -44,30 +44,30 @@ bool ButtonFieldConnect::Click(POINT& coordinates)
 /// </summary>
 void ButtonFieldConnect::Draw()
 {
-	GLuint TextureID;
-	switch (engine.ConnectionStatus)
+	GLuint TextureID{};
+	switch (engine.GameStatus)
 	{
-	case Engine::CONNECTIONSTATUS::ChoosingConnectionType:
+	case Engine::GAMESTATUS::ChoosingConnectionMode:
 	{
 		TextureID = textureManager.ButtonFieldConnect_AutoManualTextureID;
 	}
 	break;
-	case Engine::CONNECTIONSTATUS::ChoosingConnectionSide:
+	case Engine::GAMESTATUS::ChoosingConnectionSide:
 	{
 		TextureID = textureManager.ButtonFieldConnect_M_ServerClientTextureID;
 	}
 	break;
-	case Engine::CONNECTIONSTATUS::ServerConnection:
+	case Engine::GAMESTATUS::ServerConnection:
 	{
 		TextureID = textureManager.ButtonFieldConnect_M_ServerConnectionTextureID;
 	}
 	break;
-	case Engine::CONNECTIONSTATUS::ClientConnection:
+	case Engine::GAMESTATUS::ClientConnection:
 	{
 		TextureID = textureManager.ButtonFieldConnect_M_ClientConnectionTextureID;
 	}
 	break;
-	case Engine::CONNECTIONSTATUS::AutoConnection:
+	case Engine::GAMESTATUS::AutoConnection:
 	{
 		TextureID = textureManager.ButtonFieldConnect_A_ConnectionTextureID;
 	}

@@ -34,11 +34,22 @@ extern SoundButton soundButton;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :GameMode(GAMEMODE::Menu), GameStatus(GAMESTATUS::NewGame), animation(Animation::None),
-lastGameResults(LastGameResults::N_A), ConnectionStatus(CONNECTIONSTATUS::ChoosingConnectionType),
-fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0), ShipsDeployed(0), 
-UserTurn(true),  LastShotAccomplished(true), MatchTimeSec(0), PlayerShipsAlive(10),
-OpponentShipsAlive(10)
+Engine::Engine()	:GameMode(GAMEMODE::Menu),
+					GameStatus(GAMESTATUS::NewGame),
+					animation(Animation::None),
+					lastGameResults(LastGameResults::N_A),
+					connection(nullptr),
+					fOffsetH(0),
+					fOffsetW(0),
+					fCurrentHeight(0),
+					fCurrentWidth(0),
+					fGLUnitSize(0),
+					ShipsDeployed(0),
+					UserTurn(true),
+					LastShotAccomplished(true),
+					MatchTimeSec(0),
+					PlayerShipsAlive(10),
+					OpponentShipsAlive(10)
 {
 	std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
 	this->dtn = tp.time_since_epoch();
@@ -110,20 +121,96 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	{
 	case this->GAMEMODE::Menu:
 	{
-		switch (TranslatedMSG)
+		switch (this->GameStatus)
 		{
-		case TRANSLATEDMSG_NEWGAMEPVE:
+		case GAMESTATUS::NewGame:
 		{
-			this->StartNewGame();
-			this->GameMode = GAMEMODE::PVE;
-			this->SetMode(GAMESTATUS::Deploying);
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_NEWGAMEPVE:
+			{
+				this->StartNewGame();
+				this->GameMode = GAMEMODE::PVE;
+				this->SetMode(GAMESTATUS::Deploying);
+			}
+			break;
+			case TRANSLATEDMSG_NEWGAMEPVP:
+			{
+				this->StartNewGame();
+				this->GameStatus = GAMESTATUS::ChoosingConnectionMode;
+			}
+			break;
+			}
 		}
 		break;
-		case TRANSLATEDMSG_NEWGAMEPVP:
+		case GAMESTATUS::ChoosingConnectionMode:
 		{
-			this->StartNewGame();
-			this->GameMode = GAMEMODE::PVP;
-			this->SetMode(GAMESTATUS::Connecting);
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_AUTO:
+			{
+				this->GameStatus = GAMESTATUS::AutoConnection;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_MANUAL:
+			{
+				this->GameStatus = GAMESTATUS::ChoosingConnectionSide;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::ChoosingConnectionSide:
+		{
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_SERVER:
+			{
+				this->GameStatus = GAMESTATUS::ServerConnection;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CLIENT:
+			{
+				this->GameStatus = GAMESTATUS::ClientConnection;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::AutoConnection:
+		{
+			if (!connection)
+			{
+				connection = new Connection;
+				this->connection->AsyncAutoConnect();
+			}
+			if (this->connection->Connected())
+			{
+				MessageBox(NULL, L"CONNECTED!", L"CONNECTED!!!!!!!", NULL);
+				this->SetMode(GAMESTATUS::Deploying);
+			}
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->ConnectionCleanUp();
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
 		}
 		break;
 		}
@@ -240,41 +327,46 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	{
 		switch (this->GameStatus)
 		{
-		case GAMESTATUS::Connecting:
+		case GAMESTATUS::Deploying:
 		{
 			switch (TranslatedMSG)
 			{
-			case TRANSLATEDMSG_CONNECTION_AUTO:
+			case TRANSLATEDMSG_MOVESHIPL:
 			{
-				this->ConnectionMode = CONNECTIONMODE::Auto;
-				this->ConnectionStatus = CONNECTIONSTATUS::AutoConnection;
+				userField.MoveActiveShip(BF_MOVE_LEFT);
 			}
 			break;
-			case TRANSLATEDMSG_CONNECTION_MANUAL:
+			case TRANSLATEDMSG_MOVESHIPR:
 			{
-				this->ConnectionMode = CONNECTIONMODE::Manual;
-				this->ConnectionStatus = CONNECTIONSTATUS::ChoosingConnectionSide;
+				userField.MoveActiveShip(BF_MOVE_RIGHT);
 			}
 			break;
-			case TRANSLATEDMSG_CONNECTION_SERVER:
+			case TRANSLATEDMSG_MOVESHIPUP:
 			{
-				this->ConnectionStatus = CONNECTIONSTATUS::ServerConnection;
+				userField.MoveActiveShip(BF_MOVE_UP);
 			}
 			break;
-			case TRANSLATEDMSG_CONNECTION_CLIENT:
+			case TRANSLATEDMSG_MOVESHIPDOWN:
 			{
-				this->ConnectionStatus = CONNECTIONSTATUS::ClientConnection;
+				userField.MoveActiveShip(BF_MOVE_DOWN);
 			}
 			break;
-			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			case TRANSLATEDMSG_DEPLOY:
 			{
-				this->GameMode = GAMEMODE::Menu;
-				this->GameStatus = GAMESTATUS::NewGame;
-				this->ConnectionStatus = CONNECTIONSTATUS::ChoosingConnectionType;
+				buttonFieldDeploy.Deploy();
 			}
 			break;
+			case TRANSLATEDMSG_ROTATE:
+			{
+				userField.RotateActiveShip();
+			}
+			break;
+			default:
+				return MSG_VOID;
+				break;
 			}
 		}
+		break;
 		}
 	}
 	break;
@@ -371,7 +463,11 @@ void Engine::DecreaseShipsAlive(bool User)
 
 void Engine::StartNewGame()
 {
+	userField.CleanShips();
+	userField.ClearField();
+
 	enemyField.NewGameReset();
+
 	this->MatchTimeSec = 0;
 	this->ShipsDeployed = 0;
 	this->PlayerShipsAlive = 10;
@@ -538,125 +634,123 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
 		}
 	}
 	break;
-	case GAMESTATUS::Connecting:
+	case GAMESTATUS::ChoosingConnectionMode:
 	{
 		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
 		this->MSGParam.FieldCoordinates = Coordinates;
-			switch (this->ConnectionStatus)
-			{
-			case CONNECTIONSTATUS::ChoosingConnectionType:
-			{
-				switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
-				{
-				case BF_CONNECT_TOP_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_AUTO;
-				}
-				break;
-				case BF_CONNECT_MIDDLE_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_MANUAL;
-				}
-				break;
-				case BF_CONNECT_BOTTOM_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_CANCEL;
-				}
-				break;
-				}
-			}
-			break;
-			case CONNECTIONSTATUS::ChoosingConnectionSide:
-			{
-				switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
-				{
-				case BF_CONNECT_TOP_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_SERVER;
-				}
-				break;
-				case BF_CONNECT_MIDDLE_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_CLIENT;
-				}
-				break;
-				case BF_CONNECT_BOTTOM_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_CANCEL;
-				}
-				break;
-				}
-			}
-			break;
-			case CONNECTIONSTATUS::ServerConnection:
-			{
-				switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
-				{
-				case BF_CONNECT_TOP_BUTTON:
-				{
-					return MSG_VOID;
-				}
-				break;
-				case BF_CONNECT_MIDDLE_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_SHOWIP;
-				}
-				break;
-				case BF_CONNECT_BOTTOM_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_CANCEL;
-				}
-				break;
-				}
-			}
-			break;
-			case CONNECTIONSTATUS::ClientConnection:
-			{
-				switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
-				{
-				case BF_CONNECT_TOP_BUTTON:
-				{
-					return MSG_VOID;
-				}
-				break;
-				case BF_CONNECT_MIDDLE_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_INPUTIP;
-				}
-				break;
-				case BF_CONNECT_BOTTOM_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_CANCEL;
-				}
-				break;
-				}
-			}
-			break;
-			case CONNECTIONSTATUS::AutoConnection:
-			{
-				switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
-				{
-				case BF_CONNECT_TOP_BUTTON:
-				{
-					return MSG_VOID;
-				}
-				break;
-				case BF_CONNECT_MIDDLE_BUTTON:
-				{
-					return MSG_VOID;
-				}
-				break;
-				case BF_CONNECT_BOTTOM_BUTTON:
-				{
-					return TRANSLATEDMSG_CONNECTION_CANCEL;
-				}
-				break;
-				}
-			}
-			break;
-			default:
-				return MSG_VOID;
-			}
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_AUTO;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_MANUAL;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	case GAMESTATUS::ChoosingConnectionSide:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_SERVER;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CLIENT;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
+	case GAMESTATUS::ServerConnection:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return MSG_VOID;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_SHOWIP;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
+	case GAMESTATUS::ClientConnection:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return MSG_VOID;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_INPUTIP;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
+	case GAMESTATUS::AutoConnection:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return MSG_VOID;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_SHOWIP;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
 	}
 	break;
 	case GAMESTATUS::MainGame:
@@ -757,6 +851,13 @@ void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 				* (this->rocket.Position[i].x - (UserCannonFieldPosX + 1)) + (UserCannonFieldPosY + 1);
 		}
 	}
+}
+
+void Engine::ConnectionCleanUp()
+{
+	this->connection->Disconnect();
+	delete this->connection;
+	this->connection = nullptr;
 }
 
 void Engine::AnimationRocket::Draw()

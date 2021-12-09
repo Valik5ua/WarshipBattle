@@ -1,5 +1,5 @@
-#include "ClueField.h"
 #include "Engine.h"
+#include "ClueField.h"
 #include "resource.h"
 #include "TextureManager.h"
 
@@ -48,36 +48,29 @@ void ClueField::Draw()
 		TextureID = textureManager.ClueFieldMainGameTextureID;
 	}
 	break;
-	case Engine::GAMESTATUS::Connecting:
+	case Engine::GAMESTATUS::ChoosingConnectionMode:
 	{
-		switch (engine.ConnectionStatus)
-		{
-		case Engine::CONNECTIONSTATUS::ChoosingConnectionType:
-		{
-			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::ChoosingConnectionSide:
-		{
-			TextureID = textureManager.ClueFieldChooseConnSideTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::ServerConnection:
-		{
-			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::ClientConnection:
-		{
-			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
-		}
-		break;
-		case Engine::CONNECTIONSTATUS::AutoConnection:
-		{
-			TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
-		}
-		break;
-		}
+		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ChoosingConnectionSide:
+	{
+		TextureID = textureManager.ClueFieldChooseConnSideTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ServerConnection:
+	{
+		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ClientConnection:
+	{
+		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::AutoConnection:
+	{
+		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
 	}
 	break;
 	}
