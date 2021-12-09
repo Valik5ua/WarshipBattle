@@ -65,6 +65,9 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldMainGame.bmp", this->ClueFieldMainGameTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldYouWon.bmp", this->ClueFieldYouWonTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldYouLost.bmp", this->ClueFieldYouLostTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldInputIP.bmp", this->ClueFieldInputIPTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldShowIP.bmp", this->ClueFieldShowIPTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldConnSearch.bmp", this->ClueFieldConnSearchTextureID);
 
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopPVE.bmp", this->StatusFieldTopPVETextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopPVP.bmp", this->StatusFieldTopPVPTextureID);
@@ -79,6 +82,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomWaitingConnection.bmp", this->StatusFieldBottomWaitingConnectionTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseConnType.bmp", this->StatusFieldBottomChooseConnTypeTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseConnSide.bmp", this->StatusFieldBottomChooseConnSideTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomDisconnect.bmp", this->StatusFieldBottomDisconnectTextureID);
 
     LoadTexture((char*)"Textures\\StatisticField.bmp", this->StatisticFieldTextureID);
 
@@ -122,6 +126,8 @@ void TextureManager::LoadAllTextures()
 
     LoadTexture((char*)"Textures\\Sound_On.bmp", this->SoundOnTextureID);
     LoadTexture((char*)"Textures\\Sound_Off.bmp", this->SoundOffTextureID);
+
+    LoadTexture((char*)"Textures\\Searching Icon.bmp", this->SearchingIconTextureID);
 }
 
 /// <summary>

@@ -31,6 +31,7 @@ void StatusField::Draw()
 		if (engine.GetTurn()) BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
 		else BottomTextureID = textureManager.StatusFieldBottomOpponentTurnTextureID;
 	}
+	break;
 	case Engine::GAMESTATUS::ChoosingConnectionMode:
 	{
 		TopTextureID = textureManager.StatusFieldTopPVPTextureID;

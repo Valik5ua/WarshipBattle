@@ -4,7 +4,7 @@
 class Deck : public Cell
 {
 public:
-	Deck() :Cell(), integrityStatus(this->IntegrityStatus::Whole) {};
+	Deck() :Cell(), integrityStatus(IntegrityStatus::Whole) {};
 
 	POINT Position;
 

@@ -8,6 +8,9 @@ extern Engine engine;
 
 ClueField::ClueField(const unsigned int StartX, const unsigned int StartY) :startX(StartX), startY(StartY)
 {
+	searchingIcon.StartX = this->startX + 5;
+	searchingIcon.MaxPosX = searchingIcon.StartX + 4;
+	searchingIcon.Direction = true;
 }
 
 void ClueField::Draw()
@@ -60,17 +63,29 @@ void ClueField::Draw()
 	break;
 	case Engine::GAMESTATUS::ServerConnection:
 	{
-		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		TextureID = textureManager.ClueFieldShowIPTextureID;
 	}
 	break;
 	case Engine::GAMESTATUS::ClientConnection:
 	{
-		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		TextureID = textureManager.ClueFieldInputIPTextureID;
 	}
 	break;
 	case Engine::GAMESTATUS::AutoConnection:
 	{
-		TextureID = textureManager.ClueFieldChooseConnTypeTextureID;
+		TextureID = textureManager.ClueFieldConnSearchTextureID;
+		if (searchingIcon.Direction)
+		{
+			searchingIcon.StartX += (float)(4 / (float)40);
+			if (searchingIcon.StartX >= searchingIcon.MaxPosX)
+				searchingIcon.Direction = !searchingIcon.Direction;
+		}
+		else
+		{
+			searchingIcon.StartX -= (float)(4 / (float)40);
+			if (searchingIcon.StartX <= searchingIcon.MaxPosX - 4)
+				searchingIcon.Direction = !searchingIcon.Direction;
+		}
 	}
 	break;
 	}
@@ -84,4 +99,17 @@ void ClueField::Draw()
 	glTexCoord2d(1.f, 1.f); glVertex2f(ClueFieldW + this->startX, ClueFieldH + this->startY);
 	glTexCoord2d(0, 1.f); glVertex2f(this->startX, ClueFieldH + this->startY);
 	glEnd();
+
+	if (engine.GameStatus == Engine::GAMESTATUS::AutoConnection)
+	{
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textureManager.SearchingIconTextureID);
+
+		glBegin(GL_QUADS);
+		glTexCoord2d(0, 0); glVertex2f(this->searchingIcon.StartX, this->startY + 0.25f);
+		glTexCoord2d(1.f, 0); glVertex2f(1.5f + this->searchingIcon.StartX, this->startY + 0.25f);
+		glTexCoord2d(1.f, 1.f); glVertex2f(1.5f + this->searchingIcon.StartX, 1.75f + this->startY);
+		glTexCoord2d(0, 1.f); glVertex2f(this->searchingIcon.StartX, 1.75f + this->startY);
+		glEnd();
+	}
 }

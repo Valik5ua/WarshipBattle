@@ -10,4 +10,11 @@ public:
 public:
 	float startX;
 	float startY;
+private:
+	struct SearchingIcon
+	{
+		float StartX;
+		float MaxPosX;
+		bool Direction;
+	} searchingIcon;
 };

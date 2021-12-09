@@ -69,6 +69,9 @@ public:
 	GLuint	ClueFieldMainGameTextureID;
 	GLuint	ClueFieldYouWonTextureID;
 	GLuint	ClueFieldYouLostTextureID;
+	GLuint	ClueFieldInputIPTextureID;
+	GLuint	ClueFieldShowIPTextureID;
+	GLuint	ClueFieldConnSearchTextureID;
 
 	GLuint	StatusFieldTopPVPTextureID;
 	GLuint	StatusFieldTopPVETextureID;
@@ -83,6 +86,7 @@ public:
 	GLuint	StatusFieldBottomWaitingConnectionTextureID;
 	GLuint	StatusFieldBottomChooseConnTypeTextureID;
 	GLuint	StatusFieldBottomChooseConnSideTextureID;
+	GLuint	StatusFieldBottomDisconnectTextureID;
 
 	GLuint	Btn_FireTextureID;
 	GLuint	Btn_DeployTextureID;
@@ -133,4 +137,6 @@ public:
 
 	GLuint SoundOnTextureID;
 	GLuint SoundOffTextureID;
+
+	GLuint SearchingIconTextureID;
 };

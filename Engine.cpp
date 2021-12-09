@@ -189,6 +189,44 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			}
 		}
 		break;
+		case GAMESTATUS::ClientConnection:
+		{
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_INPUTIP:
+			{
+				this->GameStatus = GAMESTATUS::ClientConnection;
+				//InputIP();
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::ServerConnection:
+		{
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_SHOWIP:
+			{
+				this->GameStatus = GAMESTATUS::ClientConnection;
+				//ShowIP();
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
+		}
+		break;
 		case GAMESTATUS::AutoConnection:
 		{
 			if (!connection)
