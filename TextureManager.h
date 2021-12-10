@@ -56,6 +56,8 @@ public:
 	GLuint	ButtonFieldDeployTextureID;
 	GLuint	ButtonFieldNewGameTextureID;
 
+	GLuint	ButtonFieldPleaseWaitTextureID;
+
 	GLuint	ButtonFieldConnect_AutoManualTextureID;
 	GLuint	ButtonFieldConnect_A_ConnectionTextureID;
 	GLuint	ButtonFieldConnect_M_ServerClientTextureID;
@@ -72,6 +74,7 @@ public:
 	GLuint	ClueFieldInputIPTextureID;
 	GLuint	ClueFieldShowIPTextureID;
 	GLuint	ClueFieldConnSearchTextureID;
+	GLuint	ClueFieldDisconnectingTextureID;
 
 	GLuint	StatusFieldTopPVPTextureID;
 	GLuint	StatusFieldTopPVETextureID;
@@ -139,4 +142,5 @@ public:
 	GLuint SoundOffTextureID;
 
 	GLuint SearchingIconTextureID;
+	GLuint DisconnectingDotsTextureID;
 };

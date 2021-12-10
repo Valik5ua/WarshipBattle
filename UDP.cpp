@@ -1,62 +1,62 @@
 #pragma comment(lib,"Ws2_32.lib")
 #include "UDP.h"
 
-void UDP::ErroToConsole(int Err)
+std::string UDP::ErroToString(UDP::LastError Err)
 {
     switch (Err)
     {
-    case WSA_INIT_ERROR: { std::cout << "WSA_INIT_ERROR" << std::endl; }
-                       break;
-    case SOCKET_INIT_ERROR: { std::cout << "SOCKET_INIT_ERROR" << std::endl; }
-                          break;
-    case BROADCAST_INIT_ERROR: { std::cout << "BROADCAST_INIT_ERROR" << std::endl; }
-                             break;
-    case SEND_ERROR: { std::cout << "SEND_ERROR" << std::endl; }
-                   break;
-    case BIND_ERROR: { std::cout << "BIND_ERROR" << std::endl; }
-                   break;
-    default: std::cout << "NONE" << std::endl;
-    };
+    case UDP::LastError::WSA_INIT_ERROR: { return "WSA_INIT_ERROR"; }
+    break;
+    case UDP::LastError::SOCKET_INIT_ERROR: { return "SOCKET_INIT_ERROR"; }
+    break;
+    case UDP::LastError::BROADCAST_INIT_ERROR: { return "BROADCAST_INIT_ERROR"; }
+    break;
+    case UDP::LastError::SEND_ERROR: { return "SEND_ERROR"; }
+    break;
+    case UDP::LastError::BIND_ERROR: { return "BIND_ERROR"; }
+    break;
+    default: return "NONE";
+    }
 }
 
-int UDP::GetLastError(bool ClearLastError)
+UDP::LastError UDP::GetLastError(bool ClearLastError)
 {
     switch (this->LAST_ERROR)
     {
-    case WSA_INIT_ERROR:
+    case UDP::LastError::WSA_INIT_ERROR:
     {
-        if (ClearLastError) LAST_ERROR = NONE;
-        return WSA_INIT_ERROR;
+        if (ClearLastError) LAST_ERROR = UDP::LastError::NONE;
+        return UDP::LastError::WSA_INIT_ERROR;
     }
     break;
-    case SOCKET_INIT_ERROR:
+    case UDP::LastError::SOCKET_INIT_ERROR:
     {
-        if (ClearLastError) LAST_ERROR = NONE;
-        return SOCKET_INIT_ERROR;
+        if (ClearLastError) LAST_ERROR = UDP::LastError::NONE;
+        return UDP::LastError::SOCKET_INIT_ERROR;
     }
     break;
-    case BROADCAST_INIT_ERROR:
+    case UDP::LastError::BROADCAST_INIT_ERROR:
     {
-        if (ClearLastError) LAST_ERROR = NONE;
-        return BROADCAST_INIT_ERROR;
+        if (ClearLastError) LAST_ERROR = UDP::LastError::NONE;
+        return UDP::LastError::BROADCAST_INIT_ERROR;
     }
     break;
-    case SEND_ERROR:
+    case UDP::LastError::SEND_ERROR:
     {
-        if (ClearLastError) LAST_ERROR = NONE;
-        return SEND_ERROR;
+        if (ClearLastError) LAST_ERROR = UDP::LastError::NONE;
+        return UDP::LastError::SEND_ERROR;
     }
     break;
-    case BIND_ERROR:
+    case UDP::LastError::BIND_ERROR:
     {
-        if (ClearLastError) LAST_ERROR = NONE;
-        return BIND_ERROR;
+        if (ClearLastError) LAST_ERROR = UDP::LastError::NONE;
+        return UDP::LastError::BIND_ERROR;
     }
     break;
-    default: return NONE;
+    default: return UDP::LastError::NONE;
     }
 
-    return NONE;
+    return UDP::LastError::NONE;
 }
 
 void UDP::MSGReceivedClean()
@@ -96,7 +96,7 @@ void UDP::DecodeMsg(MSG& msg, char* str)
 {
     msg.FLAG = NULL;
     msg.SENDER = NULL;
-    msg.SIZE = NULL;
+    //msg.SIZE = NULL;
     msg.TYPE = NULL;
     for (int i = 0; i < msg.MAX_MSG_LENGTH; i++)
     {
@@ -122,7 +122,7 @@ void UDP::CleanMsg()
 
     MESSAGE.FLAG = NULL;
     MESSAGE.SENDER = NULL;
-    MESSAGE.SIZE = NULL;
+    //MESSAGE.SIZE = NULL;
     MESSAGE.TYPE = NULL;
     for (int i = 0; i < MESSAGE.MAX_MSG_LENGTH; i++)
     {

@@ -53,7 +53,8 @@ public:
 						ChoosingConnectionSide,
 						ServerConnection,
 						ClientConnection,
-						AutoConnection
+						AutoConnection,
+						Disconnecting
 					} GameStatus;
 
 	enum ShootStatus {	Miss = -1,
@@ -131,7 +132,6 @@ private:
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 	void StartAnimation(Field* field, POINT ShootingPoint);
-	void ConnectionCleanUp();
 private:
 	//Fully translated messages for Engine::Event
 

@@ -17,4 +17,13 @@ private:
 		float MaxPosX;
 		bool Direction;
 	} searchingIcon;
+
+	struct DisconnectingDots
+	{
+		float StartX;
+		unsigned short int NumOfDots;
+		const unsigned short int MaxNumOfDots = 3;
+		unsigned short int FrameCounter;
+		const unsigned short int MaxFrames = 30;
+	} disconnectingDots;
 };

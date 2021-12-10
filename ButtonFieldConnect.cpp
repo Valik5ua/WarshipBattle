@@ -72,6 +72,11 @@ void ButtonFieldConnect::Draw()
 		TextureID = textureManager.ButtonFieldConnect_A_ConnectionTextureID;
 	}
 	break;
+	case Engine::GAMESTATUS::Disconnecting:
+	{
+		TextureID = textureManager.ButtonFieldPleaseWaitTextureID;
+	}
+	break;
 	}
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TextureID);

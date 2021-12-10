@@ -231,7 +231,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		{
 			if (!connection)
 			{
-				connection = new Connection;
+				connection = new Connection(UDP::ConnectionType::AUTO);
 				this->connection->AsyncAutoConnect();
 			}
 			if (this->connection->Connected())
@@ -243,11 +243,21 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			{
 			case TRANSLATEDMSG_CONNECTION_CANCEL:
 			{
-				this->ConnectionCleanUp();
-				this->GameMode = GAMEMODE::Menu;
-				this->GameStatus = GAMESTATUS::NewGame;
+				this->connection->AsyncDisconnect();
+				this->GameStatus = GAMESTATUS::Disconnecting;
 			}
 			break;
+			}
+		}
+		break;
+		case GAMESTATUS::Disconnecting:
+		{
+			if (connection->Disconnected())
+			{
+				delete this->connection;
+				this->connection = nullptr;
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
 			}
 		}
 		break;
@@ -889,13 +899,6 @@ void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 				* (this->rocket.Position[i].x - (UserCannonFieldPosX + 1)) + (UserCannonFieldPosY + 1);
 		}
 	}
-}
-
-void Engine::ConnectionCleanUp()
-{
-	this->connection->Disconnect();
-	delete this->connection;
-	this->connection = nullptr;
 }
 
 void Engine::AnimationRocket::Draw()

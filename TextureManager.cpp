@@ -52,6 +52,8 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\ButtonFieldDeploy.bmp", this->ButtonFieldDeployTextureID);
     LoadTexture((char*)"Textures\\ButtonFieldNewGame.bmp", this->ButtonFieldNewGameTextureID);
 
+    LoadTexture((char*)"Textures\\ButtonFieldPleaseWait.bmp", this->ButtonFieldPleaseWaitTextureID);
+
     LoadTexture((char*)"Textures\\ButtonFieldConnect_AutoManual.bmp", this->ButtonFieldConnect_AutoManualTextureID);
     LoadTexture((char*)"Textures\\ButtonFieldConnect_A_Connection.bmp", this->ButtonFieldConnect_A_ConnectionTextureID);
     LoadTexture((char*)"Textures\\ButtonFieldConnect_M_ServerClient.bmp", this->ButtonFieldConnect_M_ServerClientTextureID);
@@ -68,6 +70,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldInputIP.bmp", this->ClueFieldInputIPTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldShowIP.bmp", this->ClueFieldShowIPTextureID);
     LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldConnSearch.bmp", this->ClueFieldConnSearchTextureID);
+    LoadTexture((char*)"Textures\\ClueFieldTextures\\ClueFieldDisconnecting.bmp", this->ClueFieldDisconnectingTextureID);
 
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopPVE.bmp", this->StatusFieldTopPVETextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Top\\StatusFieldTopPVP.bmp", this->StatusFieldTopPVPTextureID);
@@ -128,6 +131,7 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\Sound_Off.bmp", this->SoundOffTextureID);
 
     LoadTexture((char*)"Textures\\Searching Icon.bmp", this->SearchingIconTextureID);
+    LoadTexture((char*)"Textures\\DisconnectingDots.bmp", this->DisconnectingDotsTextureID);
 }
 
 /// <summary>

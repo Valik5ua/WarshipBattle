@@ -16,57 +16,56 @@
 #define AUTO_CONNECT_SERVER_ATTEMPTS		2
 #define AUTO_CONNECT_CLIENT_ATTEMPTS		1
 
+
 class Connection
 {
 public:
-	enum LastError
-	{
-		NONE = 0,
-		WSA_INIT_ERROR,
-		SOCKET_INIT_ERROR,
-		BROADCAST_INIT_ERROR,
-		BIND_ERROR,
-		SEND_ERROR
-	} LAST_ERROR;
-	
-	Connection();
+	UDP::ConnectionType CONNECTION_TYPE;
+	Connection() = delete;
+	Connection(UDP::ConnectionType connectionType);
 	void AsyncAutoConnect();
-	void Disconnect();
 	bool Connected();
-	int GetLastError(bool CleanLastError);
+	void AsyncDisconnect();
+	bool Disconnected();
+	UDP::LastError GetLastError(bool CleanLastError);
 	bool SendMSG(int TYPE, int FLAG, char* msg);
 	bool ReceiveMSG(UDP::MSG& msg, int iterOfReceive);
 
 private:
-	void AsyncServerConnect();
-	void AsyncClientConnect();
+	//void AsyncServerConnect();
+	//void AsyncClientConnect();
+	void Disconnect();
 	void AsyncCheckConnection();
-	void ServerConnectA();
+	void ManualConnect();
+	void ServerConnect();
 	void ServerConnect(int iter);
-	void ClientConnectA();
+	void ClientConnect();
 	void ClientConnect(int iter);
 	void CheckConnection();
 	void CheckConnection(int MaxAttempt);
-
-public:
+	void SetConnectingIP(char* ip);
 
 private:
+	UDP::LastError LAST_ERROR;
+	char IP[15];
 	HANDLE HandleID;
 	bool IsConnected;
 	bool IsServer;
 	bool IsClient;
 	bool CancelConnecting;
 	bool ConnectionError;
+	bool disconnected;
 	UDPServer* Server;
 	UDPClient* Client;
 
 private:
 	void CleanUP();
-	void SetLastError(int err);
+	void SetLastError(UDP::LastError err);
 	static void StartAsyncServerConnect(Connection* inst);
 	static void StartAsyncClientConnect(Connection* inst);
 	static void StartAsyncCheckConnection(Connection* inst);
 	static void StartAsyncAutoConnect(Connection* inst);
+	static void StartAsyncDisconnect(Connection* inst);
 	void AutoConnect();
 };
 

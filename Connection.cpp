@@ -6,33 +6,39 @@ void Connection::AsyncAutoConnect()
 	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncAutoConnect, (LPVOID)this, 0, NULL);
 }
 
-void Connection::AsyncServerConnect()
-{
-	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncServerConnect, (LPVOID)this, 0, NULL);
-}
+//void Connection::AsyncServerConnect()
+//{
+//	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncServerConnect, (LPVOID)this, 0, NULL);
+//}
+//
+//void Connection::StartAsyncServerConnect(Connection* inst)
+//{
+//	Connection* serverInst = (Connection*)inst;
+//	serverInst->ServerConnectA();
+//}
+//
+//void Connection::AsyncClientConnect()
+//{
+//	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncClientConnect, (LPVOID)this, 0, NULL);
+//
+//}
+//
+//void Connection::StartAsyncClientConnect(Connection* inst)
+//{
+//	Connection* clientInst = (Connection*)inst;
+//	clientInst->ClientConnectA();
+//}
 
-void Connection::StartAsyncServerConnect(Connection* inst)
+void Connection::AsyncDisconnect()
 {
-	Connection* serverInst = (Connection*)inst;
-	serverInst->ServerConnectA();
-}
-
-void Connection::AsyncClientConnect()
-{
-	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncClientConnect, (LPVOID)this, 0, NULL);
-
-}
-
-void Connection::StartAsyncClientConnect(Connection* inst)
-{
-	Connection* clientInst = (Connection*)inst;
-	clientInst->ClientConnectA();
+	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncDisconnect, (LPVOID)this, 0, NULL);
 }
 
 void Connection::AsyncCheckConnection()
 {
 	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncCheckConnection, (LPVOID)this, 0, NULL);
 }
+
 
 void Connection::StartAsyncCheckConnection(Connection* inst)
 {
@@ -46,16 +52,42 @@ void Connection::StartAsyncAutoConnect(Connection* inst)
 	Inst->AutoConnect();
 }
 
-Connection::Connection()
+void Connection::StartAsyncDisconnect(Connection* inst)
+{
+	Connection* Inst = (Connection*)inst;
+	Inst->Disconnect();
+}
+
+//Connection::Connection()
+//{
+//	HandleID = NULL;
+//	Server = nullptr;
+//	Client = nullptr;
+//	IsConnected = false;
+//	disconnected = false;
+//	IsServer = false;
+//	IsClient = false;
+//	ConnectionError = false;
+//	CancelConnecting = false;
+//	strcpy_s(IP, "127.0.0.1");
+//	LAST_ERROR = UDP::LastError::NONE;
+//	CONNECTION_TYPE = UDP::ConnectionType::AUTO;
+//}
+
+Connection::Connection(UDP::ConnectionType connectionType)
 {
 	HandleID = NULL;
-	Server = nullptr;
-	Client = nullptr;
 	IsConnected = false;
-	IsServer = false;
-	IsClient = false;
 	ConnectionError = false;
 	CancelConnecting = false;
+	IsServer = false;
+	IsClient = false;
+	disconnected = false;
+	Client = nullptr;
+	Server = nullptr;
+	LAST_ERROR = UDP::LastError::NONE;
+	strcpy_s(IP,"127.0.0.1");
+	CONNECTION_TYPE = connectionType;
 }
 
 void Connection::CleanUP()
@@ -78,17 +110,18 @@ void Connection::CleanUP()
 	IsClient = false;
 	ConnectionError = false;
 	CancelConnecting = false;
-	LAST_ERROR = NONE;
+	LAST_ERROR = UDP::LastError::NONE;
+	disconnected = true;
 }
 
-void Connection::ServerConnectA()
+void Connection::ServerConnect()
 {
 	while (true)
 	{
 		/// Creating Temp object
-		UDPServer* server = new UDPServer;
+		UDPServer* server = new UDPServer(UDP::ConnectionType::SERVER);
 		/// Checking if object created without errors
-		if (server->GetLastError(false) != UDP::NONE)
+		if (server->GetLastError(false) != UDP::LastError::NONE)
 		{
 			SetLastError(server->GetLastError(true));
 			delete server;
@@ -151,7 +184,7 @@ void Connection::ServerConnectA()
 		}
 	}
 
-	ExitThread(NULL);
+	//ExitThread(NULL);
 }
 
 void Connection::ServerConnect(int iter)
@@ -161,7 +194,7 @@ void Connection::ServerConnect(int iter)
 		/// Creating Temp object
 		UDPServer* server = new UDPServer;
 		/// Checking if object created without errors
-		if (server->GetLastError(false) != UDP::NONE)
+		if (server->GetLastError(false) != UDP::LastError::NONE)
 		{
 			SetLastError(server->GetLastError(true));
 			delete server;
@@ -220,14 +253,14 @@ void Connection::ServerConnect(int iter)
 	}
 }
 
-void Connection::ClientConnectA()
+void Connection::ClientConnect()
 {
 	while (true)
 	{
 		/// Creating Temp object
-		UDPClient* client = new UDPClient;
+		UDPClient* client = new UDPClient(UDP::ConnectionType::CLIENT, IP);
 		/// Checking if object created without errors
-		if (client->GetLastError(false) != UDP::NONE)
+		if (client->GetLastError(false) != UDP::LastError::NONE)
 		{
 			SetLastError(client->GetLastError(true));
 			delete client;
@@ -280,7 +313,7 @@ void Connection::ClientConnectA()
 		}
 	}
 
-	ExitThread(NULL);
+	//ExitThread(NULL);
 }
 
 void Connection::ClientConnect(int iter)
@@ -290,7 +323,7 @@ void Connection::ClientConnect(int iter)
 		/// Creating Temp object
 		UDPClient* client = new UDPClient;
 		/// Checking if object created without errors
-		if (client->GetLastError(false) != UDP::NONE)
+		if (client->GetLastError(false) != UDP::LastError::NONE)
 		{
 			SetLastError(client->GetLastError(true));
 			delete client;
@@ -394,6 +427,11 @@ void Connection::AutoConnect()
 	}
 
 	ExitThread(NULL);
+}
+
+void Connection::ManualConnect()
+{
+/////////////////////////////////////////////
 }
 
 void Connection::CheckConnection()
@@ -518,6 +556,16 @@ void Connection::CheckConnection(int MaxAttempt)
 	}
 }
 
+void Connection::SetConnectingIP(char* ip)
+{
+	for (int i = 0; i < IP_LENGTH; i++)
+	{
+		IP[i] = '\0';
+	}
+
+	strcpy_s(IP, ip);
+}
+
 void Connection::Disconnect()
 {
 	if (!IsConnected)
@@ -528,38 +576,46 @@ void Connection::Disconnect()
 	}
 
 	CleanUP();
+	ExitThread(NULL);
 }
 
-void Connection::SetLastError(int err)
+bool Connection::Disconnected()
+{
+	return disconnected;
+}
+
+void Connection::SetLastError(UDP::LastError err)
 {
 	ConnectionError = true;
 
-	switch (err)
+	LAST_ERROR = err;
+
+	/*switch (err)
 	{
-	case 0: LAST_ERROR = NONE;
+	case 0: LAST_ERROR = UDP::LastError::NONE;
 		break;
-	case 1: LAST_ERROR = WSA_INIT_ERROR;
+	case 1: LAST_ERROR = UDP::LastError::WSA_INIT_ERROR;
 		break;
-	case 2: LAST_ERROR = SOCKET_INIT_ERROR;
+	case 2: LAST_ERROR = UDP::LastError::SOCKET_INIT_ERROR;
 		break;
-	case 3: LAST_ERROR = BROADCAST_INIT_ERROR;
+	case 3: LAST_ERROR = UDP::LastError::BROADCAST_INIT_ERROR;
 		break;
-	case 4: LAST_ERROR = BIND_ERROR;
+	case 4: LAST_ERROR = UDP::LastError::BIND_ERROR;
 		break;
-	case 5: LAST_ERROR = SEND_ERROR;
+	case 5: LAST_ERROR = UDP::LastError::SEND_ERROR;
 		break;
-	default: LAST_ERROR = NONE;
+	default: LAST_ERROR = UDP::LastError::NONE;
 		break;
-	}
+	}*/
 }
 
-int Connection::GetLastError(bool CleanLastError)
+UDP::LastError Connection::GetLastError(bool CleanLastError)
 {
-	int temp_lastError = (int)LAST_ERROR;
+	UDP::LastError temp_lastError = LAST_ERROR;
 	if (CleanLastError)
 	{
 		ConnectionError = false;
-		LAST_ERROR = NONE;
+		LAST_ERROR = UDP::LastError::NONE;
 	}
 	return temp_lastError;
 }
@@ -572,7 +628,7 @@ bool Connection::SendMSG(int TYPE, int FLAG, char* msg)
 		if (IsServer)
 		{
 			Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE, FLAG, msg));
-			if (Server->GetLastError(false) != NONE)
+			if (Server->GetLastError(false) != UDP::LastError::NONE)
 			{
 				SetLastError(Server->GetLastError(true));
 				return false;
@@ -583,7 +639,7 @@ bool Connection::SendMSG(int TYPE, int FLAG, char* msg)
 		if (IsClient)
 		{
 			Client->SendMSG(Client->FormMsg(SENDER_CLIENT, TYPE, FLAG, msg));
-			if (Client->GetLastError(false) != NONE)
+			if (Client->GetLastError(false) != UDP::LastError::NONE)
 			{
 				SetLastError(Client->GetLastError(true));
 				return false;
@@ -626,3 +682,4 @@ bool Connection::Connected()
 {
 	return IsConnected;
 }
+

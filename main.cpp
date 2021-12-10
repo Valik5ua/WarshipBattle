@@ -194,26 +194,6 @@ LONG WINAPI MainWndProc(
 			statusField.startX = StatusFieldPosX;
 		}
 		break;
-		case MENU_GAME_PVE:
-		{
-			engine.StartNewGame();
-			engine.GameMode = engine.GAMEMODE::PVE;
-			engine.SetMode(engine.GAMESTATUS::Deploying);
-
-			clueField.startX = ClueFieldPosX;
-			statusField.startX = StatusFieldPosX;
-		}
-		break;
-		case MENU_GAME_PVP:
-		{
-			engine.StartNewGame();
-			engine.GameMode = Engine::GAMEMODE::PVP;
-			engine.SetMode(Engine::GAMESTATUS::Connecting);
-
-			clueField.startX = ClueFieldPosX;
-			statusField.startX = StatusFieldPosX;
-		}
-		break;
 		default:
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}

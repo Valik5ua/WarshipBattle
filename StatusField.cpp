@@ -62,6 +62,12 @@ void StatusField::Draw()
 		BottomTextureID = textureManager.StatusFieldBottomSearchingConnectionTextureID;
 	}
 	break;
+	case Engine::GAMESTATUS::Disconnecting:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomDisconnectTextureID;
+	}
+	break;
 	}
 
 	glEnable(GL_TEXTURE_2D);

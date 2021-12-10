@@ -10,7 +10,29 @@ UDPServer::UDPServer()
     Recv_addr.sin_port = htons(MYPORT);
     Recv_addr.sin_addr.s_addr = INADDR_ANY;
     
-    LAST_ERROR = NONE;
+    CONNECTION_TYPE = UDP::ConnectionType::AUTO;
+    LAST_ERROR = UDP::LastError::NONE;
+    
+    if (!Init())
+    {
+        closesocket(sock);
+        WSACleanup();
+    }
+}
+
+UDPServer::UDPServer(UDP::ConnectionType connectionType)
+{
+    len = sizeof(struct sockaddr_in);
+    Received = false;
+    BreakThread = false;
+
+    Recv_addr.sin_family = AF_INET;
+    Recv_addr.sin_port = htons(MYPORT);
+    Recv_addr.sin_addr.s_addr = INADDR_ANY;
+
+    CONNECTION_TYPE = connectionType;
+    LAST_ERROR = UDP::LastError::NONE;
+
     if (!Init())
     {
         closesocket(sock);
@@ -22,30 +44,34 @@ bool UDPServer::Init()
 {
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
     {
-        LAST_ERROR = WSA_INIT_ERROR;
+        LAST_ERROR = UDP::LastError::WSA_INIT_ERROR;
         return false;
     }
     
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock == INVALID_SOCKET)
     {
-        LAST_ERROR = SOCKET_INIT_ERROR;
+        LAST_ERROR = UDP::LastError::SOCKET_INIT_ERROR;
         return false;
     }
 
     //     This option is needed on the socket in order to be able to receive broadcast messages
     //   If not set the receiver will not receive broadcast messages in the local network.
-    if (setsockopt(this->sock, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0)
+    if (CONNECTION_TYPE == UDP::ConnectionType::AUTO)
     {
-        std::cout << "Error in setting Broadcast option" << std::endl;
-        LAST_ERROR = BROADCAST_INIT_ERROR;
-        return false;
+        if (setsockopt(this->sock, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0)
+        {
+            std::cout << "Error in setting Broadcast option" << std::endl;
+            LAST_ERROR = UDP::LastError::BROADCAST_INIT_ERROR;
+            return false;
+        }
     }
+    
     char enable = '1';
     if (setsockopt(this->sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) < 0)
     {
         std::cout << "Error in setting Reuseaddr option" << std::endl;
-        LAST_ERROR = BROADCAST_INIT_ERROR;
+        LAST_ERROR = UDP::LastError::BROADCAST_INIT_ERROR;
         return false;
     }
 
@@ -54,7 +80,7 @@ bool UDPServer::Init()
         std::cout << "Error in BINDING SERVER" << WSAGetLastError() << std::endl;
 
         std::system("pause");
-        LAST_ERROR = BIND_ERROR;
+        LAST_ERROR = UDP::LastError::BIND_ERROR;
         return false;
     }
 
@@ -124,7 +150,7 @@ void UDPServer::SendMSG(char* msg)
     if (sendto(sock, msg, strlen(msg) + 1, 0, (sockaddr*)&Sender_addr, sizeof(Sender_addr)) < 0)
     {
         std::cout << "Error in Sending." << WSAGetLastError() << std::endl;
-        LAST_ERROR = SEND_ERROR;
+        LAST_ERROR = UDP::LastError::SEND_ERROR;
         std::system("pause");
         closesocket(sock);
     }

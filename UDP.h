@@ -1,6 +1,13 @@
 #pragma once
 #include "winsock2.h"
+#include <ws2tcpip.h>
 #include <iostream>
+
+//#define SERVER			1
+//#define CLIENT			2
+//#define AUTO            3
+
+#define IP_LENGTH       15
 
 #define SENDER_SERVER   11
 #define SENDER_CLIENT   12
@@ -22,7 +29,14 @@
 class UDP
 {
 public:
-    enum LastError
+    enum class ConnectionType
+    {
+        AUTO = 0,
+        SERVER,
+        CLIENT
+    }CONNECTION_TYPE;
+
+    enum class LastError
     {
         NONE = 0,
         WSA_INIT_ERROR,
@@ -37,15 +51,16 @@ public:
         int SENDER;
         int TYPE;
         int FLAG;
-        int SIZE;
+        //int SIZE;
         const int MAX_MSG_LENGTH = MML;
         char* msg = new char[MAX_MSG_LENGTH];
     } MESSAGE;
+
     char* TempMsg = new char[MML + 3];
     UDP();
     ~UDP();
-    void ErroToConsole(int Err);
-    int GetLastError(bool ClearLastError);
+    static std::string ErroToString(UDP::LastError Err);
+    UDP::LastError GetLastError(bool ClearLastError);
     void CleanUp();
     void DecodeMsg(MSG& msg, char* str);
 

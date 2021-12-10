@@ -5,6 +5,7 @@ class UDPServer : public UDP
 {
 public:
     UDPServer();
+    UDPServer(UDP::ConnectionType connectionType);
     void AsyncReceiveMSG();
     void ReceiveMSG(int iter);
     void SendMSG(char* msg);
