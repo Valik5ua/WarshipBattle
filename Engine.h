@@ -38,6 +38,9 @@ public:
 	int GetMatchTime() { return this->MatchTimeSec; }
 	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
 	int GetOpponentShipsAlive() { return this->OpponentShipsAlive; }
+
+	void CloseConnection();
+	void WaitForDisconnection();
 public:
 
 	/// <summary>
@@ -46,8 +49,8 @@ public:
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
 
 	enum GAMESTATUS {	NewGame,
-						Connecting,
 						Deploying,
+						WaitingForOpponent,
 						MainGame,
 						ChoosingConnectionMode,
 						ChoosingConnectionSide,
@@ -71,9 +74,11 @@ public:
 	float ShootingAngle;
 	bool UserShot;
 public:
-	void SetMode(GAMESTATUS GameStatus);
+	void SetStatus(GAMESTATUS GameStatus);
 private:
 	bool UserTurn;
+
+	bool OpponentIsReady;
 
 	float fOffsetH;
 	float fOffsetW;
@@ -129,6 +134,13 @@ private:
 		POINT FieldCoordinates;
 	} MSGParam;
 
+	struct NetChecker
+	{
+		bool Connected;
+		const unsigned short int MaxCheckingFails = 60 * 2;
+		unsigned short int CheckingAttemptsFailed;
+		void CheckingFunc(bool success);
+	} netChecker;
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 	void StartAnimation(Field* field, POINT ShootingPoint);

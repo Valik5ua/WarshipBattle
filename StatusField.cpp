@@ -21,13 +21,39 @@ void StatusField::Draw()
 	break;
 	case Engine::GAMESTATUS::Deploying:
 	{
-		TopTextureID = textureManager.StatusFieldTopPVETextureID;
-		BottomTextureID = textureManager.StatusFieldBottomDeployShipsTextureID;
+		switch (engine.GameMode)
+		{
+		case Engine::GAMEMODE::PVE:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVETextureID;
+			BottomTextureID = textureManager.StatusFieldBottomDeployShipsTextureID;
+		}
+		break;
+		case Engine::GAMEMODE::PVP:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+			BottomTextureID = textureManager.StatusFieldBottomWaitingOnOpponentTextureID;
+		}
+		break;
+		}
 	}
 	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
-		TopTextureID = textureManager.StatusFieldTopPVETextureID;
+		switch (engine.GameMode)
+		{
+		case Engine::GAMEMODE::PVE:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVETextureID;
+		}
+		break;
+		case Engine::GAMEMODE::PVP:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		}
+		break;
+		}
+
 		if (engine.GetTurn()) BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
 		else BottomTextureID = textureManager.StatusFieldBottomOpponentTurnTextureID;
 	}

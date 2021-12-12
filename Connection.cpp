@@ -1,33 +1,14 @@
 #include "Connection.h"
 
-
 void Connection::AsyncAutoConnect()
 {
 	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncAutoConnect, (LPVOID)this, 0, NULL);
 }
 
-//void Connection::AsyncServerConnect()
-//{
-//	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncServerConnect, (LPVOID)this, 0, NULL);
-//}
-//
-//void Connection::StartAsyncServerConnect(Connection* inst)
-//{
-//	Connection* serverInst = (Connection*)inst;
-//	serverInst->ServerConnectA();
-//}
-//
-//void Connection::AsyncClientConnect()
-//{
-//	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncClientConnect, (LPVOID)this, 0, NULL);
-//
-//}
-//
-//void Connection::StartAsyncClientConnect(Connection* inst)
-//{
-//	Connection* clientInst = (Connection*)inst;
-//	clientInst->ClientConnectA();
-//}
+void Connection::AsyncManualConnect()
+{
+	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncManualConnect, (LPVOID)this, 0, NULL);
+}
 
 void Connection::AsyncDisconnect()
 {
@@ -38,7 +19,6 @@ void Connection::AsyncCheckConnection()
 {
 	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncCheckConnection, (LPVOID)this, 0, NULL);
 }
-
 
 void Connection::StartAsyncCheckConnection(Connection* inst)
 {
@@ -57,22 +37,6 @@ void Connection::StartAsyncDisconnect(Connection* inst)
 	Connection* Inst = (Connection*)inst;
 	Inst->Disconnect();
 }
-
-//Connection::Connection()
-//{
-//	HandleID = NULL;
-//	Server = nullptr;
-//	Client = nullptr;
-//	IsConnected = false;
-//	disconnected = false;
-//	IsServer = false;
-//	IsClient = false;
-//	ConnectionError = false;
-//	CancelConnecting = false;
-//	strcpy_s(IP, "127.0.0.1");
-//	LAST_ERROR = UDP::LastError::NONE;
-//	CONNECTION_TYPE = UDP::ConnectionType::AUTO;
-//}
 
 Connection::Connection(UDP::ConnectionType connectionType)
 {
@@ -183,8 +147,6 @@ void Connection::ServerConnect()
 			break;
 		}
 	}
-
-	//ExitThread(NULL);
 }
 
 void Connection::ServerConnect(int iter)
@@ -312,8 +274,6 @@ void Connection::ClientConnect()
 			break;
 		}
 	}
-
-	//ExitThread(NULL);
 }
 
 void Connection::ClientConnect(int iter)
@@ -423,7 +383,6 @@ void Connection::AutoConnect()
 		{
 			break;
 		}
-
 	}
 
 	ExitThread(NULL);
@@ -431,128 +390,214 @@ void Connection::AutoConnect()
 
 void Connection::ManualConnect()
 {
-/////////////////////////////////////////////
+	if (CONNECTION_TYPE == UDP::ConnectionType::AUTO)
+	{
+		std::cout << "WRONG CONNECTION TYPE: USE SERVER OR CLIENT ONLY WITH \"ManualConnect\" FUNCTION" << std::endl;
+	}
+
+	switch (CONNECTION_TYPE)
+	{
+	case UDP::ConnectionType::SERVER:
+	{
+		while (true)
+		{
+			this->ServerConnect();
+			if (IsServer)
+			{
+				if (CancelConnecting)
+				{
+					CleanUP();
+					break;
+				}
+				else
+				{
+					this->CheckConnection(AUTO_CONNECT_CHECKING_ITER_NUM);
+				}
+
+				if (IsConnected)
+				{
+					break;
+				}
+				else
+				{
+					CleanUP();
+				}
+			}
+			else if (CancelConnecting)
+			{
+				break;
+			}
+		}
+	}
+	break;
+	case UDP::ConnectionType::CLIENT:
+	{
+		while (true)
+		{
+			this->ClientConnect();
+			if (IsClient)
+			{
+				if (CancelConnecting)
+				{
+					CleanUP();
+					break;
+				}
+				else
+				{
+					this->CheckConnection(AUTO_CONNECT_CHECKING_ITER_NUM);
+				}
+
+				if (IsConnected)
+				{
+					break;
+				}
+				else
+				{
+					CleanUP();
+				}
+			}
+			else if (CancelConnecting)
+			{
+				break;
+			}
+		}
+	}
+	break;
+	}
+	
+	ExitThread(NULL);
 }
 
 void Connection::CheckConnection()
 {
 	int AttemptCounter = 0;
-	
-	if (IsServer)
+	if (IsServer || IsClient)
 	{
-		while (true)
+		if (IsServer)
 		{
-			Server->ReceiveMSG(SERVER_CHECKING_ITER_NUM); //20 was good
-			if (Server->Received)
+			while (true)
 			{
-				UDP::MSG msg;
-				Server->DecodeMsg(msg, Server->MSGReceived);
-				if (msg.SENDER == SENDER_CLIENT && msg.TYPE == TYPE_CHECK)
+				Server->ReceiveMSG(SERVER_CHECKING_ITER_NUM);
+				if (Server->Received)
 				{
-					Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE_CHECK, FLAG_ONE, (char*)"check"));
-					AttemptCounter = 0;
-					IsConnected = true;
-					std::cout << "SERVER CONNECTION CHECKED" << std::endl;
+					UDP::MSG msg;
+					Server->DecodeMsg(msg, Server->MSGReceived);
+					if (msg.SENDER == SENDER_CLIENT && msg.TYPE == TYPE_CHECK)
+					{
+						Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE_CHECK, FLAG_ONE, (char*)"check"));
+						AttemptCounter = 0;
+						IsConnected = true;
+						std::cout << "SERVER CONNECTION CHECKED" << std::endl;
+					}
 				}
-			}
-			Sleep(SERVER_CHECKING_SLEEP_TIME); // 10 was good
-			if (++AttemptCounter == MAX_CHEKING_ATTEMPTS)
-			{
-				IsConnected = false;
-				break;
-			}
-		}
-	}
-
-	if (IsClient)
-	{
-		while (true)
-		{
-			Client->SendMSG(Client->FormMsg(SENDER_CLIENT, TYPE_CHECK, FLAG_ONE, (char*)"check"));
-
-			Client->ReceiveMSG(CLIENT_CHECKING_ITER_NUM); // 30 was good
-			if (Client->Received)
-			{
-				UDP::MSG msg;
-				Client->DecodeMsg(msg, Client->MSGReceived);
-				if (msg.SENDER == SENDER_SERVER && msg.TYPE == TYPE_CHECK)
+				Sleep(SERVER_CHECKING_SLEEP_TIME);
+				if (++AttemptCounter == MAX_CHEKING_ATTEMPTS)
 				{
-					AttemptCounter = 0;
-					IsConnected = true;
-					std::cout << "CLIENT CONNECTION CHECKED" << std::endl;
+					IsConnected = false;
+					break;
 				}
-			}
-			Sleep(CLIENT_CHECKING_SLEEP_TIME); // 10 was good
-			if (++AttemptCounter == MAX_CHEKING_ATTEMPTS)
-			{
-				IsConnected = false;
-				break;
 			}
 		}
 
+		if (IsClient)
+		{
+			while (true)
+			{
+				Client->SendMSG(Client->FormMsg(SENDER_CLIENT, TYPE_CHECK, FLAG_ONE, (char*)"check"));
+
+				Client->ReceiveMSG(CLIENT_CHECKING_ITER_NUM);
+				if (Client->Received)
+				{
+					UDP::MSG msg;
+					Client->DecodeMsg(msg, Client->MSGReceived);
+					if (msg.SENDER == SENDER_SERVER && msg.TYPE == TYPE_CHECK)
+					{
+						AttemptCounter = 0;
+						IsConnected = true;
+						std::cout << "CLIENT CONNECTION CHECKED" << std::endl;
+					}
+				}
+				Sleep(CLIENT_CHECKING_SLEEP_TIME);
+				if (++AttemptCounter == MAX_CHEKING_ATTEMPTS)
+				{
+					IsConnected = false;
+					break;
+				}
+			}
+
+		}
+	}
+	else
+	{
+		std::cout << "YOU ARE NOT CONNECTED. USE AUTO/MANUAL CONNECT BEFORE SEND OR RECEIVE." << std::endl;
 	}
 
-	IsConnected = false;
 	ExitThread(NULL);
 }
 
 void Connection::CheckConnection(int MaxAttempt)
 {
 	int AttemptCounter = 0;
-
-	if (IsServer)
+	
+	if (IsServer || IsClient)
 	{
-		while (true)
+		if (IsServer)
 		{
-			Server->ReceiveMSG(SERVER_CHECKING_ITER_NUM); //20 was good
-			if (Server->Received)
+			while (true)
 			{
-				UDP::MSG msg;
-				Server->DecodeMsg(msg, Server->MSGReceived);
-				if (msg.SENDER == SENDER_CLIENT && msg.TYPE == TYPE_CHECK)
+				Server->ReceiveMSG(SERVER_CHECKING_ITER_NUM);
+				if (Server->Received)
 				{
-					Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE_CHECK, FLAG_ONE, (char*)"check"));
-					
-					IsConnected = true;
-					std::cout << "SERVER CONNECTION CHECKED" << std::endl;
+					UDP::MSG msg;
+					Server->DecodeMsg(msg, Server->MSGReceived);
+					if (msg.SENDER == SENDER_CLIENT && msg.TYPE == TYPE_CHECK)
+					{
+						Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE_CHECK, FLAG_ONE, (char*)"check"));
+
+						IsConnected = true;
+						std::cout << "SERVER CONNECTION CHECKED" << std::endl;
+						break;
+					}
+				}
+
+				if (++AttemptCounter == MaxAttempt)
+				{
+					IsConnected = false;
 					break;
 				}
 			}
-			//Sleep(SERVER_CHECKING_SLEEP_TIME); // 10 was good
-			if (++AttemptCounter == MaxAttempt)
+		}
+
+		if (IsClient)
+		{
+			while (true)
 			{
-				IsConnected = false;
-				break;
+				Client->SendMSG(Client->FormMsg(SENDER_CLIENT, TYPE_CHECK, FLAG_ONE, (char*)"check"));
+
+				Client->ReceiveMSG(CLIENT_CHECKING_ITER_NUM);
+				if (Client->Received)
+				{
+					UDP::MSG msg;
+					Client->DecodeMsg(msg, Client->MSGReceived);
+					if (msg.SENDER == SENDER_SERVER && msg.TYPE == TYPE_CHECK)
+					{
+						IsConnected = true;
+						std::cout << "CLIENT CONNECTION CHECKED" << std::endl;
+						break;
+					}
+				}
+
+				if (++AttemptCounter == MaxAttempt)
+				{
+					IsConnected = false;
+					break;
+				}
 			}
 		}
 	}
-
-	if (IsClient)
+	else
 	{
-		while (true)
-		{
-			Client->SendMSG(Client->FormMsg(SENDER_CLIENT, TYPE_CHECK, FLAG_ONE, (char*)"check"));
-
-			Client->ReceiveMSG(CLIENT_CHECKING_ITER_NUM); // 30 was good
-			if (Client->Received)
-			{
-				UDP::MSG msg;
-				Client->DecodeMsg(msg, Client->MSGReceived);
-				if (msg.SENDER == SENDER_SERVER && msg.TYPE == TYPE_CHECK)
-				{
-					IsConnected = true;
-					std::cout << "CLIENT CONNECTION CHECKED" << std::endl;
-					break;
-				}
-			}
-			//Sleep(CLIENT_CHECKING_SLEEP_TIME); // 10 was good
-			if (++AttemptCounter == MaxAttempt)
-			{
-				IsConnected = false;
-				break;
-			}
-		}
-
+		std::cout << "YOU ARE NOT CONNECTED. USE AUTO/MANUAL CONNECT BEFORE SEND OR RECEIVE." << std::endl;
 	}
 }
 
@@ -572,7 +617,7 @@ void Connection::Disconnect()
 	{
 		CancelConnecting = true;
 		WaitForSingleObject(HandleID, INFINITE);
-		CloseHandle(HandleID);
+		//CloseHandle(HandleID);
 	}
 
 	CleanUP();
@@ -587,26 +632,13 @@ bool Connection::Disconnected()
 void Connection::SetLastError(UDP::LastError err)
 {
 	ConnectionError = true;
-
 	LAST_ERROR = err;
+}
 
-	/*switch (err)
-	{
-	case 0: LAST_ERROR = UDP::LastError::NONE;
-		break;
-	case 1: LAST_ERROR = UDP::LastError::WSA_INIT_ERROR;
-		break;
-	case 2: LAST_ERROR = UDP::LastError::SOCKET_INIT_ERROR;
-		break;
-	case 3: LAST_ERROR = UDP::LastError::BROADCAST_INIT_ERROR;
-		break;
-	case 4: LAST_ERROR = UDP::LastError::BIND_ERROR;
-		break;
-	case 5: LAST_ERROR = UDP::LastError::SEND_ERROR;
-		break;
-	default: LAST_ERROR = UDP::LastError::NONE;
-		break;
-	}*/
+void Connection::StartAsyncManualConnect(Connection* inst)
+{
+	Connection* Inst = (Connection*)inst;
+	Inst->ManualConnect();
 }
 
 UDP::LastError Connection::GetLastError(bool CleanLastError)
@@ -617,12 +649,12 @@ UDP::LastError Connection::GetLastError(bool CleanLastError)
 		ConnectionError = false;
 		LAST_ERROR = UDP::LastError::NONE;
 	}
+
 	return temp_lastError;
 }
 
 bool Connection::SendMSG(int TYPE, int FLAG, char* msg)
 {
-	///////CHECK CONNECTION
 	if (IsConnected)
 	{
 		if (IsServer)
@@ -647,6 +679,12 @@ bool Connection::SendMSG(int TYPE, int FLAG, char* msg)
 			return true;
 		}
 	}
+	else
+	{
+		std::cout << "YOU ARE NOT CONNECTED. USE AUTO/MANUAL CONNECT BEFORE SEND OR RECEIVE." << std::endl;
+		return false;
+	}
+
 	return false;
 }
 
@@ -674,6 +712,11 @@ bool Connection::ReceiveMSG(UDP::MSG& msg, int iterOfReceive)
 			}
 		}
 	}
+	else
+	{
+		std::cout << "YOU ARE NOT CONNECTED. USE AUTO/MANUAL CONNECT BEFORE SEND OR RECEIVE." << std::endl;
+		return false;
+	}
 
 	return false;
 }
@@ -682,4 +725,3 @@ bool Connection::Connected()
 {
 	return IsConnected;
 }
-

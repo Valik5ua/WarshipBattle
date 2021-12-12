@@ -86,6 +86,8 @@ void TextureManager::LoadAllTextures()
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseConnType.bmp", this->StatusFieldBottomChooseConnTypeTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomChooseConnSide.bmp", this->StatusFieldBottomChooseConnSideTextureID);
     LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomDisconnect.bmp", this->StatusFieldBottomDisconnectTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomOpponentReady.bmp", this->StatusFieldBottomOpponentReadyTextureID);
+    LoadTexture((char*)"Textures\\StatusFieldTextures\\Bottom\\StatusFieldBottomWaitingOnOpponent.bmp", this->StatusFieldBottomWaitingOnOpponentTextureID);
 
     LoadTexture((char*)"Textures\\StatisticField.bmp", this->StatisticFieldTextureID);
 

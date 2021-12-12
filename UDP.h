@@ -1,4 +1,5 @@
 #pragma once
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 #include "winsock2.h"
 #include <ws2tcpip.h>
 #include <iostream>
@@ -23,7 +24,7 @@
 #define FLAG_FOUR       34
 #define FLAG_DISCONNECT 35
 
-#define MYPORT          54000    // the port users will be connecting to
+#define MYPORT          54000
 #define MML             200
 
 class UDP

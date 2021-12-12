@@ -53,6 +53,9 @@ Engine::Engine()	:GameMode(GAMEMODE::Menu),
 {
 	std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
 	this->dtn = tp.time_since_epoch();
+
+	this->netChecker.Connected = true;
+	this->netChecker.CheckingAttemptsFailed = 0;
 }
 
 /// <summary>
@@ -131,7 +134,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			{
 				this->StartNewGame();
 				this->GameMode = GAMEMODE::PVE;
-				this->SetMode(GAMESTATUS::Deploying);
+				this->SetStatus(GAMESTATUS::Deploying);
 			}
 			break;
 			case TRANSLATEDMSG_NEWGAMEPVP:
@@ -236,8 +239,8 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			}
 			if (this->connection->Connected())
 			{
-				MessageBox(NULL, L"CONNECTED!", L"CONNECTED!!!!!!!", NULL);
-				this->SetMode(GAMESTATUS::Deploying);
+				this->SetStatus(GAMESTATUS::Deploying);
+				this->GameMode = GAMEMODE::PVP;
 			}
 			switch (TranslatedMSG)
 			{
@@ -295,6 +298,10 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			case TRANSLATEDMSG_DEPLOY:
 			{
 				buttonFieldDeploy.Deploy();
+				if (this->ShipsDeployed == 10)
+				{
+					engine.SetStatus(Engine::GAMESTATUS::MainGame);
+				}
 			}
 			break;
 			case TRANSLATEDMSG_ROTATE:
@@ -373,10 +380,42 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	break;
 	case this->GAMEMODE::PVP:
 	{
+		this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)"Check");
+		UDP::MSG Msg;
+		if (this->connection->ReceiveMSG(Msg, 2))
+		{
+			if (Msg.TYPE == TYPE_CHECK && Msg.FLAG == FLAG_ONE)
+			{
+				netChecker.CheckingFunc(true);
+			}
+			else
+			{
+				netChecker.CheckingFunc(false);
+				if (!netChecker.Connected)
+				{
+					this->CloseConnection();
+					MessageBoxA(NULL, "Disconnected from opponent.", "Disconnected.", NULL);
+				}
+			}
+		}
+		else
+		{ 
+			netChecker.CheckingFunc(false);
+			if (!netChecker.Connected)
+			{
+				this->CloseConnection();
+				MessageBoxA(NULL, "Disconnected from opponent.", "Disconnected.", NULL);
+			}
+		}
+		
 		switch (this->GameStatus)
 		{
 		case GAMESTATUS::Deploying:
 		{
+			if (engine.ShipsDeployed == 10)
+			{
+				//if (this->OpponentIsReady) 
+			}
 			switch (TranslatedMSG)
 			{
 			case TRANSLATEDMSG_MOVESHIPL:
@@ -402,6 +441,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			case TRANSLATEDMSG_DEPLOY:
 			{
 				buttonFieldDeploy.Deploy();
+				
 			}
 			break;
 			case TRANSLATEDMSG_ROTATE:
@@ -525,7 +565,7 @@ void Engine::StartNewGame()
 
 void Engine::GameOver(bool UserWon)
 {
-	this->SetMode(this->GAMESTATUS::NewGame);
+	this->SetStatus(this->GAMESTATUS::NewGame);
 
 	this->animation = Animation::MainMenu;
 	this->menuAnimation.DefaultDirection = false;
@@ -550,7 +590,7 @@ void Engine::GameOver(bool UserWon)
 /// Sets the game mode.
 /// </summary>
 /// <param name="Mode: ">The new mode to be set.</param>
-void Engine::SetMode(GAMESTATUS GameStatus)
+void Engine::SetStatus(GAMESTATUS GameStatus)
 {
 	this->GameStatus = GameStatus;
 	this->ShipsDeployed = 0;
@@ -867,6 +907,30 @@ void Engine::SwitchTurns()
 	this->UserTurn = !this->UserTurn;
 }
 
+void Engine::CloseConnection()
+{
+	if (this->connection)
+	{
+		this->connection->AsyncDisconnect();
+		this->GameStatus = GAMESTATUS::Disconnecting;
+		this->GameMode = GAMEMODE::Menu;
+	}
+}
+
+void Engine::WaitForDisconnection()
+{
+	if (!connection) return;
+	while (true)
+	{
+		if (this->connection->Disconnected())
+		{
+			delete this->connection;
+			this->connection = nullptr;
+			return;
+		}
+	}
+}
+
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 {
 	this->animation = Animation::Rocket;
@@ -1105,5 +1169,15 @@ void Engine::MenuAnimation::Draw()
 		}
 	}
 	break;
+	}
+}
+
+void Engine::NetChecker::CheckingFunc(bool success)
+{
+	if (success) { this->CheckingAttemptsFailed = 0; this->Connected = true; }
+	else
+	{
+		if (++this->CheckingAttemptsFailed == this->MaxCheckingFails)
+			this->Connected = false;
 	}
 }

@@ -4,7 +4,6 @@
 #include "UDPClient.h"
 
 #define MSG_RECEIVE_ITER_NUM				100
-//#define CONNECTION_ITER_NUM					300
 #define SERVER_CONNECTION_SLEEP_TIME		400
 #define CLIENT_CONNECTION_SLEEP_TIME		200
 #define SERVER_CHECKING_SLEEP_TIME			20
@@ -16,7 +15,6 @@
 #define AUTO_CONNECT_SERVER_ATTEMPTS		2
 #define AUTO_CONNECT_CLIENT_ATTEMPTS		1
 
-
 class Connection
 {
 public:
@@ -24,26 +22,28 @@ public:
 	Connection() = delete;
 	Connection(UDP::ConnectionType connectionType);
 	void AsyncAutoConnect();
-	bool Connected();
+	void AsyncManualConnect();
 	void AsyncDisconnect();
+	bool Connected();
 	bool Disconnected();
+
 	UDP::LastError GetLastError(bool CleanLastError);
 	bool SendMSG(int TYPE, int FLAG, char* msg);
 	bool ReceiveMSG(UDP::MSG& msg, int iterOfReceive);
+	void SetConnectingIP(char* ip);
 
 private:
 	//void AsyncServerConnect();
 	//void AsyncClientConnect();
+	void ManualConnect();
 	void Disconnect();
 	void AsyncCheckConnection();
-	void ManualConnect();
 	void ServerConnect();
 	void ServerConnect(int iter);
 	void ClientConnect();
 	void ClientConnect(int iter);
 	void CheckConnection();
 	void CheckConnection(int MaxAttempt);
-	void SetConnectingIP(char* ip);
 
 private:
 	UDP::LastError LAST_ERROR;
@@ -61,8 +61,9 @@ private:
 private:
 	void CleanUP();
 	void SetLastError(UDP::LastError err);
-	static void StartAsyncServerConnect(Connection* inst);
-	static void StartAsyncClientConnect(Connection* inst);
+	static void StartAsyncManualConnect(Connection* inst);
+	//static void StartAsyncServerConnect(Connection* inst);
+	//static void StartAsyncClientConnect(Connection* inst);
 	static void StartAsyncCheckConnection(Connection* inst);
 	static void StartAsyncAutoConnect(Connection* inst);
 	static void StartAsyncDisconnect(Connection* inst);

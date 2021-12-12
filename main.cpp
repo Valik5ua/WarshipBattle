@@ -188,10 +188,12 @@ LONG WINAPI MainWndProc(
 		{
 			engine.StartNewGame();
 			engine.GameMode = engine.GAMEMODE::Menu;
-			engine.SetMode(engine.GAMESTATUS::NewGame);
-
+			engine.SetStatus(engine.GAMESTATUS::NewGame);
+		
 			clueField.startX = ClueFieldPosX;
 			statusField.startX = StatusFieldPosX;
+			
+			engine.CloseConnection();
 		}
 		break;
 		default:
@@ -231,8 +233,11 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	case WM_CLOSE:
+	{
 		if (MessageBox(hWnd, L"Do you really want to quit Warship Battle?", L"Exit?", MB_ICONWARNING | MB_YESNO) == IDYES)
 		{
+			engine.CloseConnection();
+			engine.WaitForDisconnection();
 			if (hRC)
 				wglDeleteContext(hRC);
 			if (hDC)
@@ -241,17 +246,18 @@ LONG WINAPI MainWndProc(
 			hDC = 0;
 			DestroyWindow(hWnd);
 		}
-			break;
-
+	}
+	break;
 	case WM_DESTROY:
-
-			if (hRC)
-				wglDeleteContext(hRC);
-			if (hDC)
-				ReleaseDC(hWnd, hDC);
-			CloseHandle(TimerFuncHandler);
-			PostQuitMessage(0);
-		break;
+	{
+		if (hRC)
+			wglDeleteContext(hRC);
+		if (hDC)
+			ReleaseDC(hWnd, hDC);
+		CloseHandle(TimerFuncHandler);
+		PostQuitMessage(0);
+	}
+	break;
 	case WM_GETMINMAXINFO:
 	{
 		PMINMAXINFO pMinMaxInfo{ (PMINMAXINFO)lParam };
@@ -361,7 +367,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glLoadIdentity(); //Reset Coordinate System
 	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
-	engine.SetMode(engine.GameStatus);
+	engine.SetStatus(engine.GameStatus);
 }
 
 /// <summary>

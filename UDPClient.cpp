@@ -31,8 +31,9 @@ UDPClient::UDPClient(UDP::ConnectionType connectionType, char* ip)
 	
 	if (connectionType == UDP::ConnectionType::CLIENT)
 	{
-		//Recv_addr.sin_addr.s_addr = inet_addr(ip);
-		InetPton(AF_INET,(PCWSTR)ip, &Recv_addr.sin_addr.s_addr);
+		//Recv_addr.sin_addr.s_addr = INADDR_ANY;
+		Recv_addr.sin_addr.s_addr = inet_addr(ip);
+		//InetPton(AF_INET,(PCWSTR)ip, &Recv_addr.sin_addr.s_addr);
 	}
 	else
 	{
