@@ -394,7 +394,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 				if (!netChecker.Connected)
 				{
 					this->CloseConnection();
-					MessageBoxA(NULL, "Disconnected from opponent.", "Disconnected.", NULL);
+					MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
 				}
 			}
 		}
@@ -404,7 +404,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			if (!netChecker.Connected)
 			{
 				this->CloseConnection();
-				MessageBoxA(NULL, "Disconnected from opponent.", "Disconnected.", NULL);
+				MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
 			}
 		}
 		
