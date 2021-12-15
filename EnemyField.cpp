@@ -101,12 +101,13 @@ int EnemyField::ShipExists(const POINT Coordinates)
 /// <param name="Mode: ">The mode of the creation.</param>
 void EnemyField::CreateShips(const Engine::GAMESTATUS GameStatus)
 {
-	this->ClearField();
-	this->CleanShips();
 	switch (GameStatus)
 	{
 	case Engine::GAMESTATUS::Deploying:
 	{
+		this->ClearField();
+		this->CleanShips();
+
 		Ship ship({ 0,0 }, 4);
 		this->Ships[0] = ship;
 		Ship ship2({ 1,0 }, 3);
