@@ -41,6 +41,10 @@ public:
 
 	void CloseConnection();
 	void WaitForDisconnection();
+
+	void ShipsMSG(char* RecievedMSG);
+	std::string ShipsMSG();
+
 public:
 
 	/// <summary>
@@ -69,16 +73,20 @@ public:
 					} shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	enum Animation { None, Rocket, MainMenu } animation;
-	bool LastShotAccomplished;
-	int ShipsDeployed;
+
+	unsigned int ShipsDeployed;
 	float ShootingAngle;
+	bool LastShotAccomplished;
 	bool UserShot;
+	bool OpponentIsReady;
+
+	Ship RecievedShips[10]{};
+
 public:
 	void SetStatus(GAMESTATUS GameStatus);
+
 private:
 	bool UserTurn;
-
-	bool OpponentIsReady;
 
 	float fOffsetH;
 	float fOffsetW;
@@ -95,6 +103,7 @@ private:
 	std::chrono::system_clock::duration dtn;
 
 	Connection* connection;
+
 public:
 	class AnimationRocket
 	{
@@ -128,6 +137,7 @@ public:
 		MenuAnimation();
 		void Draw();
 	} menuAnimation;
+
 private:
 	struct MessageParam
 	{
@@ -141,9 +151,11 @@ private:
 		unsigned short int CheckingAttemptsFailed;
 		void CheckingFunc(bool success);
 	} netChecker;
+
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 	void StartAnimation(Field* field, POINT ShootingPoint);
+
 private:
 	//Fully translated messages for Engine::Event
 
@@ -182,4 +194,5 @@ private:
 
 	//Messages when the GAMESTATUS and GAMEMODE are not taken into account
 #define TRANSLATEDMSG_SOUNDBUTTONCLICK		15001
+
 };

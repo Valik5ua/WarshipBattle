@@ -25,16 +25,14 @@ public:
 	void AsyncManualConnect();
 	void AsyncDisconnect();
 	bool Connected();
+	bool Connected(UDP::ConnectionType connectionType);
 	bool Disconnected();
-
 	UDP::LastError GetLastError(bool CleanLastError);
 	bool SendMSG(int TYPE, int FLAG, char* msg);
 	bool ReceiveMSG(UDP::MSG& msg, int iterOfReceive);
 	void SetConnectingIP(char* ip);
 
 private:
-	//void AsyncServerConnect();
-	//void AsyncClientConnect();
 	void ManualConnect();
 	void Disconnect();
 	void AsyncCheckConnection();
@@ -47,23 +45,21 @@ private:
 
 private:
 	UDP::LastError LAST_ERROR;
-	char IP[15];
 	HANDLE HandleID;
+	UDPServer* Server;
+	UDPClient* Client;
+	char IP[IP_LENGTH];
 	bool IsConnected;
 	bool IsServer;
 	bool IsClient;
 	bool CancelConnecting;
 	bool ConnectionError;
 	bool disconnected;
-	UDPServer* Server;
-	UDPClient* Client;
 
 private:
 	void CleanUP();
 	void SetLastError(UDP::LastError err);
 	static void StartAsyncManualConnect(Connection* inst);
-	//static void StartAsyncServerConnect(Connection* inst);
-	//static void StartAsyncClientConnect(Connection* inst);
 	static void StartAsyncCheckConnection(Connection* inst);
 	static void StartAsyncAutoConnect(Connection* inst);
 	static void StartAsyncDisconnect(Connection* inst);
