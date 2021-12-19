@@ -34,6 +34,7 @@ public:
 private:
 	void SetShipDeployableStatus(Ship& ship);
 	void DeployEnemyShips();
+	void DeployEnemyShips(Ship RecievedShips[MAX_SHIPS_COUNT]);
 	void ClearField();
 	void CleanShips();
 	void Deselect();

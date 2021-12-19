@@ -137,12 +137,12 @@ void EnemyField::CreateShips(const Engine::GAMESTATUS GameStatus)
 		{
 		case Engine::GAMEMODE::PVE:
 		{
-			DeployEnemyShips();
+			this->DeployEnemyShips();
 		}
 		break;
 		case Engine::GAMEMODE::PVP:
 		{
-
+			this->DeployEnemyShips(engine.RecievedShips);
 		}
 		break;
 		}
@@ -449,6 +449,18 @@ void EnemyField::DeployEnemyShips()
 			this->Cells[this->Ships[i].Decks[DeckNum].Position.x][this->Ships[i].Decks[DeckNum].Position.y].Open = false;
 
 	}
+
+	SetShipMarkers();
+	this->DeployingShipID = 10;
+}
+
+void EnemyField::DeployEnemyShips(Ship RecievedShips[MAX_SHIPS_COUNT])
+{
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		this->Ships[i] = RecievedShips[i];
+	}
+
 	SetShipMarkers();
 	this->DeployingShipID = 10;
 }

@@ -1,15 +1,32 @@
 #include "Connection.h"
-
+/// <summary>
+/// Function creates UDP connection automaticaly. Connection object must be created with 
+/// UDP::ConnectionType::AUTO parameter befor calling this function. GetLastError() function
+/// has to be called after creating Connection object to check if error was set, if 
+/// object was created and WSA was initialized without errors GetLastError() function
+/// returns UDP::LastError::NONE.
+/// </summary>
 void Connection::AsyncAutoConnect()
 {
 	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncAutoConnect, (LPVOID)this, 0, NULL);
 }
-
+/// <summary>
+/// Function creates UDP connection automaticaly. Connection object must be created with 
+/// UDP::ConnectionType::SERVER or UDP::ConnectionType::SERVER 
+/// parameter befor calling this function. GetLastError() function
+/// has to be called after creating Connection object to check if error was set, if 
+/// object was created and WSA was initialized without errors GetLastError() function
+/// returns UDP::LastError::NONE.
+/// </summary>
 void Connection::AsyncManualConnect()
 {
 	HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncManualConnect, (LPVOID)this, 0, NULL);
 }
-
+/// <summary>
+/// Function ASYNC disconnecting UDP connection if it's connected or not.
+/// Connection object must be created befor calling this function.
+/// "Disconnected" is TRUE when UDP connection closed.
+/// </summary>
 void Connection::AsyncDisconnect()
 {
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncDisconnect, (LPVOID)this, 0, NULL);
@@ -37,7 +54,11 @@ void Connection::StartAsyncDisconnect(Connection* inst)
 	Connection* Inst = (Connection*)inst;
 	Inst->Disconnect();
 }
-
+/// <summary>
+/// Constructor with ConnectionType
+/// </summary>
+/// <param name="connectionType">Must pass UDP::ConnectionType.
+/// Can be UDP::ConnectionType::AUTO, UDP::ConnectionType::SERVER or UDP::ConnectionType::CLIENT</param>
 Connection::Connection(UDP::ConnectionType connectionType)
 {
 	HandleID = NULL;
@@ -53,7 +74,9 @@ Connection::Connection(UDP::ConnectionType connectionType)
 	strcpy_s(IP,"127.0.0.1");
 	CONNECTION_TYPE = connectionType;
 }
-
+/// <summary>
+/// Closing WSA UDP connection and setting default object parameters
+/// </summary>
 void Connection::CleanUP()
 {
 	if (IsServer)
@@ -77,7 +100,10 @@ void Connection::CleanUP()
 	LAST_ERROR = UDP::LastError::NONE;
 	disconnected = true;
 }
-
+/// <summary>
+/// Function for achieving UDP connection as server.
+/// Stops working if connection achieved or "CancelConnecting" is TRUE.
+/// </summary>
 void Connection::ServerConnect()
 {
 	while (true)
@@ -148,7 +174,11 @@ void Connection::ServerConnect()
 		}
 	}
 }
-
+/// <summary>
+/// Function for achieving UDP connection as server.
+/// Stops working if connection achieved or "iter" is 0.
+/// </summary>
+/// <param name="iter">Counter of connection attempts</param>
 void Connection::ServerConnect(int iter)
 {
 	for (int i = 0; i < iter; i++)
@@ -214,7 +244,10 @@ void Connection::ServerConnect(int iter)
 		}
 	}
 }
-
+/// <summary>
+/// Function for achieving UDP connection as client.
+/// Stops working if connection achieved or "CancelConnecting" is TRUE.
+/// </summary>
 void Connection::ClientConnect()
 {
 	while (true)
@@ -275,7 +308,11 @@ void Connection::ClientConnect()
 		}
 	}
 }
-
+/// <summary>
+/// Function for achieving UDP connection as client.
+/// Stops working if connection achieved or "iter" is 0.
+/// </summary>
+/// <param name="iter">Counter of connection attempts</param>
 void Connection::ClientConnect(int iter)
 {
 	for (int i = 0; i < iter; i++)
@@ -331,7 +368,10 @@ void Connection::ClientConnect(int iter)
 		}
 	}
 }
-
+/// <summary>
+/// Function for achieving UDP connection as server or client.
+/// Stops working if connection achieved or "CancelConnecting" is TRUE.
+/// </summary>
 void Connection::AutoConnect()
 {
 	while (true)
@@ -387,7 +427,10 @@ void Connection::AutoConnect()
 
 	ExitThread(NULL);
 }
-
+/// <summary>
+/// Function for achieving UDP connection as server or client dependes on UDP::ConnectionType.
+/// Stops working if connection achieved or "CancelConnecting" is TRUE.
+/// </summary>
 void Connection::ManualConnect()
 {
 	if (CONNECTION_TYPE == UDP::ConnectionType::AUTO)
@@ -467,7 +510,9 @@ void Connection::ManualConnect()
 	
 	ExitThread(NULL);
 }
-
+/// <summary>
+/// Function sets "IsConnected" TRUE if connection confirmed
+/// </summary>
 void Connection::CheckConnection()
 {
 	int AttemptCounter = 0;
@@ -487,7 +532,6 @@ void Connection::CheckConnection()
 						Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE_CHECK, FLAG_ONE, (char*)"check"));
 						AttemptCounter = 0;
 						IsConnected = true;
-						std::cout << "SERVER CONNECTION CHECKED" << std::endl;
 					}
 				}
 				Sleep(SERVER_CHECKING_SLEEP_TIME);
@@ -514,7 +558,6 @@ void Connection::CheckConnection()
 					{
 						AttemptCounter = 0;
 						IsConnected = true;
-						std::cout << "CLIENT CONNECTION CHECKED" << std::endl;
 					}
 				}
 				Sleep(CLIENT_CHECKING_SLEEP_TIME);
@@ -534,7 +577,10 @@ void Connection::CheckConnection()
 
 	ExitThread(NULL);
 }
-
+/// <summary>
+/// Function sets "IsConnected" TRUE if connection confirmed
+/// </summary>
+/// <param name="MaxAttempt">Counter of connection check attempts</param>
 void Connection::CheckConnection(int MaxAttempt)
 {
 	int AttemptCounter = 0;
@@ -555,7 +601,6 @@ void Connection::CheckConnection(int MaxAttempt)
 						Server->SendMSG(Server->FormMsg(SENDER_SERVER, TYPE_CHECK, FLAG_ONE, (char*)"check"));
 
 						IsConnected = true;
-						std::cout << "SERVER CONNECTION CHECKED" << std::endl;
 						break;
 					}
 				}
@@ -582,7 +627,6 @@ void Connection::CheckConnection(int MaxAttempt)
 					if (msg.SENDER == SENDER_SERVER && msg.TYPE == TYPE_CHECK)
 					{
 						IsConnected = true;
-						std::cout << "CLIENT CONNECTION CHECKED" << std::endl;
 						break;
 					}
 				}
@@ -600,7 +644,10 @@ void Connection::CheckConnection(int MaxAttempt)
 		std::cout << "YOU ARE NOT CONNECTED. USE AUTO/MANUAL CONNECT BEFORE SEND OR RECEIVE." << std::endl;
 	}
 }
-
+/// <summary>
+/// Function sets IP to connect to for client
+/// </summary>
+/// <param name="ip">Char* with IP address of SERVER to connect to</param>
 void Connection::SetConnectingIP(char* ip)
 {
 	for (int i = 0; i < IP_LENGTH; i++)
@@ -610,25 +657,33 @@ void Connection::SetConnectingIP(char* ip)
 
 	strcpy_s(IP, ip);
 }
-
+/// <summary>
+/// Disconnecting and cleaning up. Function must be called after Connection object has been created.
+/// </summary>
 void Connection::Disconnect()
 {
 	if (!IsConnected)
 	{
 		CancelConnecting = true;
 		WaitForSingleObject(HandleID, INFINITE);
-		//CloseHandle(HandleID);
+		CloseHandle(HandleID);
 	}
 
 	CleanUP();
 	ExitThread(NULL);
 }
-
+/// <summary>
+/// Function returns TRUE if UDP connection is disconnected.
+/// </summary>
+/// <returns>TRUE if disconnected.</returns>
 bool Connection::Disconnected()
 {
 	return disconnected;
 }
-
+/// <summary>
+/// Sets UDP::LastError.
+/// </summary>
+/// <param name="err">UDP::LastError to be set.</param>
 void Connection::SetLastError(UDP::LastError err)
 {
 	ConnectionError = true;
@@ -640,7 +695,11 @@ void Connection::StartAsyncManualConnect(Connection* inst)
 	Connection* Inst = (Connection*)inst;
 	Inst->ManualConnect();
 }
-
+/// <summary>
+/// Function to get UDP::LastError and clean UDP::LastError.
+/// </summary>
+/// <param name="CleanLastError">Sets UDP::LastError = UDP::LastError::NONE if TRUE.</param>
+/// <returns>UDP::LastError value. If no errors returns UDP::LastError::NONE</returns>
 UDP::LastError Connection::GetLastError(bool CleanLastError)
 {
 	UDP::LastError temp_lastError = LAST_ERROR;
@@ -652,7 +711,18 @@ UDP::LastError Connection::GetLastError(bool CleanLastError)
 
 	return temp_lastError;
 }
-
+/// <summary>
+/// Function for sending a message that contains SENDER,
+/// TYPE, FLAG and message.
+/// Must be called after creating Connection oject and calling "AsyncAutoConnect()"
+/// or "AsyncManualConnect()" function.
+/// </summary>
+/// <param name="TYPE">Can be set as TYPE_CONNECTION, TYPE_CHECK,
+/// TYPE_SHOOT, TYPE_DATA</param>
+/// <param name="FLAG">Can be set as FLAG_ONE, FLAG_TWO, FLAG_THREE, FLAG_DISCONNECT</param>
+/// <param name="msg">Has to be a char* to message</param>
+/// <returns>TRUE if no error was achieved. If returned FALSE "GetLastError()"
+/// function can be called to check error type.</returns>
 bool Connection::SendMSG(int TYPE, int FLAG, char* msg)
 {
 	if (IsConnected)
@@ -687,7 +757,14 @@ bool Connection::SendMSG(int TYPE, int FLAG, char* msg)
 
 	return false;
 }
-
+/// <summary>
+/// Function trying to receive message by UDP connection "iterOfReceive" times.
+/// Must be called after creating Connection oject and calling "AsyncAutoConnect()"
+/// or "AsyncManualConnect()" function.
+/// </summary>
+/// <param name="msg">Reference to UDP::MSG structure which will be filled.</param>
+/// <param name="iterOfReceive">Counter of receiving attempts.</param>
+/// <returns>TRUE if message was received.</returns>
 bool Connection::ReceiveMSG(UDP::MSG& msg, int iterOfReceive)
 {
 	if (IsConnected)
@@ -720,8 +797,41 @@ bool Connection::ReceiveMSG(UDP::MSG& msg, int iterOfReceive)
 
 	return false;
 }
-
+/// <summary>
+/// Function to check if UDP connection achieved.
+/// </summary>
+/// <returns>TRUE if connected.</returns>
 bool Connection::Connected()
 {
 	return IsConnected;
+}
+/// <summary>
+/// Function to check if specified "ConnectionType" connection achieved.
+/// </summary>
+/// <param name="connectionType">Parameter "ConnectionType" to compare with current connection type.</param>
+/// <returns>TRUE if "connectionType" is UDP::ConnectionType::SERVER and
+/// currently connected as SERVER. TRUE if "connectionType" is UDP::ConnectionType::CLIENT and
+/// currently connected as CLIENT. FALSE if "connectionType" is UDP::ConnectionType::SERVER and
+/// currently connected as CLIENT. FALSE if "connectionType" is UDP::ConnectionType::CLIENT and
+/// currently connected as SERVER. FALSE if not connected.</returns>
+bool Connection::Connected(UDP::ConnectionType connectionType)
+{
+	if (IsConnected)
+	{
+		if (connectionType == UDP::ConnectionType::SERVER)
+		{
+			if (IsServer) return true;
+			else return false;
+		}
+
+		if (connectionType == UDP::ConnectionType::CLIENT)
+		{
+			if (IsClient) return true;
+			else return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
 }

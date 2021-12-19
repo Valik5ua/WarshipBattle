@@ -41,6 +41,9 @@ public:
 
 	void CloseConnection();
 	void WaitForDisconnection();
+
+	void ShipsMSG(char* RecievedMSG);
+	std::string ShipsMSG();
 public:
 
 	/// <summary>
@@ -73,6 +76,8 @@ public:
 	int ShipsDeployed;
 	float ShootingAngle;
 	bool UserShot;
+
+	Ship RecievedShips[10]{};
 public:
 	void SetStatus(GAMESTATUS GameStatus);
 private:
