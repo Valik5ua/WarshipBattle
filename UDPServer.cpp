@@ -1,10 +1,12 @@
 #include "UDPServer.h"
-
+/// <summary>
+/// Default Constructor
+/// </summary>
 UDPServer::UDPServer()
 {
     len = sizeof(struct sockaddr_in);
-    Received = false;
-    BreakThread = false;
+    //Received = false;
+    //BreakThread = false;
 
     Recv_addr.sin_family = AF_INET;
     Recv_addr.sin_port = htons(MYPORT);
@@ -19,12 +21,16 @@ UDPServer::UDPServer()
         WSACleanup();
     }
 }
-
+/// <summary>
+/// Constructor with ConnectionType
+/// </summary>
+/// <param name="connectionType">Value of UDP::ConnectioType structure must be
+/// UDP::ConnectionType::SERVER</param>
 UDPServer::UDPServer(UDP::ConnectionType connectionType)
 {
     len = sizeof(struct sockaddr_in);
-    Received = false;
-    BreakThread = false;
+    //Received = false;
+    //BreakThread = false;
 
     Recv_addr.sin_family = AF_INET;
     Recv_addr.sin_port = htons(MYPORT);
@@ -39,7 +45,11 @@ UDPServer::UDPServer(UDP::ConnectionType connectionType)
         WSACleanup();
     }
 }
-
+/// <summary>
+/// Function for initialize all WSA parameters and create Socket
+/// </summary>
+/// <returns>True if all initializations didn't set Error. False if initializations 
+/// was finished with Error, UDP::LAST_ERROR holds Error code</returns>
 bool UDPServer::Init()
 {
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -89,12 +99,17 @@ bool UDPServer::Init()
 
     return true;
 }
-
+/// <summary>
+/// Function creates THREAD for StartAsyncReceiveMSG() function and passing current instance as parameter
+/// </summary>
 void UDPServer::AsyncReceiveMSG()
 {
     HandleID = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&StartAsyncReceiveMSG, (LPVOID)this, 0, NULL);
 }
-
+/// <summary>
+/// Function for receive message by "recvfrom" of WSA UDP connection.
+/// Stops receiving if "BreakThread" is TRUE or message is received
+/// </summary>
 void UDPServer::ReceiveMSG()
 {
     Received = false;
@@ -104,8 +119,6 @@ void UDPServer::ReceiveMSG()
     while (true)
     {
         recvfrom(sock, recvbuff, recvbufflen, 0, (sockaddr*)&Sender_addr, &len);
-        //std::cout << "Received Message is : " << recvbuff << std::endl;
-        //std::cout << "Received Message size is : " << strlen(recvbuff) << std::endl;
         if (strlen(recvbuff) != 0)
         {
             MSGReceived = (char*)recvbuff;
@@ -115,13 +128,20 @@ void UDPServer::ReceiveMSG()
         if (BreakThread) break;
     }
 }
-
+/// <summary>
+/// Function starts ReceiveMSG() function from received instance
+/// </summary>
+/// <param name="inst">Instance of UDPServer Class</param>
 void UDPServer::StartAsyncReceiveMSG(UDPServer* inst)
 {
     UDPServer* serverInst = (UDPServer*)inst;
     serverInst->ReceiveMSG();
 }
-
+/// <summary>
+/// Function for receive message by "recvfrom" of WSA UDP connection.
+/// Stops receiving if "--iter" is 0 or message is received
+/// </summary>
+/// <param name="iter">Counter of receiving iterations</param>
 void UDPServer::ReceiveMSG(int iter)
 {
     Received = false;
@@ -131,8 +151,6 @@ void UDPServer::ReceiveMSG(int iter)
     while (true)
     {
         recvfrom(sock, recvbuff, recvbufflen, 0, (sockaddr*)&Sender_addr, &len);
-        //std::cout << "Received Message is : " << recvbuff << std::endl;
-        //std::cout << "Received Message size is : " << strlen(recvbuff) << std::endl;
         Sleep(10);
         if (strlen(recvbuff) != 0)
         {
@@ -144,7 +162,10 @@ void UDPServer::ReceiveMSG(int iter)
         if (--iter == 0) break;
     }
 }
-
+/// <summary>
+/// Sending message by "sendto" of WSA UDP connection
+/// </summary>
+/// <param name="msg">Char* to message has to send</param>
 void UDPServer::SendMSG(char* msg)
 {
     if (sendto(sock, msg, strlen(msg) + 1, 0, (sockaddr*)&Sender_addr, sizeof(Sender_addr)) < 0)
@@ -155,11 +176,10 @@ void UDPServer::SendMSG(char* msg)
         closesocket(sock);
     }
     Sleep(10);
-    //else
-        //std::cout << "SERVER send message Successfully" << std::endl;
-    //std::cout << "I'm here!";
 }
-
+/// <summary>
+/// Destructor
+/// </summary>
 UDPServer::~UDPServer()
 {
 }

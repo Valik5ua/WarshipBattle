@@ -14,6 +14,7 @@
 #include "resource.h"
 #include <thread>
 #include "SoundButton.h"
+#include <stdio.h>
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -388,6 +389,11 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			{
 				netChecker.CheckingFunc(true);
 			}
+			else if (Msg.TYPE == TYPE_DEPLOYING && Msg.FLAG == FLAG_ONE)
+			{
+				this->ShipsMSG(Msg.msg);
+				this->OpponentIsReady = true;
+			}
 			else
 			{
 				netChecker.CheckingFunc(false);
@@ -395,6 +401,10 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 				{
 					this->CloseConnection();
 					MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
+					this->StartNewGame();
+
+					clueField.startX = ClueFieldPosX;
+					statusField.startX = StatusFieldPosX;
 				}
 			}
 		}
@@ -405,6 +415,10 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			{
 				this->CloseConnection();
 				MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
+				this->StartNewGame();
+
+				clueField.startX = ClueFieldPosX;
+				statusField.startX = StatusFieldPosX;
 			}
 		}
 		
@@ -414,44 +428,70 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		{
 			if (engine.ShipsDeployed == 10)
 			{
-				//if (this->OpponentIsReady) 
+				if (this->OpponentIsReady)
+				{
+					this->SetStatus(GAMESTATUS::MainGame);
+
+					if (this->connection->Connected(UDP::ConnectionType::SERVER)) this->UserTurn = true;
+					else this->UserTurn = false;
+				}
 			}
-			switch (TranslatedMSG)
+			else
 			{
-			case TRANSLATEDMSG_MOVESHIPL:
-			{
-				userField.MoveActiveShip(BF_MOVE_LEFT);
-			}
-			break;
-			case TRANSLATEDMSG_MOVESHIPR:
-			{
-				userField.MoveActiveShip(BF_MOVE_RIGHT);
-			}
-			break;
-			case TRANSLATEDMSG_MOVESHIPUP:
-			{
-				userField.MoveActiveShip(BF_MOVE_UP);
-			}
-			break;
-			case TRANSLATEDMSG_MOVESHIPDOWN:
-			{
-				userField.MoveActiveShip(BF_MOVE_DOWN);
-			}
-			break;
-			case TRANSLATEDMSG_DEPLOY:
-			{
-				buttonFieldDeploy.Deploy();
-				
-			}
-			break;
-			case TRANSLATEDMSG_ROTATE:
-			{
-				userField.RotateActiveShip();
-			}
-			break;
-			default:
-				return MSG_VOID;
+				switch (TranslatedMSG)
+				{
+				case TRANSLATEDMSG_MOVESHIPL:
+				{
+					userField.MoveActiveShip(BF_MOVE_LEFT);
+				}
 				break;
+				case TRANSLATEDMSG_MOVESHIPR:
+				{
+					userField.MoveActiveShip(BF_MOVE_RIGHT);
+				}
+				break;
+				case TRANSLATEDMSG_MOVESHIPUP:
+				{
+					userField.MoveActiveShip(BF_MOVE_UP);
+				}
+				break;
+				case TRANSLATEDMSG_MOVESHIPDOWN:
+				{
+					userField.MoveActiveShip(BF_MOVE_DOWN);
+				}
+				break;
+				case TRANSLATEDMSG_DEPLOY:
+				{
+					buttonFieldDeploy.Deploy();
+					if (engine.ShipsDeployed == 10)
+					{
+						std::string StrMsg = this->ShipsMSG();
+
+						//const int Len = StrMsg.size() + 1;
+						char* MSGToSend = &StrMsg[0];
+
+						//for (int i = 0; i < StrMsg.size(); i++)
+						//{
+						//	MSGToSend[i] = StrMsg[i];
+						//}
+
+						//std::copy(StrMsg.begin(), StrMsg.end(), MSGToSend);
+						//MSGToSend[Len - 1] = '\0';
+
+						connection->SendMSG(TYPE_DEPLOYING, FLAG_ONE, MSGToSend);
+						//delete MSGToSend;
+					}
+				}
+				break;
+				case TRANSLATEDMSG_ROTATE:
+				{
+					userField.RotateActiveShip();
+				}
+				break;
+				default:
+					return MSG_VOID;
+					break;
+				}
 			}
 		}
 		break;
@@ -560,6 +600,7 @@ void Engine::StartNewGame()
 	this->ShipsDeployed = 0;
 	this->PlayerShipsAlive = 10;
 	this->OpponentShipsAlive = 10;
+	this->OpponentIsReady = false;
 	this->UserTurn = true;
 }
 
@@ -587,9 +628,9 @@ void Engine::GameOver(bool UserWon)
 }
 
 /// <summary>
-/// Sets the game mode.
+/// Sets the GAMESTATUS.
 /// </summary>
-/// <param name="Mode: ">The new mode to be set.</param>
+/// <param name="GameStatus: ">The new GAMESTATUS to be set.</param>
 void Engine::SetStatus(GAMESTATUS GameStatus)
 {
 	this->GameStatus = GameStatus;
@@ -929,6 +970,83 @@ void Engine::WaitForDisconnection()
 			return;
 		}
 	}
+}
+
+void Engine::ShipsMSG(char* RecievedMSG)
+{
+	unsigned int MSGPos = 0;
+
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		this->RecievedShips[i].Size = ((int)RecievedMSG[MSGPos]) - 48;
+		MSGPos++;
+		this->RecievedShips[i].Rotated = ((int)RecievedMSG[MSGPos]) - 48;
+		MSGPos++;
+
+		switch (this->RecievedShips[i].Size)
+		{
+		case 1:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Single;
+			break;
+		case 2:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Back;
+			this->RecievedShips[i].Decks[1].Type = Deck::DeckType::Front;
+			break;
+		case 3:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Back;
+			this->RecievedShips[i].Decks[1].Type = Deck::DeckType::Middle;
+			this->RecievedShips[i].Decks[2].Type = Deck::DeckType::Front;
+			break;
+		case 4:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Back;
+			this->RecievedShips[i].Decks[1].Type = Deck::DeckType::Middle;
+			this->RecievedShips[i].Decks[2].Type = Deck::DeckType::Middle;
+			this->RecievedShips[i].Decks[3].Type = Deck::DeckType::Front;
+			break;
+		}
+
+		for (int j = 0; j < this->RecievedShips[i].Size; j++)
+		{
+			this->RecievedShips[i].Decks[j].Position.x = ((int)RecievedMSG[MSGPos]) - 48;
+			MSGPos++;
+			this->RecievedShips[i].Decks[j].Position.y = ((int)RecievedMSG[MSGPos]) - 48;
+			MSGPos++;
+		}
+	}
+}
+
+std::string Engine::ShipsMSG()
+{
+	const unsigned short int BytesToSend = 60;
+	char MSG[BytesToSend + 1]{};
+	unsigned int MSGPos = 0;
+
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		MSG[MSGPos] = ((char)userField.Ships[i].Size) + 48;
+		MSGPos++;
+		MSG[MSGPos] = ((char)userField.Ships[i].Rotated) + 48;
+		MSGPos++;
+
+		for (int j = 0; j < userField.Ships[i].Size; j++)
+		{
+			MSG[MSGPos] = ((char)userField.Ships[i].Decks[j].Position.x) + 48;
+			MSGPos++;
+			MSG[MSGPos] = ((char)userField.Ships[i].Decks[j].Position.y) + 48;
+			MSGPos++;
+		}
+	}
+
+	MSG[BytesToSend] = '\0';
+
+	std::string ReturnMSG{};
+
+	for (int i = 0; i < BytesToSend; i++)
+	{
+		ReturnMSG += MSG[i];
+	}
+
+	return ReturnMSG;
 }
 
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)

@@ -32,7 +32,20 @@ void StatusField::Draw()
 		case Engine::GAMEMODE::PVP:
 		{
 			TopTextureID = textureManager.StatusFieldTopPVPTextureID;
-			BottomTextureID = textureManager.StatusFieldBottomWaitingOnOpponentTextureID;
+
+			switch (engine.OpponentIsReady)
+			{
+			case true:
+			{
+				BottomTextureID = textureManager.StatusFieldBottomOpponentReadyTextureID;
+			}
+			break;
+			case false:
+			{
+				BottomTextureID = textureManager.StatusFieldBottomWaitingOnOpponentTextureID;
+			}
+			break;
+			}
 		}
 		break;
 		}
@@ -95,7 +108,6 @@ void StatusField::Draw()
 	}
 	break;
 	}
-
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TopTextureID);
 
@@ -103,7 +115,7 @@ void StatusField::Draw()
 	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY + StatusFieldH - 1);
 	glTexCoord2d(1.f, 0); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH - 1);
 	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH);
-	glTexCoord2d(0, 1.f); glVertex2f(this->startX,this->startY + StatusFieldH);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 
@@ -116,5 +128,5 @@ void StatusField::Draw()
 	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH - 1);
 	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH - 1);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);	
 }
