@@ -1018,7 +1018,7 @@ void Engine::ShipsMSG(char* RecievedMSG)
 std::string Engine::ShipsMSG()
 {
 	const unsigned short int BytesToSend = 60;
-	char MSG[BytesToSend + 1];
+	char MSG[BytesToSend + 1]{};
 	unsigned int MSGPos = 0;
 
 	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
