@@ -15,6 +15,7 @@
 #include <thread>
 #include "SoundButton.h"
 #include <stdio.h>
+#include <commctrl.h>
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -65,9 +66,9 @@ Engine::Engine()	:GameMode(GAMEMODE::Menu),
 /// <param name="Pixels: ">Pointer to the desired POINT struct to convert.</param>
 void Engine::ConvertPixelsToGL(POINT* Pixels)
 {
-	Pixels->y = OpenGLHeight * fGLUnitSize - Pixels->y;
-	Pixels->y = floor((Pixels->y / fGLUnitSize) + fOffsetH);
-	Pixels->x = floor((Pixels->x / fGLUnitSize) - fOffsetW);
+	Pixels->y = OpenGLHeight * fGLUnitSize - (float)Pixels->y;
+	Pixels->y = floor(((float)Pixels->y / fGLUnitSize) + fOffsetH);
+	Pixels->x = floor(((float)Pixels->x / fGLUnitSize) - fOffsetW);
 }
 
 /// <summary>
@@ -77,8 +78,8 @@ void Engine::ConvertPixelsToGL(POINT* Pixels)
 /// <param name="Height: ">The current height of the window.</param>
 void Engine::SetWindowGLParam(int Width, int Height)
 {
-	fCurrentHeight = Height;
-	fCurrentWidth = Width;
+	fCurrentHeight = (float)Height;
+	fCurrentWidth = (float)Width;
 	fOffsetW = 0;
 	fOffsetH = 0;
 	if (fCurrentWidth / fCurrentHeight < AspectRatio)
@@ -195,18 +196,43 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		break;
 		case GAMESTATUS::ClientConnection:
 		{
+			if (!this->connection)
+			{
+				this->connection = new Connection(UDP::ConnectionType::CLIENT);
+				this->connection->AsyncManualConnect();
+				if (this->connection->GetLastError(false) != UDP::LastError::NONE)
+				{
+					MessageBox(hwnd, L"Error in connection", L"Error", MB_ICONERROR);
+				}
+			}
+			if (this->connection->Connected())
+			{
+				this->SetStatus(GAMESTATUS::Deploying);
+				this->GameMode = GAMEMODE::PVP;
+			}
+
 			switch (TranslatedMSG)
 			{
 			case TRANSLATEDMSG_CONNECTION_INPUTIP:
 			{
-				this->GameStatus = GAMESTATUS::ClientConnection;
-				//InputIP();
+				DialogBox(NULL, MAKEINTRESOURCE(IDD_DIALOG3), hwnd, InputIP);
+
+				std::string TempStr;
+				TempStr = std::to_string(this->IPpart[0]);
+				TempStr += ".";
+				TempStr += std::to_string(this->IPpart[1]);
+				TempStr += ".";
+				TempStr += std::to_string(this->IPpart[2]);
+				TempStr += ".";
+				TempStr += std::to_string(this->IPpart[3]);
+
+				this->connection->SetConnectingIP((char*)TempStr.c_str());
 			}
 			break;
 			case TRANSLATEDMSG_CONNECTION_CANCEL:
 			{
-				this->GameMode = GAMEMODE::Menu;
-				this->GameStatus = GAMESTATUS::NewGame;
+				this->connection->AsyncDisconnect();
+				this->GameStatus = GAMESTATUS::Disconnecting;
 			}
 			break;
 			}
@@ -214,18 +240,34 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		break;
 		case GAMESTATUS::ServerConnection:
 		{
+			if (!this->connection)
+			{
+				this->connection = new Connection(UDP::ConnectionType::SERVER);
+				this->connection->AsyncManualConnect();
+				if (this->connection->GetLastError(false) != UDP::LastError::NONE)
+				{
+					MessageBox(hwnd, L"Error in connection", L"Error", MB_ICONERROR);
+				}
+			}
+			if (this->connection->Connected())
+			{
+				this->SetStatus(GAMESTATUS::Deploying);
+				this->GameMode = GAMEMODE::PVP;
+			}
+
 			switch (TranslatedMSG)
 			{
 			case TRANSLATEDMSG_CONNECTION_SHOWIP:
 			{
-				this->GameStatus = GAMESTATUS::ClientConnection;
-				//ShowIP();
+				char* MyIP = this->connection->GetMyIP();
+				std::string IPstr(MyIP);
+				MessageBoxA(hwnd, (LPCSTR)IPstr.c_str(), "Your IP is:", MB_OK);
 			}
 			break;
 			case TRANSLATEDMSG_CONNECTION_CANCEL:
 			{
-				this->GameMode = GAMEMODE::Menu;
-				this->GameStatus = GAMESTATUS::NewGame;
+				this->connection->AsyncDisconnect();
+				this->GameStatus = GAMESTATUS::Disconnecting;
 			}
 			break;
 			}
@@ -467,19 +509,9 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 					{
 						std::string StrMsg = this->ShipsMSG();
 
-						//const int Len = StrMsg.size() + 1;
 						char* MSGToSend = &StrMsg[0];
 
-						//for (int i = 0; i < StrMsg.size(); i++)
-						//{
-						//	MSGToSend[i] = StrMsg[i];
-						//}
-
-						//std::copy(StrMsg.begin(), StrMsg.end(), MSGToSend);
-						//MSGToSend[Len - 1] = '\0';
-
 						connection->SendMSG(TYPE_DEPLOYING, FLAG_ONE, MSGToSend);
-						//delete MSGToSend;
 					}
 				}
 				break;
@@ -492,6 +524,55 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 					return MSG_VOID;
 					break;
 				}
+			}
+		}
+		break;
+		case GAMESTATUS::MainGame:
+		{
+			switch (this->UserTurn)
+			{
+			case true:
+			{
+				switch (TranslatedMSG)
+				{
+				case TRANSLATEDMSG_RANDOMAIM:
+				{
+					userField.SetAimPoint(enemyField.RandomSelect());
+				}
+				break;
+				case TRANSLATEDMSG_AIM:
+				{
+					userField.SetAimPoint(enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_LEFT:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_LEFT));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_RIGHT:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_RIGHT));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_DOWN:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_DOWN));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_UP:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_UP));
+				}
+				break;
+				case TRANSLATEDMSG_FIRE:
+				{
+					if (this->LastShotAccomplished) this->Shoot(&userField, &enemyField);
+				}
+				break;
+				}
+			}
+			break;
 			}
 		}
 		break;
@@ -1047,6 +1128,59 @@ std::string Engine::ShipsMSG()
 	}
 
 	return ReturnMSG;
+}
+
+INT_PTR Engine::InputIP(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	static HWND hWndIPAddress;
+
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+	{
+		hWndIPAddress = CreateWindowEx(0,
+			WC_IPADDRESS,
+			NULL,
+			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+			40, 33, 150, 25,
+			hDlg,
+			NULL,
+			NULL,
+			NULL);
+
+		LPARAM lpAdr = MAKEIPADDRESS(192, 168, 1, 1);
+
+		SendMessage(hWndIPAddress, IPM_SETADDRESS, 0, lpAdr);
+
+		return (INT_PTR)TRUE;
+	}
+	break;
+	case WM_COMMAND:
+	{
+		if (LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		else if (LOWORD(wParam) == IDOK)
+		{
+			DWORD Addr;
+
+			SendMessage(hWndIPAddress, IPM_GETADDRESS, NULL, (LPARAM)(LPDWORD)&Addr);
+
+			engine.IPpart[0] = FIRST_IPADDRESS((LPARAM)Addr);
+			engine.IPpart[1] = SECOND_IPADDRESS((LPARAM)Addr);
+			engine.IPpart[2] = THIRD_IPADDRESS((LPARAM)Addr);
+			engine.IPpart[3] = FOURTH_IPADDRESS((LPARAM)Addr);
+
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+	}
+	break;
+	}
+	return (INT_PTR)FALSE;
 }
 
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)

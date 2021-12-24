@@ -45,6 +45,8 @@ public:
 	void ShipsMSG(char* RecievedMSG);
 	std::string ShipsMSG();
 
+	static INT_PTR CALLBACK InputIP(HWND, UINT, WPARAM, LPARAM);
+
 public:
 
 	/// <summary>
@@ -104,6 +106,7 @@ private:
 
 	Connection* connection;
 
+	BYTE IPpart[4];
 public:
 	class AnimationRocket
 	{
