@@ -19,7 +19,10 @@ public:
 
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
 	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
+
 	void Shoot(Field* FieldFrom, Field* FieldTo);
+	void NetShoot();
+	void NetShootRecv();
 
 	void IncreaseMatchTime();
 	void DecreaseShipsAlive(bool User);
@@ -76,7 +79,7 @@ public:
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	enum Animation { None, Rocket, MainMenu } animation;
 
-	unsigned int ShipsDeployed;
+	short unsigned int ShipsDeployed;
 	float ShootingAngle;
 	bool LastShotAccomplished;
 	bool UserShot;
@@ -90,6 +93,9 @@ public:
 private:
 	bool UserTurn;
 
+	bool EnemyFieldMsgRecieved;
+	POINT PointRecieved;
+
 	float fOffsetH;
 	float fOffsetW;
 
@@ -98,15 +104,18 @@ private:
 
 	float fGLUnitSize;
 
-	unsigned int MatchTimeSec;
-	unsigned int PlayerShipsAlive;
-	unsigned int OpponentShipsAlive;
+	short unsigned int MatchTimeSec;
+	short unsigned int PlayerShipsAlive;
+	short unsigned int OpponentShipsAlive;
 
 	std::chrono::system_clock::duration dtn;
 
 	Connection* connection;
 
 	BYTE IPpart[4];
+
+	short unsigned int NumOfIterations;
+	const short unsigned int MaxNumOfIterations = 60;
 public:
 	class AnimationRocket
 	{
@@ -150,7 +159,7 @@ private:
 	struct NetChecker
 	{
 		bool Connected;
-		const unsigned short int MaxCheckingFails = 60 * 2;
+		const unsigned short int MaxCheckingFails = 60 * 4;
 		unsigned short int CheckingAttemptsFailed;
 		void CheckingFunc(bool success);
 	} netChecker;

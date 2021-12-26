@@ -51,7 +51,8 @@ Engine::Engine()	:GameMode(GAMEMODE::Menu),
 					LastShotAccomplished(true),
 					MatchTimeSec(0),
 					PlayerShipsAlive(10),
-					OpponentShipsAlive(10)
+					OpponentShipsAlive(10),
+					NumOfIterations(0)
 {
 	std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
 	this->dtn = tp.time_since_epoch();
@@ -423,9 +424,13 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	break;
 	case this->GAMEMODE::PVP:
 	{
-		this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)"Check");
+		if (++this->NumOfIterations == this->MaxNumOfIterations)
+		{
+			this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)"Check");
+			this->NumOfIterations = 0;
+		}
 		UDP::MSG Msg;
-		if (this->connection->ReceiveMSG(Msg, 2))
+		if (this->connection->ReceiveMSG(Msg, 1))
 		{
 			if (Msg.TYPE == TYPE_CHECK && Msg.FLAG == FLAG_ONE)
 			{
@@ -435,6 +440,11 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			{
 				this->ShipsMSG(Msg.msg);
 				this->OpponentIsReady = true;
+			}
+			else if (Msg.TYPE == TYPE_MAINGAME && Msg.FLAG == FLAG_ONE)
+			{
+				this->EnemyFieldMsgRecieved = true;
+				this->PointRecieved = { ((int)Msg.msg[0]) - 48,((int)Msg.msg[1]) - 48 };
 			}
 			else
 			{
@@ -451,7 +461,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			}
 		}
 		else
-		{ 
+		{
 			netChecker.CheckingFunc(false);
 			if (!netChecker.Connected)
 			{
@@ -567,10 +577,15 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 				break;
 				case TRANSLATEDMSG_FIRE:
 				{
-					if (this->LastShotAccomplished) this->Shoot(&userField, &enemyField);
+					if (this->LastShotAccomplished) this->NetShoot();
 				}
 				break;
 				}
+			}
+			break;
+			case false:
+			{
+				this->NetShootRecv();
 			}
 			break;
 			}
@@ -623,6 +638,53 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 
 	const short int AnswerStatus = FieldTo->ShootRecieve(Aimpoint);
 	FieldFrom->ShootAnswer(AnswerStatus);
+}
+
+void Engine::NetShoot()
+{
+	if (!enemyField.CanFire())
+	{
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
+		return;
+	}
+
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, 0, 0);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_SHOOT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
+
+	this->LastShotAccomplished = false;
+
+	POINT Aimpoint = userField.ShootCreate();
+	std::string Msg = std::to_string(Aimpoint.x) + std::to_string(Aimpoint.y);
+	this->connection->SendMSG(TYPE_MAINGAME, FLAG_ONE, (char*)Msg.c_str());
+
+	this->StartAnimation(&enemyField, Aimpoint);
+
+	enemyField.ShootRecieve(Aimpoint);
+}
+
+void Engine::NetShootRecv()
+{
+	if (!this->EnemyFieldMsgRecieved) return;
+
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, 0, 0);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_SHOOT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
+
+	this->StartAnimation(&userField, this->PointRecieved);
+
+	userField.ShootRecieve(this->PointRecieved);
+
+	this->EnemyFieldMsgRecieved = false;
+	this->PointRecieved = { 0,0 };
 }
 
 void Engine::IncreaseMatchTime()
@@ -683,6 +745,9 @@ void Engine::StartNewGame()
 	this->OpponentShipsAlive = 10;
 	this->OpponentIsReady = false;
 	this->UserTurn = true;
+
+	this->netChecker.CheckingAttemptsFailed = 0;
+	this->netChecker.Connected = true;
 }
 
 void Engine::GameOver(bool UserWon)
@@ -691,6 +756,8 @@ void Engine::GameOver(bool UserWon)
 
 	this->animation = Animation::MainMenu;
 	this->menuAnimation.DefaultDirection = false;
+
+	this->CloseConnection();
 
 	switch (UserWon)
 	{
@@ -1041,7 +1108,7 @@ void Engine::CloseConnection()
 
 void Engine::WaitForDisconnection()
 {
-	if (!connection) return;
+	if (!this->connection) return;
 	while (true)
 	{
 		if (this->connection->Disconnected())
@@ -1165,7 +1232,7 @@ INT_PTR Engine::InputIP(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		else if (LOWORD(wParam) == IDOK)
 		{
-			DWORD Addr;
+			DWORD Addr{};
 
 			SendMessage(hWndIPAddress, IPM_GETADDRESS, NULL, (LPARAM)(LPDWORD)&Addr);
 
@@ -1231,7 +1298,7 @@ void Engine::AnimationRocket::Draw()
 
 			glPushMatrix();
 			glTranslatef(this->Position[1].x, this->Position[1].y, 0);
-			glScaled((this->FrameCount / 2), this->FrameCount / 2, 1);
+			glScaled((this->FrameCount / (float)2), this->FrameCount / (float)2, 1);
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);
 

@@ -15,6 +15,7 @@
 #define TYPE_SHOOT          23
 #define TYPE_DATA           24
 #define TYPE_DEPLOYING      25
+#define TYPE_MAINGAME       26
 
 #define FLAG_ONE            31
 #define FLAG_TWO            32
