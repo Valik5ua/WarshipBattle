@@ -1,7 +1,7 @@
+#include "Engine.h"
 #include "StatusField.h"
 #include "TextureManager.h"
 #include "resource.h"
-#include "Engine.h"
 
 extern TextureManager textureManager;
 extern Engine engine;
@@ -21,20 +21,93 @@ void StatusField::Draw()
 	break;
 	case Engine::GAMESTATUS::Deploying:
 	{
-		TopTextureID = textureManager.StatusFieldTopPVETextureID;
-		BottomTextureID = textureManager.StatusFieldBottomDeployShipsTextureID;
+		switch (engine.GameMode)
+		{
+		case Engine::GAMEMODE::PVE:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVETextureID;
+			BottomTextureID = textureManager.StatusFieldBottomDeployShipsTextureID;
+		}
+		break;
+		case Engine::GAMEMODE::PVP:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+
+			switch (engine.OpponentIsReady)
+			{
+			case true:
+			{
+				BottomTextureID = textureManager.StatusFieldBottomOpponentReadyTextureID;
+			}
+			break;
+			case false:
+			{
+				BottomTextureID = textureManager.StatusFieldBottomWaitingOnOpponentTextureID;
+			}
+			break;
+			}
+		}
+		break;
+		}
 	}
 	break;
 	case Engine::GAMESTATUS::MainGame:
 	{
-		TopTextureID = textureManager.StatusFieldTopPVETextureID;
-		if (engine.GetTurn())
-			BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
+		switch (engine.GameMode)
+		{
+		case Engine::GAMEMODE::PVE:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVETextureID;
+		}
+		break;
+		case Engine::GAMEMODE::PVP:
+		{
+			TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		}
+		break;
+		}
+
+		if (engine.GetTurn()) BottomTextureID = textureManager.StatusFieldBottomYourTurnTextureID;
 		else BottomTextureID = textureManager.StatusFieldBottomOpponentTurnTextureID;
 	}
 	break;
+	case Engine::GAMESTATUS::ChoosingConnectionMode:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomChooseConnTypeTextureID;
 	}
-
+	break;
+	case Engine::GAMESTATUS::ChoosingConnectionSide:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomChooseConnSideTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ServerConnection:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomWaitingConnectionTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ClientConnection:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomInputIPTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::AutoConnection:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomSearchingConnectionTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::Disconnecting:
+	{
+		TopTextureID = textureManager.StatusFieldTopPVPTextureID;
+		BottomTextureID = textureManager.StatusFieldBottomDisconnectTextureID;
+	}
+	break;
+	}
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, TopTextureID);
 
@@ -42,7 +115,7 @@ void StatusField::Draw()
 	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY + StatusFieldH - 1);
 	glTexCoord2d(1.f, 0); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH - 1);
 	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH);
-	glTexCoord2d(0, 1.f); glVertex2f(this->startX,this->startY + StatusFieldH);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 
@@ -52,8 +125,8 @@ void StatusField::Draw()
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, 0); glVertex2f(this->startX, this->startY);
 	glTexCoord2d(1.f, 0); glVertex2f(this->startX + StatusFieldW, this->startY);
-	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH-1);
-	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH-1);
+	glTexCoord2d(1.f, 1.f); glVertex2f(this->startX + StatusFieldW, this->startY + StatusFieldH - 1);
+	glTexCoord2d(0, 1.f); glVertex2f(this->startX, this->startY + StatusFieldH - 1);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);	
 }

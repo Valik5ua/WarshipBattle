@@ -101,12 +101,13 @@ int EnemyField::ShipExists(const POINT Coordinates)
 /// <param name="Mode: ">The mode of the creation.</param>
 void EnemyField::CreateShips(const Engine::GAMESTATUS GameStatus)
 {
-	this->ClearField();
-	this->CleanShips();
 	switch (GameStatus)
 	{
 	case Engine::GAMESTATUS::Deploying:
 	{
+		this->ClearField();
+		this->CleanShips();
+
 		Ship ship({ 0,0 }, 4);
 		this->Ships[0] = ship;
 		Ship ship2({ 1,0 }, 3);
@@ -136,12 +137,12 @@ void EnemyField::CreateShips(const Engine::GAMESTATUS GameStatus)
 		{
 		case Engine::GAMEMODE::PVE:
 		{
-			DeployEnemyShips();
+			this->DeployEnemyShips();
 		}
 		break;
 		case Engine::GAMEMODE::PVP:
 		{
-
+			this->DeployEnemyShips(engine.RecievedShips);
 		}
 		break;
 		}
@@ -448,6 +449,18 @@ void EnemyField::DeployEnemyShips()
 			this->Cells[this->Ships[i].Decks[DeckNum].Position.x][this->Ships[i].Decks[DeckNum].Position.y].Open = false;
 
 	}
+
+	SetShipMarkers();
+	this->DeployingShipID = 10;
+}
+
+void EnemyField::DeployEnemyShips(Ship RecievedShips[MAX_SHIPS_COUNT])
+{
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		this->Ships[i] = RecievedShips[i];
+	}
+
 	SetShipMarkers();
 	this->DeployingShipID = 10;
 }
@@ -472,16 +485,8 @@ void EnemyField::ClearField()
 /// </summary>
 void EnemyField::CleanShips()
 {
-	for (int i{}; i < 10; i++)
-	{
-		this->Ships[i].Killed = false;
-		for (int j{}; j < Ships[i].Size; j++)
-		{
-			this->Ships[i].Decks[j].integrityStatus = Deck::IntegrityStatus::Whole;
-			this->Ships[i].Decks[j].Position = { -1,-1 };
-			this->Ships[i].Decks[j].Open = true;
-		}
-	}
+	for (int i{}; i < MAX_SHIPS_COUNT; i++)
+		this->Ships[i].Size = 0;
 }
 
 /// <summary>
@@ -767,18 +772,6 @@ POINT EnemyField::ShootCreate()
 	{
 	case this->opponent.Strategy::Damage:
 	{
-		//POINT points[4] = {
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y + 1},
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y - 1},
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x + 1,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y},
-		//	{this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].x - 1,
-		//	this->opponent.TargetShip[this->opponent.TargetShip.size() - 1].y} };
-
-
-
 		POINT points[4]{};
 		unsigned int StartNum = rand() % 4;
 
@@ -1004,6 +997,8 @@ void EnemyField::ShootAnswer(const int status)
 
 void EnemyField::NewGameReset()
 {
+	this->CleanShips();
+	this->ClearField();
 	this->opponent.NewGameReset();
 }
 
@@ -1088,7 +1083,56 @@ void EnemyField::Opponent::SetDamageAroundShip(std::vector<POINT> KilledShip)
 
 POINT EnemyField::Opponent::RandShootingPoint(std::vector<POINT> vec)
 {
-	if (vec.empty()) return { -1,-1 };
+	if (vec.empty())
+	{
+		switch (this->Ships[0])
+		{
+		case 2:
+		{
+			this->strategy = this->Strategy::OneDeckShip;
+
+			do
+			{
+				std::vector<int>::iterator It = this->Ships.begin();
+				this->Ships.erase(It);
+			} while (this->Ships[0] == 2);
+
+			this->AdjustShootingPoints(this->OneDeckShootingPoints);
+			vec = this->OneDeckShootingPoints;
+		}
+		break;
+		case 3:
+		{
+			this->strategy = this->Strategy::Twodeckship;
+
+			do
+			{
+				std::vector<int>::iterator It = this->Ships.begin();
+				this->Ships.erase(It);
+			} while (this->Ships[0] == 3);
+
+			this->AdjustShootingPoints(this->TwoDeckShootingPoints);
+			vec = this->TwoDeckShootingPoints;
+		}
+		break;
+		case 4:
+		{
+			this->strategy = this->Strategy::Threedeckship;
+
+			do
+			{
+				std::vector<int>::iterator It = this->Ships.begin();
+				this->Ships.erase(It);
+			} while (this->Ships[0] == 4);
+
+			this->AdjustShootingPoints(this->ThreeDeckShootingPoints);
+			vec = this->ThreeDeckShootingPoints;
+		}
+		break;
+		default:
+			return { -1,-1 };
+		}
+	}
 	time_t Time;
 	srand((unsigned)time(&Time));
 

@@ -4,7 +4,7 @@
 class StatusField : public Field
 {
 public:
-	StatusField(const unsigned int startX, const unsigned int startY) :startX(startX), startY(startY) {}
+	StatusField(const float startX, const float startY) :startX(startX), startY(startY) {}
 	void Draw() override;
 	bool Click(POINT& coordinates) override { return false; }
 public:

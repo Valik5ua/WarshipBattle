@@ -1,8 +1,8 @@
+#include "Engine.h"
 #include "ButtonFieldDeploy.h"
 #include "TextureManager.h"
 #include "UserField.h"
 #include "EnemyField.h"
-#include "Engine.h"
 #include "resource.h"
 #include "SoundButton.h"
 
@@ -99,7 +99,7 @@ void ButtonFieldDeploy::Deploy()
 		return;
 	}
 	engine.ShipsDeployed++;
-	if (engine.ShipsDeployed == 10) { engine.SetMode(Engine::GAMESTATUS::MainGame); return; }
+	if (engine.ShipsDeployed == 10) return;
 	enemyField.CloseNextShip();
 	engine.MoveShipToUserField(enemyField.Ships[engine.ShipsDeployed], userField.Ships[engine.ShipsDeployed]);
 }

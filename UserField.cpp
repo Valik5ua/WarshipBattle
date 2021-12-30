@@ -1,5 +1,5 @@
-#include "UserField.h"
 #include "Engine.h"
+#include "UserField.h"
 #include "TextureManager.h"
 #include "SoundButton.h"
 #include "resource.h"
@@ -50,6 +50,15 @@ void UserField::SetShipDeployableStatus()
 /// <param name="Direction: ">The direction in which to move the ship.</param>
 void UserField::MoveActiveShip(int Direction)
 {
+	if (engine.ShipsDeployed == 10)
+	{
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
+		return;
+	}
 	switch (Direction)
 	{
 	case BF_MOVE_LEFT:
@@ -139,6 +148,16 @@ void UserField::MoveActiveShip(int Direction)
 
 void UserField::RotateActiveShip()
 {
+	if (engine.ShipsDeployed == 10)
+	{
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
+		return;
+	}
+
 	if (soundButton.State == SoundButton::STATE::On)
 	{
 		PlaySound(NULL, NULL, NULL);
