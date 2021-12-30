@@ -59,6 +59,8 @@ Engine::Engine()	:GameMode(GAMEMODE::Menu),
 
 	this->netChecker.Connected = true;
 	this->netChecker.CheckingAttemptsFailed = 0;
+	this->netChecker.LastShootingPoint = { 0,0 };
+	this->netChecker.ShotCounter = 0;
 }
 
 /// <summary>
@@ -430,7 +432,11 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		{
 			if (++this->NumOfIterations == this->MaxNumOfIterations)
 			{
-				this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)"Check");
+				std::string MsgToSend = std::to_string(netChecker.ShotCounter) + " " +
+					std::to_string(netChecker.LastShootingPoint.x) +
+					std::to_string(netChecker.LastShootingPoint.y);
+
+				this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)MsgToSend.c_str());
 				this->NumOfIterations = 0;
 			}
 			UDP::MSG Msg;
@@ -438,7 +444,29 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			{
 				if (Msg.TYPE == TYPE_CHECK && Msg.FLAG == FLAG_ONE)
 				{
-					netChecker.CheckingFunc(true);
+					unsigned short int SpacePos = 0;
+
+					while (Msg.msg[SpacePos] != ' ')
+					{
+						SpacePos++;
+					}
+
+					std::string ShotCounter{};
+
+					for (int i = 0; i < SpacePos; i++)
+					{
+						ShotCounter += Msg.msg[i];
+					}
+
+					if (std::to_string(netChecker.RecievedShotCounter) != ShotCounter)
+					{
+						this->EnemyFieldMsgRecieved = true;
+						this->PointRecieved = { ((int)Msg.msg[SpacePos + 1]) - 48,((int)Msg.msg[SpacePos + 2]) - 48 };
+
+						this->netChecker.RecievedShotCounter++;
+					}
+
+					this->netChecker.CheckingFunc(true);
 				}
 				else if (Msg.TYPE == TYPE_DEPLOYING && Msg.FLAG == FLAG_ONE)
 				{
@@ -449,6 +477,8 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 				{
 					this->EnemyFieldMsgRecieved = true;
 					this->PointRecieved = { ((int)Msg.msg[0]) - 48,((int)Msg.msg[1]) - 48 };
+
+					this->netChecker.RecievedShotCounter++;
 				}
 				else
 				{
@@ -665,13 +695,16 @@ void Engine::NetShoot()
 
 	this->LastShotAccomplished = false;
 
-	POINT Aimpoint = userField.ShootCreate();
+	const POINT Aimpoint = userField.ShootCreate();
 	std::string Msg = std::to_string(Aimpoint.x) + std::to_string(Aimpoint.y);
 	this->connection->SendMSG(TYPE_MAINGAME, FLAG_ONE, (char*)Msg.c_str());
 
 	this->StartAnimation(&enemyField, Aimpoint);
 
 	enemyField.ShootRecieve(Aimpoint);
+
+	this->netChecker.LastShootingPoint = Aimpoint;
+	this->netChecker.ShotCounter++;
 }
 
 void Engine::NetShootRecv()
@@ -753,6 +786,9 @@ void Engine::StartNewGame()
 
 	this->netChecker.CheckingAttemptsFailed = 0;
 	this->netChecker.Connected = true;
+	this->netChecker.LastShootingPoint = { 0,0 };
+	this->netChecker.ShotCounter = 0;
+	this->netChecker.RecievedShotCounter = 0;
 }
 
 void Engine::GameOver(bool UserWon)
@@ -761,8 +797,6 @@ void Engine::GameOver(bool UserWon)
 
 	this->animation = Animation::MainMenu;
 	this->menuAnimation.DefaultDirection = false;
-
-	//this->CloseConnection();
 
 	switch (UserWon)
 	{

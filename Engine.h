@@ -163,6 +163,10 @@ private:
 		const unsigned short int MaxCheckingFails = 60 * 4;
 		unsigned short int CheckingAttemptsFailed;
 		void CheckingFunc(bool success);
+
+		POINT LastShootingPoint;
+		unsigned int ShotCounter;
+		unsigned int RecievedShotCounter;
 	} netChecker;
 
 private:
