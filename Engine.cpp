@@ -131,6 +131,8 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 		{
 		case GAMESTATUS::NewGame:
 		{
+			if(connection) this->CloseConnection();
+
 			switch (TranslatedMSG)
 			{
 			case TRANSLATEDMSG_NEWGAMEPVE:
@@ -424,27 +426,43 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	break;
 	case this->GAMEMODE::PVP:
 	{
-		if (++this->NumOfIterations == this->MaxNumOfIterations)
+		if (this->connection)
 		{
-			this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)"Check");
-			this->NumOfIterations = 0;
-		}
-		UDP::MSG Msg;
-		if (this->connection->ReceiveMSG(Msg, 1))
-		{
-			if (Msg.TYPE == TYPE_CHECK && Msg.FLAG == FLAG_ONE)
+			if (++this->NumOfIterations == this->MaxNumOfIterations)
 			{
-				netChecker.CheckingFunc(true);
+				this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)"Check");
+				this->NumOfIterations = 0;
 			}
-			else if (Msg.TYPE == TYPE_DEPLOYING && Msg.FLAG == FLAG_ONE)
+			UDP::MSG Msg;
+			if (this->connection->ReceiveMSG(Msg, 1))
 			{
-				this->ShipsMSG(Msg.msg);
-				this->OpponentIsReady = true;
-			}
-			else if (Msg.TYPE == TYPE_MAINGAME && Msg.FLAG == FLAG_ONE)
-			{
-				this->EnemyFieldMsgRecieved = true;
-				this->PointRecieved = { ((int)Msg.msg[0]) - 48,((int)Msg.msg[1]) - 48 };
+				if (Msg.TYPE == TYPE_CHECK && Msg.FLAG == FLAG_ONE)
+				{
+					netChecker.CheckingFunc(true);
+				}
+				else if (Msg.TYPE == TYPE_DEPLOYING && Msg.FLAG == FLAG_ONE)
+				{
+					this->ShipsMSG(Msg.msg);
+					this->OpponentIsReady = true;
+				}
+				else if (Msg.TYPE == TYPE_MAINGAME && Msg.FLAG == FLAG_ONE)
+				{
+					this->EnemyFieldMsgRecieved = true;
+					this->PointRecieved = { ((int)Msg.msg[0]) - 48,((int)Msg.msg[1]) - 48 };
+				}
+				else
+				{
+					netChecker.CheckingFunc(false);
+					if (!netChecker.Connected)
+					{
+						this->CloseConnection();
+						MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
+						this->StartNewGame();
+
+						clueField.startX = ClueFieldPosX;
+						statusField.startX = StatusFieldPosX;
+					}
+				}
 			}
 			else
 			{
@@ -460,20 +478,7 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 				}
 			}
 		}
-		else
-		{
-			netChecker.CheckingFunc(false);
-			if (!netChecker.Connected)
-			{
-				this->CloseConnection();
-				MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
-				this->StartNewGame();
 
-				clueField.startX = ClueFieldPosX;
-				statusField.startX = StatusFieldPosX;
-			}
-		}
-		
 		switch (this->GameStatus)
 		{
 		case GAMESTATUS::Deploying:
@@ -757,7 +762,7 @@ void Engine::GameOver(bool UserWon)
 	this->animation = Animation::MainMenu;
 	this->menuAnimation.DefaultDirection = false;
 
-	this->CloseConnection();
+	//this->CloseConnection();
 
 	switch (UserWon)
 	{

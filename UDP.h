@@ -29,71 +29,71 @@
 class UDP
 {
 public:
-    /// <summary>
-    /// CONNECTION_TYPE is a ConnectionType enum instance could be set to AUTO, SERVER or CLIENT
-    /// </summary>
-    enum class ConnectionType
-    {
-        AUTO = 0,
-        SERVER,
-        CLIENT
-    }CONNECTION_TYPE;
+	/// <summary>
+	/// CONNECTION_TYPE is a ConnectionType enum instance could be set to AUTO, SERVER or CLIENT
+	/// </summary>
+	enum class ConnectionType
+	{
+		AUTO = 0,
+		SERVER,
+		CLIENT
+	}CONNECTION_TYPE;
 
-    /// <summary>
-    /// LAST_ERROR is a LastError enum instance could be set to NONE, WSA_INIT_ERROR,
-    /// SOCKET_INIT_ERROR, BROADCAST_INIT_ERROR, BIND_ERROR, SEND_ERROR
-    /// </summary>
-    enum class LastError
-    {
-        NONE = 0,
-        WSA_INIT_ERROR,
-        SOCKET_INIT_ERROR,
-        BROADCAST_INIT_ERROR,
-        BIND_ERROR,
-        SEND_ERROR
-    }LAST_ERROR;
+	/// <summary>
+	/// LAST_ERROR is a LastError enum instance could be set to NONE, WSA_INIT_ERROR,
+	/// SOCKET_INIT_ERROR, BROADCAST_INIT_ERROR, BIND_ERROR, SEND_ERROR
+	/// </summary>
+	enum class LastError
+	{
+		NONE = 0,
+		WSA_INIT_ERROR,
+		SOCKET_INIT_ERROR,
+		BROADCAST_INIT_ERROR,
+		BIND_ERROR,
+		SEND_ERROR
+	}LAST_ERROR;
 
-    /// <summary>
-    /// Structure incapsulates message with fields SENDER, TYPE, FLAG, msg. Maximum length of msg
-    /// can be checked in MAX_MSG_LENGTH field
-    /// </summary>
-    struct MSG
-    {
-        int SENDER;
-        int TYPE;
-        int FLAG;
-        const int MAX_MSG_LENGTH = MAX_MESSAGE_LENGTH;
-        char* msg = new char[MAX_MSG_LENGTH];
-    }MESSAGE;
+	/// <summary>
+	/// Structure incapsulates message with fields SENDER, TYPE, FLAG, msg. Maximum length of msg
+	/// can be checked in MAX_MSG_LENGTH field
+	/// </summary>
+	struct MSG
+	{
+		int SENDER;
+		int TYPE;
+		int FLAG;
+		const int MAX_MSG_LENGTH = MAX_MESSAGE_LENGTH;
+		char* msg = new char[MAX_MSG_LENGTH];
+	}MESSAGE;
 
-    static std::string ErroToString(UDP::LastError Err);
-    UDP::LastError GetLastError(bool ClearLastError);
-    void CleanUp();
-    bool Received;
-    void DecodeMsg(MSG& msg, char* str);
-    char* FormMsg(int sender, int type, int flag, char* msg);
-    char* MSGReceived = new char[MAX_MESSAGE_LENGTH];
-
-protected:
-    UDP();
-    ~UDP();
+	static std::string ErroToString(UDP::LastError Err);
+	UDP::LastError GetLastError(bool ClearLastError);
+	void CleanUp();
+	bool Received;
+	void DecodeMsg(MSG& msg, char* str);
+	char* FormMsg(int sender, int type, int flag, char* msg);
+	char* MSGReceived = new char[MAX_MESSAGE_LENGTH];
 
 protected:
-    SOCKET sock;
-    WSADATA wsaData;
-    HANDLE HandleID;
-    struct sockaddr_in Recv_addr;
-    struct sockaddr_in Sender_addr;
-    bool BreakThread;
-    int len;
-    int recvbufflen;
-    char recvbuff[MAX_MESSAGE_LENGTH];
-    char broadcast;
-    //char* TempMsg = new char[MAX_MESSAGE_LENGTH + 3];
-    char* TempMsg;
+	UDP();
+	~UDP();
+
+protected:
+	SOCKET sock;
+	WSADATA wsaData;
+	HANDLE HandleID;
+	struct sockaddr_in Recv_addr;
+	struct sockaddr_in Sender_addr;
+	bool BreakThread;
+	int len;
+	int recvbufflen;
+	char recvbuff[MAX_MESSAGE_LENGTH];
+	char broadcast;
+	//char* TempMsg = new char[MAX_MESSAGE_LENGTH + 3];
+	char* TempMsg;
 
 private:
-    void MSGReceivedClean();
-    void CleanMsg();    
+	void MSGReceivedClean();
+	void CleanMsg();    
 };
 

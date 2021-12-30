@@ -116,6 +116,7 @@ private:
 
 	short unsigned int NumOfIterations;
 	const short unsigned int MaxNumOfIterations = 60;
+
 public:
 	class AnimationRocket
 	{
