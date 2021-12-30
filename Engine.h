@@ -1,4 +1,5 @@
 #pragma once
+#include "Connection.h"
 #include <chrono>
 #include "Field.h"
 #include "Ship.h"
@@ -18,7 +19,10 @@ public:
 
 	bool Event(int MSG, POINT Coordinates = { 0,0 }, unsigned int key = 0);
 	void MoveShipToUserField(Ship EnemyFieldShip, Ship& UserFieldShip);
+
 	void Shoot(Field* FieldFrom, Field* FieldTo);
+	void NetShoot();
+	void NetShootRecv();
 
 	void IncreaseMatchTime();
 	void DecreaseShipsAlive(bool User);
@@ -26,27 +30,71 @@ public:
 	void StartNewGame();
 	void GameOver(bool UserWon);
 
+	/// <summary>
+	/// A function that returns whose turn it is to shoot.
+	/// </summary>
+	/// <returns>Wether or not the current turn is the user's.</returns>
 	bool GetTurn() { return this->UserTurn; }
+
 	void SwitchTurns();
 
 	int GetMatchTime() { return this->MatchTimeSec; }
 	int GetPlayerShipsAlive() { return this->PlayerShipsAlive; }
 	int GetOpponentShipsAlive() { return this->OpponentShipsAlive; }
+
+	void CloseConnection();
+	void WaitForDisconnection();
+
+	void ShipsMSG(char* RecievedMSG);
+	std::string ShipsMSG();
+
+	static INT_PTR CALLBACK InputIP(HWND, UINT, WPARAM, LPARAM);
+
 public:
+
+	/// <summary>
+	/// An enumerator dedicated to keeping the game's current mode.
+	/// </summary>
 	enum GAMEMODE { Menu, PVE, PVP } GameMode;
-	enum GAMESTATUS { NewGame, Connecting, Deploying, MainGame } GameStatus;
-	enum CONNECTIONMODE { Auto, Manual } ConnectionMode;
-	enum ShootStatus { Miss = -1, Damage, KilledOneDeckShip, KilledTwoDeckShip, KilledThreeDeckShip, KilledFourDeckShip } shootStatus;
+
+	enum GAMESTATUS {	NewGame,
+						Deploying,
+						WaitingForOpponent,
+						MainGame,
+						ChoosingConnectionMode,
+						ChoosingConnectionSide,
+						ServerConnection,
+						ClientConnection,
+						AutoConnection,
+						Disconnecting
+					} GameStatus;
+
+	enum ShootStatus {	Miss = -1,
+						Damage,
+						KilledOneDeckShip,
+						KilledTwoDeckShip,
+						KilledThreeDeckShip,
+						KilledFourDeckShip 
+					} shootStatus;
 	enum LastGameResults { N_A, UserWon, OpponentWon } lastGameResults;
 	enum Animation { None, Rocket, MainMenu } animation;
-	bool LastShotAccomplished;
-	int ShipsDeployed;
+
+	short unsigned int ShipsDeployed;
 	float ShootingAngle;
+	bool LastShotAccomplished;
 	bool UserShot;
+	bool OpponentIsReady;
+
+	Ship RecievedShips[10]{};
+
 public:
-	void SetMode(GAMESTATUS GameStatus);
+	void SetStatus(GAMESTATUS GameStatus);
+
 private:
 	bool UserTurn;
+
+	bool EnemyFieldMsgRecieved;
+	POINT PointRecieved;
 
 	float fOffsetH;
 	float fOffsetW;
@@ -56,11 +104,19 @@ private:
 
 	float fGLUnitSize;
 
-	unsigned int MatchTimeSec;
-	unsigned int PlayerShipsAlive;
-	unsigned int OpponentShipsAlive;
+	short unsigned int MatchTimeSec;
+	short unsigned int PlayerShipsAlive;
+	short unsigned int OpponentShipsAlive;
 
 	std::chrono::system_clock::duration dtn;
+
+	Connection* connection;
+
+	BYTE IPpart[4];
+
+	short unsigned int NumOfIterations;
+	const short unsigned int MaxNumOfIterations = 60;
+
 public:
 	class AnimationRocket
 	{
@@ -94,46 +150,66 @@ public:
 		MenuAnimation();
 		void Draw();
 	} menuAnimation;
+
 private:
 	struct MessageParam
 	{
 		POINT FieldCoordinates;
 	} MSGParam;
 
+	struct NetChecker
+	{
+		bool Connected;
+		const unsigned short int MaxCheckingFails = 60 * 4;
+		unsigned short int CheckingAttemptsFailed;
+		void CheckingFunc(bool success);
+
+		POINT LastShootingPoint;
+		unsigned int ShotCounter;
+		unsigned int RecievedShotCounter;
+	} netChecker;
+
 private:
 	int TranslateMSG(POINT FieldCoordinates, const int MSG, const unsigned int Key);
 	void StartAnimation(Field* field, POINT ShootingPoint);
+
 private:
 	//Fully translated messages for Engine::Event
 
-	//Messages when GAMESTATUS::Connecting is the current mode
-#define TRANSLATEDMSG_CONNECT			10001
-#define TRANSLATEDMSG_DISCONNECT		10002
-
 	//Messages when GAMESTATUS::Deploying is the current mode
-#define TRANSLATEDMSG_SELECTSHIP		11001
-#define TRANSLATEDMSG_MOVESHIPL			11002
-#define TRANSLATEDMSG_MOVESHIPR			11003
-#define TRANSLATEDMSG_MOVESHIPUP		11004
-#define TRANSLATEDMSG_MOVESHIPDOWN		11005
+#define TRANSLATEDMSG_SELECTSHIP			10001
+#define TRANSLATEDMSG_MOVESHIPL				10002
+#define TRANSLATEDMSG_MOVESHIPR				10003
+#define TRANSLATEDMSG_MOVESHIPUP			10004
+#define TRANSLATEDMSG_MOVESHIPDOWN			10005
 
-#define TRANSLATEDMSG_DEPLOY			11101
-#define TRANSLATEDMSG_ROTATE			11102
+#define TRANSLATEDMSG_DEPLOY				10101
+#define TRANSLATEDMSG_ROTATE				10102
 
 	//Messages when GAMESTATUS::MainGame is the current mode
-#define TRANSLATEDMSG_AIM				12001
-#define TRANSLATEDMSG_FIRE				12002
-#define	TRANSLATEDMSG_RANDOMAIM			12003
+#define TRANSLATEDMSG_AIM					11001
+#define TRANSLATEDMSG_FIRE					11002
+#define	TRANSLATEDMSG_RANDOMAIM				11003
 
-#define TRANSLATEDMSG_MOVE_LEFT			12101
-#define TRANSLATEDMSG_MOVE_RIGHT		12102
-#define TRANSLATEDMSG_MOVE_UP			12103
-#define TRANSLATEDMSG_MOVE_DOWN			12104
+#define TRANSLATEDMSG_MOVE_LEFT				11101
+#define TRANSLATEDMSG_MOVE_RIGHT			11102
+#define TRANSLATEDMSG_MOVE_UP				11103
+#define TRANSLATEDMSG_MOVE_DOWN				11104
 
 	//Messages when GAMESTATUS::NewGame is the current GAMESTATUS
-#define TRANSLATEDMSG_NEWGAMEPVE		13001
-#define TRANSLATEDMSG_NEWGAMEPVP		13002
+#define TRANSLATEDMSG_NEWGAMEPVE			12001
+#define TRANSLATEDMSG_NEWGAMEPVP			12002
+
+	//Messages when Connection is being picked/when connecting is happening
+#define	TRANSLATEDMSG_CONNECTION_CANCEL		13000
+#define	TRANSLATEDMSG_CONNECTION_AUTO		13001
+#define	TRANSLATEDMSG_CONNECTION_MANUAL		13002
+#define	TRANSLATEDMSG_CONNECTION_SERVER		13003
+#define	TRANSLATEDMSG_CONNECTION_CLIENT		13004
+#define	TRANSLATEDMSG_CONNECTION_INPUTIP	13011
+#define	TRANSLATEDMSG_CONNECTION_SHOWIP		13012
 
 	//Messages when the GAMESTATUS and GAMEMODE are not taken into account
-#define TRANSLATEDMSG_SOUNDBUTTONCLICK	14001
+#define TRANSLATEDMSG_SOUNDBUTTONCLICK		15001
+
 };

@@ -1,6 +1,6 @@
+#include "Engine.h"
 #include "WindowsX.h"
 #include "Menu.h"
-#include "Engine.h"
 #include "UserField.h"
 #include "EnemyField.h"
 #include "ButtonFieldDeploy.h"
@@ -103,7 +103,7 @@ int WINAPI WinMain(
 
 	/* Create the frame */
 	hwnd = CreateWindow((LPCWSTR)WindowClassName,
-		L"Warships Battle",
+		L"Warship Battle",
 		WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -184,14 +184,16 @@ LONG WINAPI MainWndProc(
 		case MENU_GAME_EXIT:
 			SendMessage(hWnd, WM_CLOSE, NULL, NULL);
 			break;
-		case MENU_GAME_PVE:
+		case MENU_GAME_MAINMENU:
 		{
 			engine.StartNewGame();
-			engine.GameMode = engine.GAMEMODE::PVE;
-			engine.SetMode(engine.GAMESTATUS::Deploying);
-
+			engine.GameMode = engine.GAMEMODE::Menu;
+			engine.SetStatus(engine.GAMESTATUS::NewGame);
+		
 			clueField.startX = ClueFieldPosX;
 			statusField.startX = StatusFieldPosX;
+			
+			engine.CloseConnection();
 		}
 		break;
 		default:
@@ -231,23 +233,31 @@ LONG WINAPI MainWndProc(
 	}
 	break;
 	case WM_CLOSE:
-		if (hRC)
-			wglDeleteContext(hRC);
-		if (hDC)
-			ReleaseDC(hWnd, hDC);
-		hRC = 0;
-		hDC = 0;
-		DestroyWindow(hWnd);
-		break;
-
+	{
+		if (MessageBox(hWnd, L"Do you really want to quit Warship Battle?", L"Exit?", MB_ICONWARNING | MB_YESNO) == IDYES)
+		{
+			engine.CloseConnection();
+			engine.WaitForDisconnection();
+			if (hRC)
+				wglDeleteContext(hRC);
+			if (hDC)
+				ReleaseDC(hWnd, hDC);
+			hRC = 0;
+			hDC = 0;
+			DestroyWindow(hWnd);
+		}
+	}
+	break;
 	case WM_DESTROY:
+	{
 		if (hRC)
 			wglDeleteContext(hRC);
 		if (hDC)
 			ReleaseDC(hWnd, hDC);
 		CloseHandle(TimerFuncHandler);
 		PostQuitMessage(0);
-		break;
+	}
+	break;
 	case WM_GETMINMAXINFO:
 	{
 		PMINMAXINFO pMinMaxInfo{ (PMINMAXINFO)lParam };
@@ -357,7 +367,7 @@ GLvoid InitGL(GLsizei width, GLsizei height)
 	glLoadIdentity(); //Reset Coordinate System
 	gluOrtho2D(-(engine.GetOffsetW()), OpenGLWidth + engine.GetOffsetW(), -(engine.GetOffsetH()), OpenGLHeight + engine.GetOffsetH()); //Setting Up 2D ORTHOGRAPHIC projection
 	glMatrixMode(GL_MODELVIEW); //Changing back mode to MODELVIEW mode to start drawing
-	engine.SetMode(engine.GameStatus);
+	engine.SetStatus(engine.GameStatus);
 }
 
 /// <summary>
@@ -374,25 +384,63 @@ GLvoid DrawScene(GLvoid)
 	statisticField.Draw();
 	statusField.Draw();
 	soundButton.Draw();
-	switch (engine.GameStatus)
-	{
-	case Engine::GAMESTATUS::NewGame:
-	{
-		buttonFieldNewGame.Draw();
-	}
-	break;
-	case Engine::GAMESTATUS::Deploying:
-	{
-		buttonFieldDeploy.Draw();
-	}
-	break;
-	case Engine::GAMESTATUS::MainGame:
-	{
-		buttonFieldFire.Draw();
-	}
-	break;
-	}
 
+	switch (engine.GameMode)
+	{
+	case Engine::GAMEMODE::Menu:
+	{
+		switch (engine.GameStatus)
+		{
+		case Engine::GAMESTATUS::NewGame:
+		{
+			buttonFieldNewGame.Draw();
+		}
+		break;
+		default:
+		{
+			buttonFieldConnect.Draw();
+		}
+		}
+	}
+	break;
+	case Engine::GAMEMODE::PVE:
+	{
+		switch (engine.GameStatus)
+		{
+		case Engine::GAMESTATUS::Deploying:
+		{
+			buttonFieldDeploy.Draw();
+		}
+		break;
+		case Engine::GAMESTATUS::MainGame:
+		{
+			buttonFieldFire.Draw();
+		}
+		break;
+		}
+	}
+	break;
+	case Engine::GAMEMODE::PVP:
+	{
+		switch (engine.GameStatus)
+		{
+		case Engine::GAMESTATUS::Deploying:
+		{
+			buttonFieldDeploy.Draw();
+		}
+		break;
+		case Engine::GAMESTATUS::MainGame:
+		{
+			buttonFieldFire.Draw();
+		}
+		break;
+		}
+	}
+	break;
+	default:
+		break;
+	}
+	
 	switch (engine.animation)
 	{
 	case Engine::Animation::None:

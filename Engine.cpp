@@ -14,6 +14,8 @@
 #include "resource.h"
 #include <thread>
 #include "SoundButton.h"
+#include <stdio.h>
+#include <commctrl.h>
 
 extern const float OpenGLHeight;
 extern const float OpenGLWidth;
@@ -34,13 +36,31 @@ extern SoundButton soundButton;
 /// <summary>
 /// Default constructor for engine class.
 /// </summary>
-Engine::Engine() :GameStatus(GAMESTATUS::NewGame), lastGameResults(LastGameResults::N_A),
-fOffsetH(0), fOffsetW(0), fCurrentHeight(0), fCurrentWidth(0), fGLUnitSize(0),
-ShipsDeployed(0), UserTurn(true), animation(Animation::None), LastShotAccomplished(true),
-MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
+Engine::Engine()	:GameMode(GAMEMODE::Menu),
+					GameStatus(GAMESTATUS::NewGame),
+					animation(Animation::None),
+					lastGameResults(LastGameResults::N_A),
+					connection(nullptr),
+					fOffsetH(0),
+					fOffsetW(0),
+					fCurrentHeight(0),
+					fCurrentWidth(0),
+					fGLUnitSize(0),
+					ShipsDeployed(0),
+					UserTurn(true),
+					LastShotAccomplished(true),
+					MatchTimeSec(0),
+					PlayerShipsAlive(10),
+					OpponentShipsAlive(10),
+					NumOfIterations(0)
 {
 	std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
 	this->dtn = tp.time_since_epoch();
+
+	this->netChecker.Connected = true;
+	this->netChecker.CheckingAttemptsFailed = 0;
+	this->netChecker.LastShootingPoint = { 0,0 };
+	this->netChecker.ShotCounter = 0;
 }
 
 /// <summary>
@@ -49,9 +69,9 @@ MatchTimeSec(0), PlayerShipsAlive(10), OpponentShipsAlive(10)
 /// <param name="Pixels: ">Pointer to the desired POINT struct to convert.</param>
 void Engine::ConvertPixelsToGL(POINT* Pixels)
 {
-	Pixels->y = OpenGLHeight * fGLUnitSize - Pixels->y;
-	Pixels->y = floor((Pixels->y / fGLUnitSize) + fOffsetH);
-	Pixels->x = floor((Pixels->x / fGLUnitSize) - fOffsetW);
+	Pixels->y = OpenGLHeight * fGLUnitSize - (float)Pixels->y;
+	Pixels->y = floor(((float)Pixels->y / fGLUnitSize) + fOffsetH);
+	Pixels->x = floor(((float)Pixels->x / fGLUnitSize) - fOffsetW);
 }
 
 /// <summary>
@@ -61,8 +81,8 @@ void Engine::ConvertPixelsToGL(POINT* Pixels)
 /// <param name="Height: ">The current height of the window.</param>
 void Engine::SetWindowGLParam(int Width, int Height)
 {
-	fCurrentHeight = Height;
-	fCurrentWidth = Width;
+	fCurrentHeight = (float)Height;
+	fCurrentWidth = (float)Width;
 	fOffsetW = 0;
 	fOffsetH = 0;
 	if (fCurrentWidth / fCurrentHeight < AspectRatio)
@@ -109,17 +129,187 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	{
 	case this->GAMEMODE::Menu:
 	{
-		switch (TranslatedMSG)
+		switch (this->GameStatus)
 		{
-		case TRANSLATEDMSG_NEWGAMEPVE:
+		case GAMESTATUS::NewGame:
 		{
-			this->StartNewGame();
-			this->GameMode = this->GAMEMODE::PVE;
-			this->SetMode(this->GAMESTATUS::Deploying);
+			if(connection) this->CloseConnection();
+
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_NEWGAMEPVE:
+			{
+				this->StartNewGame();
+				this->GameMode = GAMEMODE::PVE;
+				this->SetStatus(GAMESTATUS::Deploying);
+			}
+			break;
+			case TRANSLATEDMSG_NEWGAMEPVP:
+			{
+				this->StartNewGame();
+				this->GameStatus = GAMESTATUS::ChoosingConnectionMode;
+			}
+			break;
+			}
 		}
 		break;
-		case TRANSLATEDMSG_NEWGAMEPVP:
+		case GAMESTATUS::ChoosingConnectionMode:
 		{
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_AUTO:
+			{
+				this->GameStatus = GAMESTATUS::AutoConnection;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_MANUAL:
+			{
+				this->GameStatus = GAMESTATUS::ChoosingConnectionSide;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::ChoosingConnectionSide:
+		{
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_SERVER:
+			{
+				this->GameStatus = GAMESTATUS::ServerConnection;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CLIENT:
+			{
+				this->GameStatus = GAMESTATUS::ClientConnection;
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::ClientConnection:
+		{
+			if (!this->connection)
+			{
+				this->connection = new Connection(UDP::ConnectionType::CLIENT);
+				this->connection->AsyncManualConnect();
+				if (this->connection->GetLastError(false) != UDP::LastError::NONE)
+				{
+					MessageBox(hwnd, L"Error in connection", L"Error", MB_ICONERROR);
+				}
+			}
+			if (this->connection->Connected())
+			{
+				this->SetStatus(GAMESTATUS::Deploying);
+				this->GameMode = GAMEMODE::PVP;
+			}
+
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_INPUTIP:
+			{
+				DialogBox(NULL, MAKEINTRESOURCE(IDD_DIALOG3), hwnd, InputIP);
+
+				std::string TempStr;
+				TempStr = std::to_string(this->IPpart[0]);
+				TempStr += ".";
+				TempStr += std::to_string(this->IPpart[1]);
+				TempStr += ".";
+				TempStr += std::to_string(this->IPpart[2]);
+				TempStr += ".";
+				TempStr += std::to_string(this->IPpart[3]);
+
+				this->connection->SetConnectingIP((char*)TempStr.c_str());
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->connection->AsyncDisconnect();
+				this->GameStatus = GAMESTATUS::Disconnecting;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::ServerConnection:
+		{
+			if (!this->connection)
+			{
+				this->connection = new Connection(UDP::ConnectionType::SERVER);
+				this->connection->AsyncManualConnect();
+				if (this->connection->GetLastError(false) != UDP::LastError::NONE)
+				{
+					MessageBox(hwnd, L"Error in connection", L"Error", MB_ICONERROR);
+				}
+			}
+			if (this->connection->Connected())
+			{
+				this->SetStatus(GAMESTATUS::Deploying);
+				this->GameMode = GAMEMODE::PVP;
+			}
+
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_SHOWIP:
+			{
+				char* MyIP = this->connection->GetMyIP();
+				std::string IPstr(MyIP);
+				MessageBoxA(hwnd, (LPCSTR)IPstr.c_str(), "Your IP is:", MB_OK);
+			}
+			break;
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->connection->AsyncDisconnect();
+				this->GameStatus = GAMESTATUS::Disconnecting;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::AutoConnection:
+		{
+			if (!connection)
+			{
+				connection = new Connection(UDP::ConnectionType::AUTO);
+				this->connection->AsyncAutoConnect();
+			}
+			if (this->connection->Connected())
+			{
+				this->SetStatus(GAMESTATUS::Deploying);
+				this->GameMode = GAMEMODE::PVP;
+			}
+			switch (TranslatedMSG)
+			{
+			case TRANSLATEDMSG_CONNECTION_CANCEL:
+			{
+				this->connection->AsyncDisconnect();
+				this->GameStatus = GAMESTATUS::Disconnecting;
+			}
+			break;
+			}
+		}
+		break;
+		case GAMESTATUS::Disconnecting:
+		{
+			if (connection->Disconnected())
+			{
+				delete this->connection;
+				this->connection = nullptr;
+				this->GameMode = GAMEMODE::Menu;
+				this->GameStatus = GAMESTATUS::NewGame;
+			}
 		}
 		break;
 		}
@@ -156,6 +346,10 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 			case TRANSLATEDMSG_DEPLOY:
 			{
 				buttonFieldDeploy.Deploy();
+				if (this->ShipsDeployed == 10)
+				{
+					engine.SetStatus(Engine::GAMESTATUS::MainGame);
+				}
 			}
 			break;
 			case TRANSLATEDMSG_ROTATE:
@@ -234,7 +428,205 @@ bool Engine::Event(int MSG, POINT Coordinates, unsigned int key)
 	break;
 	case this->GAMEMODE::PVP:
 	{
+		if (this->connection)
+		{
+			if (++this->NumOfIterations == this->MaxNumOfIterations)
+			{
+				std::string MsgToSend = std::to_string(netChecker.ShotCounter) + " " +
+					std::to_string(netChecker.LastShootingPoint.x) +
+					std::to_string(netChecker.LastShootingPoint.y);
 
+				this->connection->SendMSG(TYPE_CHECK, FLAG_ONE, (char*)MsgToSend.c_str());
+				this->NumOfIterations = 0;
+			}
+			UDP::MSG Msg;
+			if (this->connection->ReceiveMSG(Msg, 1))
+			{
+				if (Msg.TYPE == TYPE_CHECK && Msg.FLAG == FLAG_ONE)
+				{
+					unsigned short int SpacePos = 0;
+
+					while (Msg.msg[SpacePos] != ' ')
+					{
+						SpacePos++;
+					}
+
+					std::string ShotCounter{};
+
+					for (int i = 0; i < SpacePos; i++)
+					{
+						ShotCounter += Msg.msg[i];
+					}
+
+					if (std::to_string(netChecker.RecievedShotCounter) != ShotCounter)
+					{
+						this->EnemyFieldMsgRecieved = true;
+						this->PointRecieved = { ((int)Msg.msg[SpacePos + 1]) - 48,((int)Msg.msg[SpacePos + 2]) - 48 };
+
+						this->netChecker.RecievedShotCounter++;
+					}
+
+					this->netChecker.CheckingFunc(true);
+				}
+				else if (Msg.TYPE == TYPE_DEPLOYING && Msg.FLAG == FLAG_ONE)
+				{
+					this->ShipsMSG(Msg.msg);
+					this->OpponentIsReady = true;
+				}
+				else if (Msg.TYPE == TYPE_MAINGAME && Msg.FLAG == FLAG_ONE)
+				{
+					this->EnemyFieldMsgRecieved = true;
+					this->PointRecieved = { ((int)Msg.msg[0]) - 48,((int)Msg.msg[1]) - 48 };
+
+					this->netChecker.RecievedShotCounter++;
+				}
+				else
+				{
+					netChecker.CheckingFunc(false);
+					if (!netChecker.Connected)
+					{
+						this->CloseConnection();
+						MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
+						this->StartNewGame();
+
+						clueField.startX = ClueFieldPosX;
+						statusField.startX = StatusFieldPosX;
+					}
+				}
+			}
+			else
+			{
+				netChecker.CheckingFunc(false);
+				if (!netChecker.Connected)
+				{
+					this->CloseConnection();
+					MessageBoxA(hwnd, "Disconnected from opponent.", "Disconnected.", NULL);
+					this->StartNewGame();
+
+					clueField.startX = ClueFieldPosX;
+					statusField.startX = StatusFieldPosX;
+				}
+			}
+		}
+
+		switch (this->GameStatus)
+		{
+		case GAMESTATUS::Deploying:
+		{
+			if (engine.ShipsDeployed == 10)
+			{
+				if (this->OpponentIsReady)
+				{
+					this->SetStatus(GAMESTATUS::MainGame);
+
+					if (this->connection->Connected(UDP::ConnectionType::SERVER)) this->UserTurn = true;
+					else this->UserTurn = false;
+				}
+			}
+			else
+			{
+				switch (TranslatedMSG)
+				{
+				case TRANSLATEDMSG_MOVESHIPL:
+				{
+					userField.MoveActiveShip(BF_MOVE_LEFT);
+				}
+				break;
+				case TRANSLATEDMSG_MOVESHIPR:
+				{
+					userField.MoveActiveShip(BF_MOVE_RIGHT);
+				}
+				break;
+				case TRANSLATEDMSG_MOVESHIPUP:
+				{
+					userField.MoveActiveShip(BF_MOVE_UP);
+				}
+				break;
+				case TRANSLATEDMSG_MOVESHIPDOWN:
+				{
+					userField.MoveActiveShip(BF_MOVE_DOWN);
+				}
+				break;
+				case TRANSLATEDMSG_DEPLOY:
+				{
+					buttonFieldDeploy.Deploy();
+					if (engine.ShipsDeployed == 10)
+					{
+						std::string StrMsg = this->ShipsMSG();
+
+						char* MSGToSend = &StrMsg[0];
+
+						connection->SendMSG(TYPE_DEPLOYING, FLAG_ONE, MSGToSend);
+					}
+				}
+				break;
+				case TRANSLATEDMSG_ROTATE:
+				{
+					userField.RotateActiveShip();
+				}
+				break;
+				default:
+					return MSG_VOID;
+					break;
+				}
+			}
+		}
+		break;
+		case GAMESTATUS::MainGame:
+		{
+			switch (this->UserTurn)
+			{
+			case true:
+			{
+				switch (TranslatedMSG)
+				{
+				case TRANSLATEDMSG_RANDOMAIM:
+				{
+					userField.SetAimPoint(enemyField.RandomSelect());
+				}
+				break;
+				case TRANSLATEDMSG_AIM:
+				{
+					userField.SetAimPoint(enemyField.Select(this->MSGParam.FieldCoordinates.x, this->MSGParam.FieldCoordinates.y));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_LEFT:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_LEFT));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_RIGHT:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_RIGHT));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_DOWN:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_DOWN));
+				}
+				break;
+				case TRANSLATEDMSG_MOVE_UP:
+				{
+					userField.SetAimPoint(enemyField.MoveSelection(BF_MOVE_UP));
+				}
+				break;
+				case TRANSLATEDMSG_FIRE:
+				{
+					if (this->LastShotAccomplished) this->NetShoot();
+				}
+				break;
+				}
+			}
+			break;
+			case false:
+			{
+				this->NetShootRecv();
+			}
+			break;
+			}
+		}
+		break;
+		}
 	}
 	break;
 	}
@@ -281,6 +673,56 @@ void Engine::Shoot(Field* FieldFrom, Field* FieldTo)
 
 	const short int AnswerStatus = FieldTo->ShootRecieve(Aimpoint);
 	FieldFrom->ShootAnswer(AnswerStatus);
+}
+
+void Engine::NetShoot()
+{
+	if (!enemyField.CanFire())
+	{
+		if (soundButton.State == SoundButton::STATE::On)
+		{
+			PlaySound(NULL, NULL, NULL);
+			PlaySound(MAKEINTRESOURCE(S_WAVE_ERROR), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+		}
+		return;
+	}
+
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, 0, 0);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_SHOOT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
+
+	this->LastShotAccomplished = false;
+
+	const POINT Aimpoint = userField.ShootCreate();
+	std::string Msg = std::to_string(Aimpoint.x) + std::to_string(Aimpoint.y);
+	this->connection->SendMSG(TYPE_MAINGAME, FLAG_ONE, (char*)Msg.c_str());
+
+	this->StartAnimation(&enemyField, Aimpoint);
+
+	enemyField.ShootRecieve(Aimpoint);
+
+	this->netChecker.LastShootingPoint = Aimpoint;
+	this->netChecker.ShotCounter++;
+}
+
+void Engine::NetShootRecv()
+{
+	if (!this->EnemyFieldMsgRecieved) return;
+
+	if (soundButton.State == SoundButton::STATE::On)
+	{
+		PlaySound(NULL, 0, 0);
+		PlaySound(MAKEINTRESOURCE(S_WAVE_SHOOT), GetModuleHandle(NULL), SND_RESOURCE | SND_ASYNC | SND_NOSTOP);
+	}
+
+	this->StartAnimation(&userField, this->PointRecieved);
+
+	userField.ShootRecieve(this->PointRecieved);
+
+	this->EnemyFieldMsgRecieved = false;
+	this->PointRecieved = { 0,0 };
 }
 
 void Engine::IncreaseMatchTime()
@@ -330,17 +772,28 @@ void Engine::DecreaseShipsAlive(bool User)
 
 void Engine::StartNewGame()
 {
+	userField.CleanShips();
+	userField.ClearField();
+
 	enemyField.NewGameReset();
+
 	this->MatchTimeSec = 0;
 	this->ShipsDeployed = 0;
 	this->PlayerShipsAlive = 10;
 	this->OpponentShipsAlive = 10;
+	this->OpponentIsReady = false;
 	this->UserTurn = true;
+
+	this->netChecker.CheckingAttemptsFailed = 0;
+	this->netChecker.Connected = true;
+	this->netChecker.LastShootingPoint = { 0,0 };
+	this->netChecker.ShotCounter = 0;
+	this->netChecker.RecievedShotCounter = 0;
 }
 
 void Engine::GameOver(bool UserWon)
 {
-	this->SetMode(this->GAMESTATUS::NewGame);
+	this->SetStatus(this->GAMESTATUS::NewGame);
 
 	this->animation = Animation::MainMenu;
 	this->menuAnimation.DefaultDirection = false;
@@ -362,10 +815,10 @@ void Engine::GameOver(bool UserWon)
 }
 
 /// <summary>
-/// Sets the game mode.
+/// Sets the GAMESTATUS.
 /// </summary>
-/// <param name="Mode: ">The new mode to be set.</param>
-void Engine::SetMode(GAMESTATUS GameStatus)
+/// <param name="GameStatus: ">The new GAMESTATUS to be set.</param>
+void Engine::SetStatus(GAMESTATUS GameStatus)
 {
 	this->GameStatus = GameStatus;
 	this->ShipsDeployed = 0;
@@ -497,6 +950,125 @@ int Engine::TranslateMSG(POINT Coordinates, const int MSG, const unsigned int Ke
 		}
 	}
 	break;
+	case GAMESTATUS::ChoosingConnectionMode:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_AUTO;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_MANUAL;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	case GAMESTATUS::ChoosingConnectionSide:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_SERVER;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CLIENT;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
+	case GAMESTATUS::ServerConnection:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return MSG_VOID;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_SHOWIP;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
+	case GAMESTATUS::ClientConnection:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return MSG_VOID;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_INPUTIP;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
+	case GAMESTATUS::AutoConnection:
+	{
+		if (!buttonFieldConnect.Click(Coordinates)) return MSG_VOID;
+		this->MSGParam.FieldCoordinates = Coordinates;
+		switch (buttonFieldConnect.Cells[Coordinates.x][Coordinates.y].ButtonID)
+		{
+		case BF_CONNECT_TOP_BUTTON:
+		{
+			return MSG_VOID;
+		}
+		break;
+		case BF_CONNECT_MIDDLE_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_SHOWIP;
+		}
+		break;
+		case BF_CONNECT_BOTTOM_BUTTON:
+		{
+			return TRANSLATEDMSG_CONNECTION_CANCEL;
+		}
+		break;
+		}
+	}
+	break;
 	case GAMESTATUS::MainGame:
 	{
 		switch (MSG)
@@ -563,6 +1135,160 @@ void Engine::SwitchTurns()
 	this->UserTurn = !this->UserTurn;
 }
 
+void Engine::CloseConnection()
+{
+	if (this->connection)
+	{
+		this->connection->AsyncDisconnect();
+		this->GameStatus = GAMESTATUS::Disconnecting;
+		this->GameMode = GAMEMODE::Menu;
+	}
+}
+
+void Engine::WaitForDisconnection()
+{
+	if (!this->connection) return;
+	while (true)
+	{
+		if (this->connection->Disconnected())
+		{
+			delete this->connection;
+			this->connection = nullptr;
+			return;
+		}
+	}
+}
+
+void Engine::ShipsMSG(char* RecievedMSG)
+{
+	unsigned int MSGPos = 0;
+
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		this->RecievedShips[i].Size = ((int)RecievedMSG[MSGPos]) - 48;
+		MSGPos++;
+		this->RecievedShips[i].Rotated = ((int)RecievedMSG[MSGPos]) - 48;
+		MSGPos++;
+
+		switch (this->RecievedShips[i].Size)
+		{
+		case 1:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Single;
+			break;
+		case 2:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Back;
+			this->RecievedShips[i].Decks[1].Type = Deck::DeckType::Front;
+			break;
+		case 3:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Back;
+			this->RecievedShips[i].Decks[1].Type = Deck::DeckType::Middle;
+			this->RecievedShips[i].Decks[2].Type = Deck::DeckType::Front;
+			break;
+		case 4:
+			this->RecievedShips[i].Decks[0].Type = Deck::DeckType::Back;
+			this->RecievedShips[i].Decks[1].Type = Deck::DeckType::Middle;
+			this->RecievedShips[i].Decks[2].Type = Deck::DeckType::Middle;
+			this->RecievedShips[i].Decks[3].Type = Deck::DeckType::Front;
+			break;
+		}
+
+		for (int j = 0; j < this->RecievedShips[i].Size; j++)
+		{
+			this->RecievedShips[i].Decks[j].Position.x = ((int)RecievedMSG[MSGPos]) - 48;
+			MSGPos++;
+			this->RecievedShips[i].Decks[j].Position.y = ((int)RecievedMSG[MSGPos]) - 48;
+			MSGPos++;
+		}
+	}
+}
+
+std::string Engine::ShipsMSG()
+{
+	const unsigned short int BytesToSend = 60;
+	char MSG[BytesToSend + 1]{};
+	unsigned int MSGPos = 0;
+
+	for (int i = 0; i < MAX_SHIPS_COUNT; i++)
+	{
+		MSG[MSGPos] = ((char)userField.Ships[i].Size) + 48;
+		MSGPos++;
+		MSG[MSGPos] = ((char)userField.Ships[i].Rotated) + 48;
+		MSGPos++;
+
+		for (int j = 0; j < userField.Ships[i].Size; j++)
+		{
+			MSG[MSGPos] = ((char)userField.Ships[i].Decks[j].Position.x) + 48;
+			MSGPos++;
+			MSG[MSGPos] = ((char)userField.Ships[i].Decks[j].Position.y) + 48;
+			MSGPos++;
+		}
+	}
+
+	MSG[BytesToSend] = '\0';
+
+	std::string ReturnMSG{};
+
+	for (int i = 0; i < BytesToSend; i++)
+	{
+		ReturnMSG += MSG[i];
+	}
+
+	return ReturnMSG;
+}
+
+INT_PTR Engine::InputIP(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	static HWND hWndIPAddress;
+
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+	{
+		hWndIPAddress = CreateWindowEx(0,
+			WC_IPADDRESS,
+			NULL,
+			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
+			40, 33, 150, 25,
+			hDlg,
+			NULL,
+			NULL,
+			NULL);
+
+		LPARAM lpAdr = MAKEIPADDRESS(192, 168, 1, 1);
+
+		SendMessage(hWndIPAddress, IPM_SETADDRESS, 0, lpAdr);
+
+		return (INT_PTR)TRUE;
+	}
+	break;
+	case WM_COMMAND:
+	{
+		if (LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		else if (LOWORD(wParam) == IDOK)
+		{
+			DWORD Addr{};
+
+			SendMessage(hWndIPAddress, IPM_GETADDRESS, NULL, (LPARAM)(LPDWORD)&Addr);
+
+			engine.IPpart[0] = FIRST_IPADDRESS((LPARAM)Addr);
+			engine.IPpart[1] = SECOND_IPADDRESS((LPARAM)Addr);
+			engine.IPpart[2] = THIRD_IPADDRESS((LPARAM)Addr);
+			engine.IPpart[3] = FOURTH_IPADDRESS((LPARAM)Addr);
+
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+	}
+	break;
+	}
+	return (INT_PTR)FALSE;
+}
+
 void Engine::StartAnimation(Field* field, POINT ShootingPoint)
 {
 	this->animation = Animation::Rocket;
@@ -611,7 +1337,7 @@ void Engine::AnimationRocket::Draw()
 
 			glPushMatrix();
 			glTranslatef(this->Position[1].x, this->Position[1].y, 0);
-			glScaled((this->FrameCount / 2), this->FrameCount / 2, 1);
+			glScaled((this->FrameCount / (float)2), this->FrameCount / (float)2, 1);
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textureManager.ExplosionTextureID);
 
@@ -801,5 +1527,15 @@ void Engine::MenuAnimation::Draw()
 		}
 	}
 	break;
+	}
+}
+
+void Engine::NetChecker::CheckingFunc(bool success)
+{
+	if (success) { this->CheckingAttemptsFailed = 0; this->Connected = true; }
+	else
+	{
+		if (++this->CheckingAttemptsFailed == this->MaxCheckingFails)
+			this->Connected = false;
 	}
 }

@@ -1,8 +1,10 @@
+#include "Engine.h"
 #include "ButtonFieldConnect.h"
 #include "TextureManager.h"
 #include "resource.h"
 
 extern TextureManager textureManager;
+extern Engine engine;
 
 /// <summary>
 /// Default constructor for the ButtonFieldConnect class.
@@ -13,22 +15,12 @@ ButtonFieldConnect::ButtonFieldConnect(int StartX, int StartY)
 {
 	this->StartX = StartX;
 	this->StartY = StartY;
-	this->Cells[0][0].ButtonID = BF_CANCEL;
-	this->Cells[0][1].ButtonID = BF_DISCONNECT;
-
-	this->Cells[0][2].ButtonID = BF_CONNECT;
-
-	this->Cells[1][0].ButtonID = BF_CANCEL;
-
-	this->Cells[1][1].ButtonID = BF_DISCONNECT;
-
-	this->Cells[1][2].ButtonID = BF_CONNECT;
-
-	this->Cells[2][0].ButtonID = BF_CANCEL;
-
-	this->Cells[2][1].ButtonID = BF_DISCONNECT;
-	this->Cells[2][2].ButtonID = BF_CONNECT;
-
+	for (int i = 0; i < 4; i++)
+	{
+		this->Cells[i][0].ButtonID = BF_CONNECT_BOTTOM_BUTTON;
+		this->Cells[i][1].ButtonID = BF_CONNECT_MIDDLE_BUTTON;
+		this->Cells[i][2].ButtonID = BF_CONNECT_TOP_BUTTON;
+	}
 }
 
 /// <summary>
@@ -52,36 +44,48 @@ bool ButtonFieldConnect::Click(POINT& coordinates)
 /// </summary>
 void ButtonFieldConnect::Draw()
 {
+	GLuint TextureID{};
+	switch (engine.GameStatus)
+	{
+	case Engine::GAMESTATUS::ChoosingConnectionMode:
+	{
+		TextureID = textureManager.ButtonFieldConnect_AutoManualTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ChoosingConnectionSide:
+	{
+		TextureID = textureManager.ButtonFieldConnect_M_ServerClientTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ServerConnection:
+	{
+		TextureID = textureManager.ButtonFieldConnect_M_ServerConnectionTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::ClientConnection:
+	{
+		TextureID = textureManager.ButtonFieldConnect_M_ClientConnectionTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::AutoConnection:
+	{
+		TextureID = textureManager.ButtonFieldConnect_A_ConnectionTextureID;
+	}
+	break;
+	case Engine::GAMESTATUS::Disconnecting:
+	{
+		TextureID = textureManager.ButtonFieldPleaseWaitTextureID;
+	}
+	break;
+	}
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_ConnectTextureID);
-
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 1);
-	glTexCoord2d(1, 0); glVertex2f(this->StartX + 2.98f, ButtonFieldH + this->StartY - 1);
-	glTexCoord2d(1, 1); glVertex2f(this->StartX + 2.98f, ButtonFieldH + this->StartY);
-	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY);
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_DisconnectTextureID);
-
-	glBegin(GL_QUADS);
-	glTexCoord2d(0, 0); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 2);
-	glTexCoord2d(1, 0); glVertex2f(this->StartX + 2.98f, ButtonFieldH + this->StartY - 2);
-	glTexCoord2d(1, 1); glVertex2f(this->StartX + 2.98f, ButtonFieldH + this->StartY - 1);
-	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY - 1);
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, textureManager.Btn_CancelTextureID);
+	glBindTexture(GL_TEXTURE_2D, TextureID);
 
 	glBegin(GL_QUADS);
 	glTexCoord2d(0, 0); glVertex2f(this->StartX, this->StartY);
-	glTexCoord2d(1, 0); glVertex2f(this->StartX + 2.98f, this->StartY);
-	glTexCoord2d(1, 1); glVertex2f(this->StartX + 2.98f, this->StartY + 1);
-	glTexCoord2d(0, 1); glVertex2f(this->StartX, this->StartY + 1);
+	glTexCoord2d(1, 0); glVertex2f(this->StartX + ButtonFieldW, this->StartY);
+	glTexCoord2d(1, 1); glVertex2f(this->StartX + ButtonFieldW, ButtonFieldH + this->StartY);
+	glTexCoord2d(0, 1); glVertex2f(this->StartX, ButtonFieldH + this->StartY);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 }

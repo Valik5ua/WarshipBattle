@@ -1,7 +1,7 @@
 #pragma once
+#include "Engine.h"
 #include "Field.h"
 #include "Cell.h"
-#include "Engine.h"
 #include <vector>
 #include "resource.h"
 
@@ -34,6 +34,7 @@ public:
 private:
 	void SetShipDeployableStatus(Ship& ship);
 	void DeployEnemyShips();
+	void DeployEnemyShips(Ship RecievedShips[MAX_SHIPS_COUNT]);
 	void ClearField();
 	void CleanShips();
 	void Deselect();
