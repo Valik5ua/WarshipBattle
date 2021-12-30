@@ -199,7 +199,6 @@
     <ClInclude Include="Field.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Settings.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="SoundButton.h" />
     <ClInclude Include="StatisticField.h" />
